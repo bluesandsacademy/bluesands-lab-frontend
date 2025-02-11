@@ -5,7 +5,7 @@ import Link from "next/link"
 export default function UserLogin() {
 
     useEffect(() => {
-        document.title = "Sign In | Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences"
+        document.title = "Welcome Back! | Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences"
     }, [])
 
     return (
@@ -14,7 +14,7 @@ export default function UserLogin() {
                 <div className='w-full flex justify-center relative z-0'>
                     <img src="/images/bg/cover.png" className="w-full object-contain z-0" alt="" />
                     <div className="absolute text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-3">
-                        <h1 className="text-2xl md:text-4xl font-normal">Create your Account</h1>
+                        <h1 className="text-2xl md:text-4xl font-normal">Welcome Back!</h1>
                         <p className="font-thin md:text-lg text-sm md:max-w-lg max-w-xs">Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences</p>
                     </div>
                 </div>
