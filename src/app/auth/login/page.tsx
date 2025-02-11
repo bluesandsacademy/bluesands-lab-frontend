@@ -5,7 +5,7 @@ import Link from "next/link"
 export default function UserLogin() {
 
     useEffect(() => {
-        document.title = "Create your Account | Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences"
+        document.title = "Sign In | Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences"
     }, [])
 
     return (
