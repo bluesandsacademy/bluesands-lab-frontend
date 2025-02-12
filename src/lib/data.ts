@@ -211,3 +211,47 @@ export const workPositions = [
     "Online Instructor/ Coordinator",
     "Others",
 ];
+
+interface SidebarLinks {
+    title: string;
+    url: string;
+    icon: string
+}
+
+export const sidebarLinks: SidebarLinks[] = [
+    {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: "/images/icon/home.svg"
+    },
+    {
+        title: "Experiments",
+        url: "/dashboard/experiments",
+        icon: "/images/icon/beaker.svg"
+    },
+    {
+        title: "VR Studio",
+        url: "/dashboard/vr-studio",
+        icon: "/images/icon/vr_headset.svg"
+    },
+    {
+        title: "VR Experience",
+        url: "/dashboard/vr-experience",
+        icon: "/images/icon/game_vr_headset.svg"
+    },
+    {
+        title: "STEM Courses",
+        url: "/dashboard/stem-courses",
+        icon: "/images/icon/notepad.svg"
+    },
+    {
+        title: "STEM Quiz",
+        url: "/dashboard/stem-quiz",
+        icon: "/images/icon/quiz.svg"
+    },
+    {
+        title: "Report",
+        url: "/dashboard/report",
+        icon: "/images/icon/report.svg"
+    },
+]
