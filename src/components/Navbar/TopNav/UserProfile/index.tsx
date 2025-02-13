@@ -34,7 +34,7 @@ export default function UserProfile({ profile }: any) {
                         </Link>
                     )
                 })}
-                <div className="w-full">
+                <div className="w-full hover:cursor-pointer">
                     <span className="px-3 flex items-center gap-x-3">
                         <img src="/images/icon/logout_red.svg" alt="" />
                         Logout
