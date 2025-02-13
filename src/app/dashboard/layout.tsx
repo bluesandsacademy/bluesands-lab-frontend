@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Sidebar from "@/components/Navbar/Sidebar";
+import TopNav from "@/components/Navbar/TopNav";
 
 export const metadata: Metadata = {
     title: "Dashboard | Blue Sands Stem Labs"
@@ -10,7 +11,10 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
     return (
         <main className="flex w-full">
             <Sidebar />
-            <div className="bg-[#F5F6FA] w-full p-3">{children}</div>
+            <div className="bg-[#F5F6FA] w-full flex flex-col">
+                <TopNav />
+                {children}
+            </div>
         </main>
     )
 }
