@@ -255,3 +255,44 @@ export const sidebarLinks: SidebarLinks[] = [
         icon: "/images/icon/report.svg"
     },
 ]
+
+export type Profile = {
+    fullName: string;
+    accountType: "Individual" | "School";
+    avatarUrl: string;
+}
+
+export const profile: Profile = {
+    fullName: "John Doe",
+    accountType: "Individual",
+    avatarUrl: "/images/avatar/user01.png"
+}
+
+interface ProfileDropdown {
+    title: string;
+    url: string;
+    imgSrc: string;
+}
+
+
+export const profileDropdown: ProfileDropdown[] = [
+    {
+        title: "Profile",
+        url: "/dashboard/profile",
+        imgSrc: "/images/icon/profile.svg"
+    },
+    {
+        title: "Change Password",
+        url: "/dashboard/change-password",
+        imgSrc: "/images/icon/change_password.svg"
+    },
+]
+
+
+export const languageOptions = [
+    "English",
+    "Hausa",
+    "Igbo",
+    "Yoruba",
+    "Pidgin"
+]
