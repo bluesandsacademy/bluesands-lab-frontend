@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
     return (
         <main className="flex w-full">
             <Sidebar />
-            <div className="bg-[#F5F6FA] w-full flex flex-col">
+            <div className="bg-[#F5F6FA] w-full flex flex-col max-h-screen overflow-y-scroll">
                 <TopNav />
                 {children}
             </div>
