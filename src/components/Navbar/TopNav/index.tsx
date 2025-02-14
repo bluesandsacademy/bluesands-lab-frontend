@@ -22,7 +22,7 @@ export default function TopNav() {
     }
 
     return (
-        <nav className="bg-white h-20 flex p-3 items-center justify-between">
+        <nav className="bg-white h-20 flex px-5 py-3 items-center justify-between">
             <h3 className="font-semibold text-2xl flex items-center gap-x-3">
                 {breadcrumb.map((crumb, index) => {
                     return (
