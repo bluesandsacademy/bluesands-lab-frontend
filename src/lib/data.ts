@@ -296,3 +296,46 @@ export const languageOptions = [
     "Yoruba",
     "Pidgin"
 ]
+export interface Stat {
+    title: string;
+    percentage: string;
+    icon: string;
+    trendIcon: string;
+    percentageChange: string;
+    timeFrame: string;
+}
+
+export const stats: Stat[] = [
+    {
+        title: "Attendance",
+        percentage: "90%",
+        icon: "/images/icon/calendar.svg",
+        trendIcon: "/images/icon/trend_up.svg",
+        percentageChange: "8.5%",
+        timeFrame: "from last month"
+    },
+    {
+        title: "Lab Completion Rate",
+        percentage: "75%",
+        icon: "/images/icon/beaker_01.svg",
+        trendIcon: "/images/icon/trend_up.svg",
+        percentageChange: "8.5%",
+        timeFrame: "from yesterday"
+    },
+    {
+        title: "Quiz Average ",
+        percentage: "85%",
+        icon: "/images/icon/clipboard.svg",
+        trendIcon: "/images/icon/trend_up.svg",
+        percentageChange: "8.5%",
+        timeFrame: "from yesterday"
+    },
+    {
+        title: "Experiment Attempts",
+        percentage: "20 Attempts",
+        icon: "/images/icon/microscope.svg",
+        trendIcon: "/images/icon/trend_up.svg",
+        percentageChange: "8.5%",
+        timeFrame: "from yesterday"
+    },
+]
