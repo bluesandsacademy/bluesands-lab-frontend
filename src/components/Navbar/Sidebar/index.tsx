@@ -14,7 +14,7 @@ export default function Sidebar() {
                 {sidebarLinks.map((link, index) => {
                     return (
                         <>
-                            <Link key={index} href={link.url} className={`flex items-center text-[0.7rem] gap-x-3 px-3 py-2 rounded-md ${pathname === link.url ? "bg-bgBlue text-white" : ""}`}>
+                            <Link key={index} href={link.url} className={`flex items-center text-[0.85rem] gap-x-3 px-3 py-2 rounded-md ${pathname === link.url ? "bg-bgBlue text-white" : ""}`}>
                                 <img
                                     src={link.icon}
                                     alt={link.title}
@@ -28,13 +28,15 @@ export default function Sidebar() {
 
                 <hr />
 
-                <button className="flex items-center text-sm gap-x-3 px-3 py-3 rounded-md">
+                <button className="flex items-center text-sm gap-x-3 px-3 py-3 rounded-md text-[0.85rem]">
                     <img src="/images/icon/logout.svg" alt="Logout" />
                     <p>Logout</p>
                 </button>
             </div>
-            <div>
-                
+            <div className="mt-10">
+                <Link href="/system/chat">
+                    <img src="/images/bg/amai.svg" alt="" />
+                </Link>
             </div>
         </nav>
     )
