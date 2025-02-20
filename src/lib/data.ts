@@ -256,11 +256,12 @@ export const sidebarLinks: SidebarLinks[] = [
     },
 ]
 
-export type Profile = {
-    fullName: string;
-    accountType: "Individual" | "School";
-    avatarUrl: string;
-}
+export type Profile =
+    {
+        fullName: string;
+        accountType: "Individual" | "School";
+        avatarUrl: string;
+    }
 
 export const profile: Profile = {
     fullName: "John Doe",
@@ -337,5 +338,139 @@ export const stats: Stat[] = [
         trendIcon: "/images/icon/trend_up.svg",
         percentageChange: "8.5%",
         timeFrame: "from yesterday"
+    },
+]
+
+interface UpcomingCourse {
+    title: string;
+    timeline: string;
+    iconURI: string
+}
+
+export const upcomingCourses: UpcomingCourse[] = [
+    {
+        title: "Introduction to Chemical Reactions",
+        timeline: "December 5th, 2024 - 10:00 AM to 11:30 AM.",
+        iconURI: "/images/icon/beaker_outline.svg"
+    },
+    {
+        title: "Newton's Law of Motion",
+        timeline: "December 5th, 2024 - 10:00 AM to 11:30 AM.",
+        iconURI: "/images/icon/physics_outline.svg"
+    },
+    {
+        title: "Basics of Organic Chemistry",
+        timeline: "December 5th, 2024 - 10:00 AM to 11:30 AM.",
+        iconURI: "/images/icon/organic_chemistry_outline.svg"
+    },
+    {
+        title: "DNA Replication Workshop",
+        timeline: "December 5th, 2024 - 10:00 AM to 11:30 AM.",
+        iconURI: "/images/icon/biology_outline.svg"
+    },
+    {
+        title: "Basics of Organic Chemistry",
+        timeline: "December 5th, 2024 - 10:00 AM to 11:30 AM.",
+        iconURI: "/images/icon/gear_outline.svg"
+    },
+    {
+        title: "Basics of Organic Chemistry",
+        timeline: "December 5th, 2024 - 10:00 AM to 11:30 AM.",
+        iconURI: "/images/icon/bacteria_outline.svg"
+    },
+]
+
+interface Performance {
+    courseTitle: string;
+    timeSpent: string;
+    quizAttemptFrequency: number;
+    completion: number;
+    iconURI: string;
+}
+
+export const performance: Performance[] = [
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 90,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
+    },
+    {
+        courseTitle: "Chemistry",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/chemistry.svg"
+    },
+    {
+        courseTitle: "Biology",
+        timeSpent: "8 hours",
+        completion: 30,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/biology.svg"
+    },
+    {
+        courseTitle: "Biology",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/biology.svg"
+    },
+    {
+        courseTitle: "Chemistry",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/chemistry.svg"
+    },
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
+    },
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
+    },
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
+    },
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
+    },
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
+    },
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
+    },
+    {
+        courseTitle: "Physics",
+        timeSpent: "8 hours",
+        completion: 60,
+        quizAttemptFrequency: 3,
+        iconURI: "/images/icon/performance/physics.svg"
     },
 ]
