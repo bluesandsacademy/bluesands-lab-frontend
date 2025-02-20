@@ -56,3 +56,21 @@ input[type="number"] {
   opacity: 1;
   transform: rotate(3deg) translate(0px, -4px);
 }
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
