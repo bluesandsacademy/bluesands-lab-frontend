@@ -5,7 +5,7 @@ export default function Stats({ stats }: any) {
         <section className="w-full grid grid-cols-4 gap-4">
             {stats.map((stat: Stat, index: number) => {
                 return (
-                    <div key={index} className="border p-5 rounded-2xl shadow bg-white">
+                    <div key={index} className="p-5 rounded-2xl bg-white">
                         <div className="flex justify-between">
                             <div className="space-y-1">
                                 <h3 className="text-md text-gray-600 font-medium">{stat.title}</h3>
