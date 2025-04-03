@@ -42,7 +42,7 @@ export default function TopNav() {
                         {selectedLanguage}
                         <RxCaretDown size={25} />
                     </button>
-                    {openLanguageDropdown && <div className="absolute top-10 left-0 bg-white rounded-lg w-40 text-left space-y-2 shadow-md border py-3">
+                    {openLanguageDropdown && <div className="absolute top-10 left-0 bg-white rounded-lg w-40 text-left space-y-2 shadow-md border py-3 z-50">
                         {languageOptions.map((language, index) => {
                             return (
                                 <div key={index} className="hover:cursor-pointer" onClick={() => handleLanguageSelect(language)}>

@@ -24,7 +24,7 @@ export default function UserProfile({ profile }: any) {
                 </div>
                 <RxCaretDown size={15} className="rounded-full border h-6 w-6 object-contain" />
             </button>
-            {openDropdown && <div className="absolute top-16 right-0 bg-white rounded-lg w-52 text-left space-y-3 shadow-md border py-3">
+            {openDropdown && <div className="absolute top-16 right-0 bg-white rounded-lg w-52 text-left space-y-3 shadow-md border py-3 z-50">
                 {profileDropdown.map((link, index) => {
                     return (
                         <Link href={link.url} key={index}>

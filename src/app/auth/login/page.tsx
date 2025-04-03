@@ -29,13 +29,12 @@ export default function UserLogin() {
                     </div>
                     <div className="w-full flex flex-col gap-y-3">
                         <Link href="/auth/forgot-password" className="text-gray-500 text-md font-normal text-center">Forget Password?</Link>
-                        <button type="button" className={`text-center  rounded-md py-5 bg-bgBlue text-white w-full text-lg`}>Sign Up</button>
-                        <p className="text-gray-500 text-center">Don't have an account? <Link href="/auth/login" className="text-blue-500 underline font-normal">Create Account</Link>
+                        <button type="button" className={`text-center  rounded-md py-5 bg-bgBlue text-white w-full text-lg`}>Login</button>
+                        <p className="text-gray-500 text-center">Don't have an account? <Link href="/auth/register" className="text-blue-500 underline font-normal">Create Account</Link>
                         </p>
                     </div>
                 </form >
             </section >
-
         </>
     )
 }
