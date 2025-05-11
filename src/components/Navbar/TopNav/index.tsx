@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { languageOptions, profile } from "@/lib/data";
+import { languageOptions } from "@/lib/data";
 import { RxCaretDown } from "react-icons/rx";
 import UserProfile from "./UserProfile";
 
@@ -56,7 +56,7 @@ export default function TopNav() {
                     </div>}
                 </div>
                 <div className="relative">
-                    <UserProfile profile={profile} />
+                    <UserProfile/>
                 </div>
             </div>
         </nav>
