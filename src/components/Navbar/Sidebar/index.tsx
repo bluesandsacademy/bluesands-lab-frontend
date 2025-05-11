@@ -13,7 +13,7 @@ export default function Sidebar() {
             <div className="flex flex-col gap-y-3">
                 {sidebarLinks.map((link, index) => {
                     return (
-                        <>
+                        //<>
                             <Link key={index} href={link.url} className={`flex items-center text-[0.85rem] gap-x-3 px-3 py-2 rounded-md ${pathname === link.url ? "bg-bgBlue text-white" : ""}`}>
                                 <img
                                     src={link.icon}
@@ -22,7 +22,7 @@ export default function Sidebar() {
                                 />
                                 {link.title}
                             </Link>
-                        </>
+                       // </>
                     )
                 })}
 

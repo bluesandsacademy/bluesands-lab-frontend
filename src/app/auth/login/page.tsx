@@ -1,40 +1,116 @@
-"use client"
-import { useEffect, useState } from "react"
-import Link from "next/link"
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { login } from "@/services/auth-service";
+import { useUser } from "@/services/UserContext";
+import NProgress from "nprogress";
 
 export default function UserLogin() {
+  useEffect(() => {
+    document.title =
+      "Welcome Back! | Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences";
+  }, []);
 
-    useEffect(() => {
-        document.title = "Welcome Back! | Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences"
-    }, [])
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const router = useRouter();
+  const { setUser, setIsLoggedIn } = useUser();
 
-    return (
-        <>
-            <section className="min-h-screen p-3 mb-10">
-                <div className='w-full flex justify-center relative z-0'>
-                    <img src="/images/bg/cover.png" className="w-full object-contain z-0" alt="" />
-                    <div className="absolute text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-3">
-                        <h1 className="text-2xl md:text-4xl font-normal">Welcome Back!</h1>
-                        <p className="font-thin md:text-lg text-sm md:max-w-lg max-w-xs">Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences</p>
-                    </div>
-                </div>
-                <form className='border max-w-2xl mx-auto flex flex-col gap-y-5 py-5 px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white'>
-                    <div className='flex flex-col w-full gap-y-4'>
-                        <label htmlFor="emailAddress" className='font-medium text-gray-700 text-md'>Email Address</label>
-                        <input type="text" className='rounded-md border px-3 py-3 w-full text-gray-600' id='emailAddress' />
-                    </div>
-                    <div className='flex flex-col w-full gap-y-4'>
-                        <label htmlFor="password" className='font-medium text-gray-700 text-md'>Password</label>
-                        <input type="password" className='rounded-md border px-3 py-3 w-full text-gray-600 text-lg' id='password' />
-                    </div>
-                    <div className="w-full flex flex-col gap-y-3">
-                        <Link href="/auth/forgot-password" className="text-gray-500 text-md font-normal text-center">Forget Password?</Link>
-                        <button type="button" className={`text-center  rounded-md py-5 bg-bgBlue text-white w-full text-lg`}>Login</button>
-                        <p className="text-gray-500 text-center">Don't have an account? <Link href="/auth/register" className="text-blue-500 underline font-normal">Create Account</Link>
-                        </p>
-                    </div>
-                </form >
-            </section >
-        </>
-    )
+  const handleLogin = async () => {
+    try {
+      NProgress.start(); // Start the loading bar
+      const res = await login(email, password);
+      const { user } = res;
+      setUser(user); // saves user in context/localStorage
+      setIsLoggedIn(true);
+      router.push("/dashboard");
+      NProgress.done(); // Stop the loading bar
+      const localUser = localStorage.getItem("user");
+      if (localUser) {
+        console.log(JSON.parse(localUser));
+      } else {
+        console.log("No user found in localStorage");
+      }
+    } catch (err) {
+      NProgress.done();
+      console.error("Login failed", err);
+      alert("Invalid login credentials");
+    }
+  };
+
+  return (
+    <>
+      <section className="min-h-screen p-3 mb-10">
+        <div className="w-full flex justify-center relative z-0">
+          <img
+            src="/images/bg/cover.png"
+            className="w-full object-contain z-0"
+            alt=""
+          />
+          <div className="absolute text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-3">
+            <h1 className="text-2xl md:text-4xl font-normal">Welcome Back!</h1>
+            <p className="font-thin md:text-lg text-sm md:max-w-lg max-w-xs">
+              Transforming Education Through Innovation with Cutting-Edge STEM
+              Learning Experiences
+            </p>
+          </div>
+        </div>
+        <form className="border max-w-2xl mx-auto flex flex-col gap-y-5 py-5 px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white">
+          <div className="flex flex-col w-full gap-y-4">
+            <label
+              htmlFor="emailAddress"
+              className="font-medium text-gray-700 text-md"
+            >
+              Email Address
+            </label>
+            <input
+              type="text"
+              className="rounded-md border px-3 py-3 w-full text-gray-600"
+              id="emailAddress"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col w-full gap-y-4">
+            <label
+              htmlFor="password"
+              className="font-medium text-gray-700 text-md"
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              className="rounded-md border px-3 py-3 w-full text-gray-600 text-lg"
+              id="password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div className="w-full flex flex-col gap-y-3">
+            <Link
+              href="/auth/forgot-password"
+              className="text-gray-500 text-md font-normal text-center"
+            >
+              Forget Password?
+            </Link>
+            <button
+              type="button"
+              className={`text-center  rounded-md py-5 bg-bgBlue text-white w-full text-lg`}
+              onClick={handleLogin}
+            >
+              Login
+            </button>
+            <p className="text-gray-500 text-center">
+              Don't have an account?{" "}
+              <Link
+                href="/auth/register"
+                className="text-blue-500 underline font-normal"
+              >
+                Create Account
+              </Link>
+            </p>
+          </div>
+        </form>
+      </section>
+    </>
+  );
 }
