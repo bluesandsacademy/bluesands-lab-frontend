@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import LoadingBar from "@/components/LoadingBar";
 import { UserProvider } from "@/services/UserContext";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Blue Sands Stem Labs",
@@ -17,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={` antialiased`}>
-        <LoadingBar />
+        <Suspense fallback={null}>
+          <LoadingBar />
+        </Suspense>
         <UserProvider> {children} </UserProvider>
       </body>
     </html>
