@@ -48,39 +48,39 @@ export default function UserLogin() {
             className="w-full object-contain z-0"
             alt=""
           />
-          <div className="absolute text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-3">
-            <h1 className="text-2xl md:text-4xl font-normal">Welcome Back!</h1>
-            <p className="font-thin md:text-lg text-sm md:max-w-lg max-w-xs">
+          <div className="absolute h-full md:h-auto top-1 lg:top-0 flex flex-col justify-center items-center md:gap-y-1 lg:gap-y-5 md:text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-1 lg:space-y-3">
+            <h1 className="text-xl md:text-2xl lg:text-4xl font-normal">Welcome Back!</h1>
+            <p className="font-thin text-xs md:text-base lg:text-lg md:max-w-lg max-w-xs text-center">
               Transforming Education Through Innovation with Cutting-Edge STEM
               Learning Experiences
             </p>
           </div>
         </div>
-        <form className="border max-w-2xl mx-auto flex flex-col gap-y-5 py-5 px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white">
-          <div className="flex flex-col w-full gap-y-4">
+        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white">
+          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="emailAddress"
-              className="font-medium text-gray-700 text-md"
+              className="font-medium text-gray-700 text-sm md:text-md"
             >
               Email Address
             </label>
             <input
               type="text"
-              className="rounded-md border px-3 py-3 w-full text-gray-600"
+              className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="emailAddress"
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="flex flex-col w-full gap-y-4">
+          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="password"
-              className="font-medium text-gray-700 text-md"
+              className="font-medium text-gray-700 text-sm md:text-md"
             >
               Password
             </label>
             <input
               type="password"
-              className="rounded-md border px-3 py-3 w-full text-gray-600 text-lg"
+              className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="password"
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -88,18 +88,18 @@ export default function UserLogin() {
           <div className="w-full flex flex-col gap-y-3">
             <Link
               href="/auth/forgot-password"
-              className="text-gray-500 text-md font-normal text-center"
+              className="text-gray-500 text-sm md:text-md font-normal text-center"
             >
               Forget Password?
             </Link>
             <button
               type="button"
-              className={`text-center  rounded-md py-5 bg-bgBlue text-white w-full text-lg`}
+              className={`text-center  rounded-md py-1 md:py-5 bg-bgBlue text-white w-full md:text-lg`}
               onClick={handleLogin}
             >
               Login
             </button>
-            <p className="text-gray-500 text-center">
+            <p className="text-gray-500 text-center text-xs md:text-base">
               Don't have an account?{" "}
               <Link
                 href="/auth/register"
