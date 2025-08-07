@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import { login } from "@/services/auth-service";
 import { useUser } from "@/services/UserContext";
 import NProgress from "nprogress";
+import nProgress from "nprogress";
+import { toast } from "react-toastify";
+import { LocalStorageAuthService } from "@/services/localStorage-auth";
 
 export default function UserLogin() {
   useEffect(() => {
@@ -14,28 +17,67 @@ export default function UserLogin() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { setUser, setIsLoggedIn } = useUser();
 
-  const handleLogin = async () => {
+  // const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault(); // Prevent default form submission
+  //   setIsSubmitting(true); // Set submitting state to true
+  //   try {
+  //     NProgress.start(); // Start the loading bar
+  //     const res = await login(email, password);
+  //     const { user } = res;
+  //     setUser(user); // saves user in context/localStorage
+  //     setIsLoggedIn(true);
+  //     router.push("/dashboard");
+  //     NProgress.done(); // Stop the loading bar
+  //     toast.success("Login Successful")
+  //     const localUser = localStorage.getItem("user");
+  //     if (localUser) {
+  //       console.log(JSON.parse(localUser));
+  //     } else {
+  //       console.log("No user found in localStorage");
+  //     }
+  //   } catch (err) {
+  //     NProgress.done();
+  //     console.error("Login failed", err);
+  //     toast.error("Invalid login credentials");
+  //   } finally {
+  //     nProgress.done();
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    NProgress.start();
+
     try {
-      NProgress.start(); // Start the loading bar
-      const res = await login(email, password);
-      const { user } = res;
-      setUser(user); // saves user in context/localStorage
-      setIsLoggedIn(true);
-      router.push("/dashboard");
-      NProgress.done(); // Stop the loading bar
-      const localUser = localStorage.getItem("user");
-      if (localUser) {
-        console.log(JSON.parse(localUser));
+      const user = await LocalStorageAuthService.loginUser(email, password);
+      
+      // // Handle remember me
+      // if (rememberMe) {
+      //   localStorage.setItem('rememberedEmail', email);
+      // } else {
+      //   localStorage.removeItem('rememberedEmail');
+      // }
+      
+      toast.success(`Welcome back, ${user.fullName}!`);
+      router.push("/dashboard"); // or wherever you want to redirect after login
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        toast.error("Invalid email or password. Please try again.");
       } else {
-        console.log("No user found in localStorage");
+        toast.error("Login failed. Please try again.");
       }
-    } catch (err) {
-      NProgress.done();
       console.error("Login failed", err);
-      alert("Invalid login credentials");
+    } finally {
+      NProgress.done();
+      setIsSubmitting(false);
     }
   };
 
@@ -48,7 +90,7 @@ export default function UserLogin() {
             className="w-full object-contain z-0"
             alt=""
           />
-          <div className="absolute h-full md:h-auto top-1 lg:top-0 flex flex-col justify-center items-center md:gap-y-1 lg:gap-y-5 md:text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-1 lg:space-y-3">
+          <div className="absolute h-full md:h-auto top-1 lg:top-0 flex flex-col justify-center items-center gap-y-1 lg:gap-y-5 md:text-center text-white max-w-lg lg:bottom-36 md:bottom-28 bottom-5 space-y-1 lg:space-y-3">
             <h1 className="text-xl md:text-2xl lg:text-4xl font-normal">Welcome Back!</h1>
             <p className="font-thin text-xs md:text-base lg:text-lg md:max-w-lg max-w-xs text-center">
               Transforming Education Through Innovation with Cutting-Edge STEM
@@ -56,7 +98,9 @@ export default function UserLogin() {
             </p>
           </div>
         </div>
-        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white">
+        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white"
+              onSubmit={handleSubmit}
+        >
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="emailAddress"
@@ -67,6 +111,8 @@ export default function UserLogin() {
             <input
               type="text"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
+              value={email}
+              required
               id="emailAddress"
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -82,6 +128,8 @@ export default function UserLogin() {
               type="password"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="password"
+              value={password}
+              required
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
@@ -93,11 +141,13 @@ export default function UserLogin() {
               Forget Password?
             </Link>
             <button
-              type="button"
-              className={`text-center  rounded-md py-1 md:py-5 bg-bgBlue text-white w-full md:text-lg`}
-              onClick={handleLogin}
+              type="submit"
+              disabled={isSubmitting}
+              className={`text-center  rounded-md py-1 md:py-5 bg-bgBlue text-white w-full md:text-lg ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed':'hover:bg-blue-600'}`}
+              
             >
-              Login
+              {isSubmitting? "Logging in...": "Login"}
             </button>
             <p className="text-gray-500 text-center text-xs md:text-base">
               Don't have an account?{" "}

@@ -15,7 +15,7 @@ export default function RegisterSchoolAccount() {
             <section className="min-h-screen p-3 mb-10">
                 <div className='w-full flex justify-center relative z-0'>
                     <img src="/images/bg/cover.png" className="w-full object-contain z-0" alt="" />
-                    <div className="absolute flex flex-col items-center justify-center  top-1 md:top-0 text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-1 lg:space-y-3">
+                    <div className="absolute flex flex-col items-center justify-center  top-1 md:top-0 text-center text-white max-w-lg md:bottom-28 lg:bottom-36 bottom-5 space-y-1 lg:space-y-3">
                         <h1 className="text-xl md:text-2xl lg:text-4xl font-normal">Create your Account</h1>
                         <p className="font-thin text-xs md:text-sm lg:text-lg md:max-w-lg max-w-xs">Transforming Education Through Innovation with Cutting-Edge STEM Learning Experiences</p>
                     </div>
