@@ -6,7 +6,6 @@ import { countries, genderOptions } from "@/lib/data";
 import { useRouter } from "next/navigation";
 import { UserObject, registerNewUser } from "@/services/auth-service";
 import { toast } from "react-toastify";
-import { LocalStorageAuthService } from "@/services/localStorage-auth";
 
 export default function RegisterIndividualAccount() {
   useEffect(() => {
@@ -16,9 +15,9 @@ export default function RegisterIndividualAccount() {
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phone, setPhoneNumber] = useState("");
   const [dob, setDob] = useState(new Date());
-  const [sex, setSex] = useState("");
+  const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [password, setPassword] = useState("");
   const [rememberPassword, setRememberPassword] = useState<boolean>(false);
@@ -28,9 +27,9 @@ export default function RegisterIndividualAccount() {
   const payload: UserObject = {
     fullName,
     email,
-    phoneNumber,
+    phone,
     dob,
-    sex,
+    gender,
     country,
     password,
   };
@@ -39,48 +38,17 @@ export default function RegisterIndividualAccount() {
     setRememberPassword(!rememberPassword);
   }
 
-  // const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
 
-  //   e.preventDefault(); // Prevent default form submission
-
-  //   if (isSubmitting) return; // Prevent multiple submissions
-  //   setIsSubmitting(true); // Set submitting state to true
-  //   NProgress.start(); // Start the loading bar
-
-  //   try {
-  //     await registerNewUser(payload);
-  //     toast.success("User created successfully.");
-  //     router.push("/auth/login");
-  //   } catch (err: any) {
-  //     if (err.response?.status === 409) {
-  //       toast.warning("User already exists. Try logging in instead.");
-  //     } else {
-  //       toast.error("Registration failed. Please check your details and try again.");
-  //     }
-  //     console.error("Registration failed", err);
-  //   } finally {
-  //     NProgress.done();
-  //     setIsSubmitting(false);
-  //   }
-  // };
-
-
-   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission
-    
+
     if (isSubmitting) return; // Prevent multiple submissions
     setIsSubmitting(true); // Set submitting state to true
     NProgress.start(); // Start the loading bar
 
     try {
-      await LocalStorageAuthService.registerUser(payload);
-      toast.success("Account created successfully! You can now login.");
-      
-      // Optionally remember password by storing it temporarily
-      if (rememberPassword) {
-        localStorage.setItem('rememberedEmail', email);
-      }
-      
+      await registerNewUser(payload);
+      toast.success("User created successfully.");
       router.push("/auth/login");
     } catch (err: any) {
       if (err.response?.status === 409) {
@@ -114,7 +82,7 @@ export default function RegisterIndividualAccount() {
             </p>
           </div>
         </div>
-        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white" onSubmit={handleSubmit}>
+        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white" onSubmit={handleRegister}>
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="fullName"
@@ -158,7 +126,7 @@ export default function RegisterIndividualAccount() {
               type="text"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="phoneNumber"
-              value={phoneNumber}
+              value={phone}
               required
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
@@ -204,8 +172,8 @@ export default function RegisterIndividualAccount() {
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="gender"
               required
-              value={sex}
-              onChange={(e) => setSex(e.target.value)}
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
             >
               <option value="">Select Gender</option>
               {genderOptions.map((option, index) => (

@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import { login } from "@/services/auth-service";
 import { useUser } from "@/services/UserContext";
 import NProgress from "nprogress";
-import nProgress from "nprogress";
 import { toast } from "react-toastify";
-import { LocalStorageAuthService } from "@/services/localStorage-auth";
 
 export default function UserLogin() {
   useEffect(() => {
@@ -19,37 +17,16 @@ export default function UserLogin() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  const { setUser, setIsLoggedIn } = useUser();
+  const { setUser, setToken, isLoggedIn } = useUser(); //also import isLoggedin 
 
-  // const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault(); // Prevent default form submission
-  //   setIsSubmitting(true); // Set submitting state to true
-  //   try {
-  //     NProgress.start(); // Start the loading bar
-  //     const res = await login(email, password);
-  //     const { user } = res;
-  //     setUser(user); // saves user in context/localStorage
-  //     setIsLoggedIn(true);
-  //     router.push("/dashboard");
-  //     NProgress.done(); // Stop the loading bar
-  //     toast.success("Login Successful")
-  //     const localUser = localStorage.getItem("user");
-  //     if (localUser) {
-  //       console.log(JSON.parse(localUser));
-  //     } else {
-  //       console.log("No user found in localStorage");
-  //     }
-  //   } catch (err) {
-  //     NProgress.done();
-  //     console.error("Login failed", err);
-  //     toast.error("Invalid login credentials");
-  //   } finally {
-  //     nProgress.done();
-  //     setIsSubmitting(false);
-  //   }
-  // };
+  //Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push("/dashboard");
+    }
+  }, [isLoggedIn, router]);
 
-   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (isSubmitting) return;
@@ -57,24 +34,25 @@ export default function UserLogin() {
     NProgress.start();
 
     try {
-      const user = await LocalStorageAuthService.loginUser(email, password);
+      const { user, token } = await login(email, password);
       
-      // // Handle remember me
-      // if (rememberMe) {
-      //   localStorage.setItem('rememberedEmail', email);
-      // } else {
-      //   localStorage.removeItem('rememberedEmail');
-      // }
+      // Set user and token in context (this will also save to localStorage)
+      setUser(user);
+      setToken(token);
       
       toast.success(`Welcome back, ${user.fullName}!`);
-      router.push("/dashboard"); // or wherever you want to redirect after login
+      router.push("/dashboard");
+      
     } catch (err: any) {
+      console.error("Login failed", err);
+      
       if (err.response?.status === 401) {
         toast.error("Invalid email or password. Please try again.");
+      } else if (err.response?.status === 400) {
+        toast.error("Please check your login credentials and try again.");
       } else {
-        toast.error("Login failed. Please try again.");
+        toast.error("Login failed. Please try again later.");
       }
-      console.error("Login failed", err);
     } finally {
       NProgress.done();
       setIsSubmitting(false);
@@ -99,7 +77,7 @@ export default function UserLogin() {
           </div>
         </div>
         <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white"
-              onSubmit={handleSubmit}
+              onSubmit={handleLogin}
         >
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label

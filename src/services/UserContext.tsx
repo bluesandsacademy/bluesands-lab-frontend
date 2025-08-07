@@ -1,16 +1,19 @@
 "use client";
 
-import axios from "@/services/axios-instance";
-
 import { createContext, useContext, useEffect, useState } from "react";
-import AuthInitializer from "./AuthInitializer";
+import { logout as apiLogout } from "@/services/auth-service";
 
-interface User {
+// Use the same User interface from auth-service
+export interface User {
   userId: string;
   fullName: string;
   email: string;
-  role: string;
-  avatarUrl: string;
+  phone: string;
+  gender: string;
+  country: string;
+  dob: string;
+  role?: string;
+  avatarUrl?: string;
 }
 
 interface UserContextType {
@@ -18,7 +21,9 @@ interface UserContextType {
   setUser: (user: User | null) => void;
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
+  token: string | null;
+  setToken: (token: string | null) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,30 +31,42 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [token, setTokenState] = useState<string | null>(null);
 
   const logout = async () => {
-    setUserState(null);
-    setIsLoggedIn(false);
-    localStorage.removeItem("user");
-    localStorage.setItem("isLoggedIn", "false");
-
     try {
-      await axios.post("/auth/logout", {}, { withCredentials: true });
+      await apiLogout();
     } catch (err) {
       console.error("Logout error:", err);
+    } finally {
+      // Always clear local state regardless of API call success
+      setUserState(null);
+      setIsLoggedIn(false);
+      setTokenState(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
     }
   };
 
+  // Initialize from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
     const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
 
-    if (storedUser) {
-      setUserState(JSON.parse(storedUser));
-    }
-
-    if (storedIsLoggedIn === "true") {
-      setIsLoggedIn(true);
+    if (storedUser && storedToken) {
+      try {
+        setUserState(JSON.parse(storedUser));
+        setTokenState(storedToken);
+        setIsLoggedIn(storedIsLoggedIn === "true");
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+        // Clear corrupted data
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("isLoggedIn");
+      }
     }
   }, []);
 
@@ -57,19 +74,28 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setUserState(user);
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("isLoggedIn", "true");
     } else {
       localStorage.removeItem("user");
-      localStorage.setItem("isLoggedIn", "false");
+    }
+  };
+
+  const setToken = (token: string | null) => {
+    setTokenState(token);
+    if (token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("isLoggedIn", "true");
+      setIsLoggedIn(true);
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
+      setIsLoggedIn(false);
     }
   };
 
   return (
     <UserContext.Provider
-      value={{ user, setUser, isLoggedIn, setIsLoggedIn, logout }}
+      value={{ user, setUser, isLoggedIn, setIsLoggedIn, logout, token, setToken }}
     >
-      {/* 👇 this makes sure useAuth is called in a client-safe way */}
-      <AuthInitializer />
       {children}
     </UserContext.Provider>
   );
