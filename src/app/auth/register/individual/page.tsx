@@ -5,6 +5,8 @@ import NProgress from "nprogress";
 import { countries, genderOptions } from "@/lib/data";
 import { useRouter } from "next/navigation";
 import { UserObject, registerNewUser } from "@/services/auth-service";
+import { toast } from "react-toastify";
+import { LocalStorageAuthService } from "@/services/localStorage-auth";
 
 export default function RegisterIndividualAccount() {
   useEffect(() => {
@@ -37,20 +39,54 @@ export default function RegisterIndividualAccount() {
     setRememberPassword(!rememberPassword);
   }
 
-  const handleRegister = async () => {
+  // const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  //   e.preventDefault(); // Prevent default form submission
+
+  //   if (isSubmitting) return; // Prevent multiple submissions
+  //   setIsSubmitting(true); // Set submitting state to true
+  //   NProgress.start(); // Start the loading bar
+
+  //   try {
+  //     await registerNewUser(payload);
+  //     toast.success("User created successfully.");
+  //     router.push("/auth/login");
+  //   } catch (err: any) {
+  //     if (err.response?.status === 409) {
+  //       toast.warning("User already exists. Try logging in instead.");
+  //     } else {
+  //       toast.error("Registration failed. Please check your details and try again.");
+  //     }
+  //     console.error("Registration failed", err);
+  //   } finally {
+  //     NProgress.done();
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+
+   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // Prevent default form submission
+    
     if (isSubmitting) return; // Prevent multiple submissions
     setIsSubmitting(true); // Set submitting state to true
     NProgress.start(); // Start the loading bar
 
     try {
-      await registerNewUser(payload);
-      alert("User created successfully, Now you can login");
+      await LocalStorageAuthService.registerUser(payload);
+      toast.success("Account created successfully! You can now login.");
+      
+      // Optionally remember password by storing it temporarily
+      if (rememberPassword) {
+        localStorage.setItem('rememberedEmail', email);
+      }
+      
       router.push("/auth/login");
     } catch (err: any) {
       if (err.response?.status === 409) {
-        alert("User already exists. Try logging in instead.");
+        toast.warning("User already exists. Try logging in instead.");
       } else {
-        alert("Registration failed. Please check your details and try again.");
+        toast.error("Registration failed. Please check your details and try again.");
       }
       console.error("Registration failed", err);
     } finally {
@@ -68,17 +104,17 @@ export default function RegisterIndividualAccount() {
             className="w-full object-contain z-0"
             alt=""
           />
-          <div className="absolute flex flex-col items-center justify-center  top-1 lg:top-0 text-center text-white max-w-lg md:bottom-36 bottom-5 space-y-1 lg:space-y-3">
+          <div className="absolute flex flex-col items-center justify-center top-1 md:top-0 text-center text-white max-w-lg lg:bottom-36 md:bottom-28 bottom-5 space-y-1 lg:space-y-3">
             <h1 className="text-xl md:text-2xl lg:text-4xl font-normal">
               Create your Account
             </h1>
-            <p className="font-thin text-xs md:text-base lg:text-lg md:max-w-lg max-w-xs">
+            <p className="font-thin text-xs md:text-sm lg:text-lg md:max-w-lg max-w-xs">
               Transforming Education Through Innovation with Cutting-Edge STEM
               Learning Experiences
             </p>
           </div>
         </div>
-        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white">
+        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white" onSubmit={handleSubmit}>
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="fullName"
@@ -90,6 +126,8 @@ export default function RegisterIndividualAccount() {
               type="text"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="fullName"
+              value={fullName}
+              required
               onChange={(e) => setFullName(e.target.value)}
             />
           </div>
@@ -101,9 +139,11 @@ export default function RegisterIndividualAccount() {
               Email Address
             </label>
             <input   
-              type="text"
+              type="email"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="emailAddress"
+              value={email}
+              required
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
@@ -118,6 +158,8 @@ export default function RegisterIndividualAccount() {
               type="text"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="phoneNumber"
+              value={phoneNumber}
+              required
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
           </div>
@@ -128,6 +170,16 @@ export default function RegisterIndividualAccount() {
             <input
               type="date"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
+              
+              value={
+                dob.getFullYear().toString() +
+                "-" +
+                (dob.getMonth() + 1).toString().padStart(2, "0") +
+                "-" +
+                dob.getDate().toString().padStart(2, "0")
+              }
+
+              required
               id="dob"
               //   value={
               //     dob.getFullYear().toString() +
@@ -151,8 +203,11 @@ export default function RegisterIndividualAccount() {
             <select
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="gender"
+              required
+              value={sex}
               onChange={(e) => setSex(e.target.value)}
             >
+              <option value="">Select Gender</option>
               {genderOptions.map((option, index) => (
                 <option value={option} key={index}>
                   {option}
@@ -170,8 +225,11 @@ export default function RegisterIndividualAccount() {
             <select
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="country"
+              required
+              value={country}
               onChange={(e) => setCountry(e.target.value)}
             >
+              <option value="">Select Country</option>
               {countries.map((option, index) => (
                 <option value={option} key={index}>
                   {option}
@@ -190,6 +248,9 @@ export default function RegisterIndividualAccount() {
               type="password"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-lg"
               id="password"
+              value={password}
+              minLength={6}
+              required
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
@@ -210,11 +271,13 @@ export default function RegisterIndividualAccount() {
           </div>
           <div className="w-full flex flex-col gap-y-3">
             <button
-              type="button"
-              className={`text-center  rounded-md py-1 md:py-3 lg:py-5 bg-bgBlue text-white w-full text-sm md:text-lg`}
-              onClick={handleRegister}
+              type="submit"
+              disabled={isSubmitting}
+              className={`text-center rounded-md py-1 md:py-3 lg:py-5 bg-bgBlue text-white w-full text-sm md:text-lg ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+              }`}
             >
-              Sign Up
+              {isSubmitting ? "Signing Up..." : "Sign Up"}
             </button>
             <p className="text-gray-500 text-center text-sm md:text-base">
               Already have an account?{" "}
