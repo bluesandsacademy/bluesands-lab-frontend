@@ -48,7 +48,7 @@ export default function UserProfile() {
         className="flex items-center gap-x-5"
         onClick={handleToggleDropdown}
       >
-        <img src={user?.avatarUrl} alt="" />
+        {user?.avatarUrl && <img src={user?.avatarUrl} alt="avatar-image" />}
         <div className="text-left">
           <h4 className="truncate">{user?.fullName}</h4>
           <p className="text-gray-400 font-medium">Account: {user?.role}</p>

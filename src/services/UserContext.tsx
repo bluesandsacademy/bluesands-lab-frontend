@@ -35,7 +35,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await apiLogout();
+     // await apiLogout();
+      setUserState(null);
+      setIsLoggedIn(false);
+      setTokenState(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
