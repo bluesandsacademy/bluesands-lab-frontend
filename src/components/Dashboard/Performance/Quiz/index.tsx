@@ -172,19 +172,19 @@ export default function QuizPerformance() {
             data={chartData}
             margin={{ 
               top: 5, 
-              right: window.innerWidth < 768 ? 10 : 30, 
-              left: window.innerWidth < 768 ? 0 : 20, 
+              right: 10, 
+              left: 0, 
               bottom: 5 
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
               dataKey="name" 
-              tick={{ fill: "#6b7280", fontSize: window.innerWidth < 768 ? 12 : 14 }}
+              tick={{ fill: "#6b7280", fontSize: 12 }}
               axisLine={{ stroke: "#e5e7eb" }}
             />
             <YAxis 
-              tick={{ fill: "#6b7280", fontSize: window.innerWidth < 768 ? 12 : 14 }}
+              tick={{ fill: "#6b7280", fontSize: 12 }}
               axisLine={{ stroke: "#e5e7eb" }}
             />
             <Tooltip
@@ -199,16 +199,16 @@ export default function QuizPerformance() {
             <Legend 
               wrapperStyle={{ 
                 paddingTop: "10px",
-                fontSize: window.innerWidth < 768 ? "12px" : "14px"
+                fontSize: 12
               }} 
             />
             <Line
               type="monotone"
               dataKey="value"
               stroke="#3b82f6"
-              strokeWidth={window.innerWidth < 768 ? 2 : 3}
-              dot={{ fill: "#3b82f6", r: window.innerWidth < 768 ? 3 : 4 }}
-              activeDot={{ r: window.innerWidth < 768 ? 5 : 6 }}
+              strokeWidth={3}
+              dot={{ fill: "#3b82f6", r: 4}}
+              activeDot={{ r: 6 }}
             />
           </LineChart>
         </ResponsiveContainer>

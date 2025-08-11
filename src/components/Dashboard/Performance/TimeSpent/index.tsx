@@ -66,7 +66,7 @@
 // }
 
 
-import { useWindowSize } from "@/hooks/UseWindowSize";
+
 import { getTimeSpentOnPlatform } from "@/services/dashboard-service";
 import { useEffect, useState } from "react";
 import {
@@ -82,8 +82,8 @@ import {
 
 export default function TimeSpentImproved() {
   const [timeData, setTimeData] = useState([]);
-  const { width } = useWindowSize();
-  const isMobile = width < 768;
+  // const { width } = useWindowSize();
+  // const isMobile = width < 768;
   const defaultData = [
   { name: "Lab", hours: 0 },
   { name: "Quiz", hours: 0 },
@@ -116,29 +116,28 @@ export default function TimeSpentImproved() {
         </span>
       </div>
       
-      {/* <div className="h-[280px] md:h-[320px] lg:h-[300px]"> */}
       <div className="h-[200px] md:h-[240px] lg:h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
             margin={{ 
               top: 10, 
-             // right: isMobile ? 10 : 30, 
+              // right: isMobile ? 10 : 30, 
               // left: isMobile ? 0 : 20, 
-              bottom: 20 
+              // bottom: 20 
             }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
               dataKey="name" 
-              tick={{ fill: "#6b7280", fontSize: isMobile ? 12 : 14 }}
+              tick={{ fill: "#6b7280", fontSize: 12 }}
               axisLine={{ stroke: "#e5e7eb" }}
-              angle={isMobile ? -45 : 0}
-              textAnchor={isMobile ? "end" : "middle"}
-              height={isMobile ? 60 : 40}
+              angle={ -45 }
+              textAnchor={"middle"}
+              height={ 40}
             />
             <YAxis 
-              tick={{ fill: "#6b7280", fontSize: isMobile ? 12 : 14 }}
+              tick={{ fill: "#6b7280", fontSize: 12}}
               axisLine={{ stroke: "#e5e7eb" }}
             />
             <Tooltip
@@ -153,7 +152,7 @@ export default function TimeSpentImproved() {
             <Legend 
               wrapperStyle={{ 
                 paddingTop: "10px",
-                fontSize: isMobile ? "12px" : "14px"
+                fontSize: 12
               }} 
             />
             <Bar 
