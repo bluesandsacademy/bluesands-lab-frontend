@@ -96,7 +96,7 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
         <nav className="bg-white h-16 md:h-20 flex px-3 md:px-5 py-3 items-center justify-between relative">
             {/* Mobile menu button */}
             <button 
-                className="md:hidden p-2 hover:bg-gray-100 rounded-md"
+                className="md:hidden pr-2 hover:bg-gray-100 rounded-md"
                 onClick={onMenuClick}
             >
                 <HiMenu size={24} />
@@ -114,8 +114,8 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
             </h3>
 
             {/* Mobile breadcrumb - simplified */}
-            <h3 className="md:hidden font-semibold text-lg">
-                {breadcrumb[breadcrumb.length - 1] || "Dashboard"}
+            <h3 className="md:hidden font-semibold">
+                 {(breadcrumb[breadcrumb.length - 1] || "Dashboard").charAt(0).toUpperCase() + (breadcrumb[breadcrumb.length - 1] || "Dashboard").slice(1)}
             </h3>
 
             <div className="flex items-center gap-x-2 md:gap-x-6 lg:gap-x-10">
@@ -137,6 +137,9 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
 
                 {/* Language selector - simplified on mobile */}
                 <div className="relative">
+                    {
+                        openLanguageDropdown && <div className="fixed inset-0 z-10" onClick={()=>setOpenLanguageDropdown(false)}></div>
+                    }
                     <button 
                         onClick={() => setOpenLanguageDropdown(!openLanguageDropdown)} 
                         className="flex items-center gap-x-1 md:gap-x-3 group p-1 md:p-0"
