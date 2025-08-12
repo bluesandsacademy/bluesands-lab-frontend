@@ -44,6 +44,7 @@ export default function UserProfile() {
 
   return (
     <div className="relative">
+      {openDropdown && (<div className="fixed inset-0 z-10" onClick={()=> setOpenDropdown(false)}></div>)}
       <button
         className="flex items-center gap-x-5"
         onClick={handleToggleDropdown}

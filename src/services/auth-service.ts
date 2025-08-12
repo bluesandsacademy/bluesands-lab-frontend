@@ -13,12 +13,13 @@ export interface UserObject {
 // Interface for login response from backend
 export interface LoginResponse {
   token: string;
-  fullname: string;
+  fullName: string;
   userId: string;
   phone: string;
   email: string;
   gender: string;
   country: string;
+  role: string;
   dob: string; // Assuming backend returns date as string
 }
 
@@ -57,13 +58,13 @@ export async function login(email: string, password: string): Promise<{ user: Us
     // Transform backend response to match our User interface
     const user: User = {
       userId: loginResponse.userId,
-      fullName: loginResponse.fullname, // Note: backend uses 'fullname', we use 'fullName'
+      fullName: loginResponse.fullName,
       email: loginResponse.email,
       phone: loginResponse.phone,
       gender: loginResponse.gender,
       country: loginResponse.country,
       dob: loginResponse.dob,
-      role: 'user', // Default role, adjust as at when needed
+      role: loginResponse.role, // Default role, adjust as at when needed
       avatarUrl: '', // Default empty, adjust as when needed
     };
     

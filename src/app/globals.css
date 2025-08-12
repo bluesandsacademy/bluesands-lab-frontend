@@ -93,7 +93,7 @@ input[type="number"] {
 
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 2px;
 }
 
 ::-webkit-scrollbar-track {
