@@ -80,6 +80,7 @@ interface TopNavProps {
 export default function TopNav({ onMenuClick }: TopNavProps) {
     const [selectedLanguage, setSelectedLanguage] = useState<string>(languageOptions[0])
     const [openLanguageDropdown, setOpenLanguageDropdown] = useState<boolean>(false);
+    const [openSearchDropdown, setOpenSearchDropdown] = useState<boolean>(false);
     const pathname = usePathname();
     const breadcrumb = pathname.split("/").filter((val) => val !== "")
 
@@ -131,14 +132,33 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
                 </form>
 
                 {/* Search icon for mobile */}
-                <button className="lg:hidden p-2 hover:bg-gray-100 rounded-md">
-                    <img src="/images/icon/magnifying_glass.svg" alt="Search" className="w-5 h-5" />
-                </button>
-
+                <div className="relative">
+                    {openSearchDropdown && <div className="fixed inset-0 z-10" onClick={()=> setOpenSearchDropdown(false)}></div>}
+                    {/* <button className="lg:hidden p-2 hover:bg-gray-100 rounded-md" onClick={()=> setOpenSearchDropdown(!openSearchDropdown)}> */}
+                    <button className="lg:hidden p-2 hover:bg-gray-100 rounded-md">
+                        <img src="/images/icon/magnifying_glass.svg" alt="Search" className="w-5 h-5" />
+                    </button>
+                    {
+                        openSearchDropdown && (
+                    <div className="absolute bg-white">
+                        <form action="" onSubmit={handleSubmit} className="p-3 border-2 border-gray-400 rounded-lg gap-x-3">
+                            <img src="/images/icon/magnifying_glass.svg" alt="" />
+                            <input 
+                                type="text" 
+                                id="search" 
+                                placeholder="Search Dashboard" 
+                                className="h-full w-[280px] xl:w-[380px] object-contain outline-none" 
+                            />
+                        </form>
+                    </div>
+                        )
+                    }
+                </div>
+                
                 {/* Language selector - simplified on mobile */}
                 <div className="relative">
                     {
-                        openLanguageDropdown && <div className="fixed inset-0 z-10" onClick={()=>setOpenLanguageDropdown(false)}></div>
+                        openLanguageDropdown && <div className="fixed inset-0 z-10" onClick={()=> setOpenLanguageDropdown(false)}></div>
                     }
                     <button 
                         onClick={() => setOpenLanguageDropdown(!openLanguageDropdown)} 
