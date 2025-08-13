@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 import Link from "next/link";
 import NProgress from "nprogress";
+import Image from "next/image";
 
 export default function UserProfile() {
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
@@ -49,14 +50,14 @@ export default function UserProfile() {
         className="flex items-center gap-x-5"
         onClick={handleToggleDropdown}
       >
-        {user?.avatarUrl && <img src={user?.avatarUrl} alt="avatar-image" />}
-        <div className="text-left">
-          <h4 className="truncate">{user?.fullName}</h4>
-          <p className="text-gray-400 font-medium">Account: {user?.role}</p>
+        {user?.avatarUrl ? <Image src={user?.avatarUrl} alt="avatar-image" className="w-8 h-8 lg:w-10 lg:h-10"  width={40} height={40}/> : <Image src="/images/avatar/user01.png" alt="avatar-image" className="w-8 h-8 lg:w-10 lg:h-10"  width={40} height={40} />}
+        <div className="hidden text-left md:block">
+          <h4 className="truncate text-sm lg:text-base">{user?.fullName}</h4>
+          <p className="text-gray-400 font-medium text-xs lg:text-sm">Account: {user?.role}</p>
         </div>
         <RxCaretDown
           size={15}
-          className="rounded-full border h-6 w-6 object-contain"
+          className="hidden md:block rounded-full border h-6 w-6 object-contain"
         />
       </button>
       {openDropdown && (
