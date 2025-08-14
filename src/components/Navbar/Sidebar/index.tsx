@@ -108,8 +108,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                         return (
                             <Link 
                                 key={index} 
-                                // href={link.url} 
-                                href="#"
+                                href={link.url}
                                 className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${pathname === link.url ? "bg-bgBlue text-white" : ""}`}
                                 onClick={onClose} // Close sidebar on mobile when link is clicked
                             >

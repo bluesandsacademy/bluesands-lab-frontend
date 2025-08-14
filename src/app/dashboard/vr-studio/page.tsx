@@ -1,7 +1,7 @@
 export default function DashboardVRStudioPage() {
     return (
         <>
-            DashboardVR Studio Page
+            VR Studio Page under Construction
         </>
     )
 }
