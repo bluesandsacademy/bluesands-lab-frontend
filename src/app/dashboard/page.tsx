@@ -58,11 +58,6 @@ import { useUser } from "@/services/UserContext";
 export default function DashboardHome() {
   const { user } = useUser();
   const firstName = user?.fullName?.split(" ")[0];
-   
-  const handleclick = () => {
-    console.log(user);
-    alert(user)
-  }
 
   return (
     <div className="p-3 md:p-5 space-y-6 md:space-y-10">

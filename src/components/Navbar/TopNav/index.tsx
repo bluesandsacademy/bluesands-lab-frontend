@@ -104,7 +104,7 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
             </button>
 
             {/* Breadcrumb - hidden on mobile */}
-            <h3 className="hidden md:flex font-semibold text-xl lg:text-2xl items-center gap-x-3">
+            <h3 className="hidden md:flex font-semibold text-xl lg:text-2xl items-center gap-x-3 lg:mr-6">
                 {breadcrumb.map((crumb, index) => {
                     return (
                         <span key={index} className={`capitalize flex items-center gap-x-3 ${index !== 0 ? "font-medium text-sm text-gray-500" : ""}`}>

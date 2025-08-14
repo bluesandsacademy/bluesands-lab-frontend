@@ -1,7 +1,7 @@
 export default function DashboardExperimentsPage() {
     return (
         <>
-            Experiments
+            Experiments page under construction...
         </>
     )
 }

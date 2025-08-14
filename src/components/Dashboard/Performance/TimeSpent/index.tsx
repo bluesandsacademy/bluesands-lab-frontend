@@ -152,7 +152,7 @@ export default function TimeSpentImproved() {
             <Legend 
               wrapperStyle={{ 
                 paddingTop: "10px",
-                fontSize: 12
+                fontSize: 12 
               }} 
             />
             <Bar 

@@ -245,12 +245,12 @@ export const sidebarLinks: SidebarLinks[] = [
   },
   {
     title: "STEM Quiz",
-    url: "/dashboard/stem-quiz",
+    url: "/dashboard/stem-quizes",
     icon: "/images/icon/quiz.svg",
   },
   {
     title: "Report",
-    url: "/dashboard/report",
+    url: "/dashboard/reports",
     icon: "/images/icon/report.svg",
   },
 ];

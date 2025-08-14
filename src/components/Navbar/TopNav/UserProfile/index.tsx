@@ -47,11 +47,11 @@ export default function UserProfile() {
     <div className="relative">
       {openDropdown && (<div className="fixed inset-0 z-10" onClick={()=> setOpenDropdown(false)}></div>)}
       <button
-        className="flex items-center gap-x-5"
+        className="flex items-center gap-x-2 lg:gap-x-5"
         onClick={handleToggleDropdown}
-      >
+      > 
         {user?.avatarUrl ? <Image src={user?.avatarUrl} alt="avatar-image" className="w-8 h-8 lg:w-10 lg:h-10"  width={40} height={40}/> : <Image src="/images/avatar/user01.png" alt="avatar-image" className="w-8 h-8 lg:w-10 lg:h-10"  width={40} height={40} />}
-        <div className="hidden text-left md:block">
+        <div className="hidden text-left lg:block">
           <h4 className="truncate text-sm lg:text-base">{user?.fullName}</h4>
           <p className="text-gray-400 font-medium text-xs lg:text-sm">Account: {user?.role}</p>
         </div>
