@@ -1,6 +1,8 @@
 const DashboardReportsPage = () => {
   return (
-    <div>Reports Page Under construction</div>
+    <>
+        <p className="font-semibold text-center mt-8 text-bgBlue">Reports page checked out for maintenance...</p>
+    </>
   )
 }
 

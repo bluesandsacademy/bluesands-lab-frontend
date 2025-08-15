@@ -228,16 +228,16 @@ export const sidebarLinks: SidebarLinks[] = [
     url: "/dashboard/experiments",
     icon: "/images/icon/beaker.svg",
   },
-  {
-    title: "VR Studio",
-    url: "/dashboard/vr-studio",
-    icon: "/images/icon/vr_headset.svg",
-  },
-  {
-    title: "VR Experience",
-    url: "/dashboard/vr-experience",
-    icon: "/images/icon/game_vr_headset.svg",
-  },
+  // {
+  //   title: "VR Studio",
+  //   url: "/dashboard/vr-studio",
+  //   icon: "/images/icon/vr_headset.svg",
+  // },
+  // {
+  //   title: "VR Experience",
+  //   url: "/dashboard/vr-experience",
+  //   icon: "/images/icon/game_vr_headset.svg",
+  // },
   {
     title: "STEM Courses",
     url: "/dashboard/stem-courses",
@@ -245,7 +245,7 @@ export const sidebarLinks: SidebarLinks[] = [
   },
   {
     title: "STEM Quiz",
-    url: "/dashboard/stem-quizes",
+    url: "/dashboard/stem-quizzes",
     icon: "/images/icon/quiz.svg",
   },
   {
@@ -325,6 +325,119 @@ export const stats: Stat[] = [
     title: "Experiment Attempts",
     percentage: "20 Attempts",
     icon: "/images/icon/microscope.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+export const expStats: Stat[] = [
+  {
+    title: "Average Grade",
+    percentage: "0%",
+    icon: "/images/icon/grad.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Number of Experiments",
+    percentage: "0",
+    icon: "/images/icon/test-tube.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Number of Attempts",
+    percentage: "0",
+    icon: "/images/icon/clipboard.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Pre-Experiment Assessments",
+    percentage: "0",
+    icon: "/images/icon/beaker_01.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Post-Experiment Assessments",
+    percentage: "0",
+    icon: "/images/icon/microscope.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+export const quizStats: Stat[] = [
+  {
+    title: "Total Quizzes Taken",
+    percentage: "0",
+    icon: "/images/icon/grad.svg",
+    trendIcon: "/images/icon/add.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Average Score Across Quizzes",
+    percentage: "0",
+    icon: "/images/icon/chart.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "High Scores",
+    percentage: "0",
+    icon: "/images/icon/highscore.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Recent Quiz Performance",
+    percentage: "0",
+    icon: "/images/icon/stopwatch.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+export const courseStats: Stat[] = [
+  {
+    title: "Stem Courses",
+    percentage: "0",
+    icon: "/images/icon/grad.svg",
+    trendIcon: "/images/icon/add.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Course Experiments",
+    percentage: "0",
+    icon: "/images/icon/beaker_01.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Hours Spent",
+    percentage: "0",
+    icon: "/images/icon/stopwatch.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Average Grade",
+    percentage: "0",
+    icon: "/images/icon/chart.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
