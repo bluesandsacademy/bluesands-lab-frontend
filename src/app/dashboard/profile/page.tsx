@@ -13,7 +13,7 @@ const DashboardEditProfilePage = () => {
     <div>
         <WelcomeBanner firstName={firstName? firstName : ""}/>
         <Link href="/dashboard" className="flex flex-row">
-        <p className="font-bold ml-5 flex items-center gap-1 lg:gap-2"><FaAngleLeft className="text-bgBlue"/> Profile </p>
+          <p className="font-bold ml-5 flex items-center gap-1 lg:gap-2"><FaAngleLeft className="text-bgBlue"/> Profile </p>
         </Link>
         <EditProfile/>
     </div>

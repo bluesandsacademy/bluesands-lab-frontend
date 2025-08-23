@@ -41,7 +41,15 @@ export default function UserLogin() {
       setToken(token);
       
       toast.success(`Welcome back, ${user.fullName}!`);
+     
+      if (user.role === "student") {
       router.push("/dashboard");
+    } else if (user.role === "schoolAdmin" || user.role === "SchoolAdmin") {
+      router.push("/school/dashboard");
+    } else {
+      // Default fallback for any other roles
+      router.push("/dashboard");
+    }
       
     } catch (err: any) {
       console.error("Login failed", err);

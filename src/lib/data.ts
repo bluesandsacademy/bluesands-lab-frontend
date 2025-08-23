@@ -255,6 +255,39 @@ export const sidebarLinks: SidebarLinks[] = [
   },
 ];
 
+export const sideNavLinks: SidebarLinks[] = [
+  {
+    title: "Overview",
+    url: "/school/dashboard",
+    icon: "/images/icon/home.svg",
+  },
+  {
+    title: "Students",
+    url: "/school/dashboard/students",
+    icon: "/images/icon/notepad.svg",
+  },
+  {
+    title: "Class Management",
+    url: "/school/dashboard/class-management",
+    icon: "/images/icon/report.svg",
+  },
+  {
+    title: "Teachers",
+    url: "/school/dashboard/teachers",
+    icon: "/images/icon/notepad.svg",
+  },
+  {
+    title: "Lab Experiments",
+    url: "/school/dashboard/lab-experiments",
+    icon: "/images/icon/beaker.svg",
+  },
+  {
+    title: "Quizzes",
+    url: "/school/dashboard/quizzes",
+    icon: "/images/icon/quiz.svg",
+  },
+];
+
 export type Profile = {
   fullName: string;
   accountType: "Individual" | "School";
@@ -291,9 +324,9 @@ export interface Stat {
   title: string;
   percentage: string;
   icon: string;
-  trendIcon: string;
-  percentageChange: string;
-  timeFrame: string;
+  trendIcon?: string;
+  percentageChange?: string;
+  timeFrame?: string;
 }
 
 export const stats: Stat[] = [
@@ -438,6 +471,69 @@ export const courseStats: Stat[] = [
     title: "Average Grade",
     percentage: "0",
     icon: "/images/icon/chart.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+export const quizResultStats: Stat[] = [
+  {
+    title: "Score",
+    percentage: "0/0",
+    icon: "/images/icon/clipboard.svg",
+  },
+  {
+    title: "Correct Answers",
+    percentage: "0",
+    icon: "/images/icon/highscore.svg",
+  },
+  {
+    title: "Incorrect Answers",
+    percentage: "0",
+    icon: "/images/icon/add.svg",
+  },
+  {
+    title: "Time taken",
+    percentage: "0 Minutes",
+    icon: "/images/icon/stopwatch.svg",
+  },
+  {
+    title: "Result",
+    percentage: "Pass",
+    icon: "/images/icon/grad.svg",
+  },
+];
+
+export const schoolDashStats: Stat[] = [
+  {
+    title: "Total Students",
+    percentage: "0",
+    icon: "/images/icon/grad.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Average Attendance",
+    percentage: "0%",
+    icon: "/images/icon/calendar.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Experiments Conducted",
+    percentage: "85%",
+    icon: "/images/icon/microscope.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Average Quiz Score",
+    percentage: "0",
+    icon: "/images/icon/clipboard.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",

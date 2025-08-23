@@ -8,6 +8,20 @@ export interface UserObject {
   gender: string;
   country: string;
   password: string;
+  couponCode: string;
+}
+
+export interface SchoolObject {
+  fullName: string;
+  schoolName: string;
+  email: string;
+  phone: string;
+  position: string;
+  totalStudents: string;
+  country: string;
+  password: string;
+  subdomain: string;
+  couponCode: string;
 }
 
 // Interface for login response from backend
@@ -39,6 +53,15 @@ export interface User {
 export async function registerNewUser(newUser: UserObject) {
   try {
     const res = await axios.post("/auth/register", newUser);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function registerNewSchool(newSchool: SchoolObject) {
+  try {
+    const res = await axios.post("/auth/register/school", newSchool);
     return res.data;
   } catch (error) {
     throw error;

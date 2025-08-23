@@ -3,21 +3,27 @@
 import StatCards from "@/components/Dashboard/StatCards";
 import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import { expStats } from "@/lib/data";
+import CourseFilter from "@/services/FilterButton";
 import { useUser } from "@/services/UserContext";
+import { useState } from "react";
 
 export default function DashboardExperimentsPage() {
-     const { user } = useUser();
-     const firstName = user?.fullName?.split(" ")[0];
+    const { user } = useUser();
+    const firstName = user?.fullName?.split(" ")[0];
+    const filters = ["All Experiments", "Physics", "Chemistry", "Biology"];
+    const [activeFilter, setActiveFilter] = useState(filters[0]);
+
+    //  The function to filter courses 
+    //  const filteredCourses =
+    // activeFilter === "All Experiments"
+    //   ? courseData
+    //   : courseData.filter((course) => course.subject === activeFilter);
+
     return (
         <div className="m-1">
-           <WelcomeBanner firstName={firstName? firstName : ""}/>
-           <StatCards stats={expStats} />
-            <div className="flex gap-1 md:gap-2 lg:gap-4 mx-auto lg:mx-0 bg-white rounded-md mt-4 p-3">
-                <button className="bg-[#f5f6fa] p-1 lg:p-2 text-bgBlue rounded-md text-xs lg:text-sm active:bg-bgBlue active:text-white">All Experiments</button>
-                <button className="bg-[#f5f6fa] p-1 lg:p-2 text-bgBlue text-xs lg:text-sm rounded-md active:bg-bgBlue active:text-white">Physics</button>
-                <button className="bg-[#f5f6fa] p-1 lg:p-2 text-bgBlue text-xs lg:text-sm rounded-md active:bg-bgBlue active:text-white">Chemistry</button>
-                <button className="bg-[#f5f6fa] p-1 lg:p-2 text-bgBlue text-xs lg:text-sm rounded-md active:bg-bgBlue active:text-white">Biology</button>
-            </div>
+            <WelcomeBanner firstName={firstName? firstName : ""}/>
+            <StatCards stats={expStats} />
+            <CourseFilter filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter}/>
 
             <div className="m-4">
                 {/* <iframe src="https://youtu.be/6R8EFrK0Vk0?si=1BTzaPa9C6UrS5Ye" className="rounded-sm"> Watch our demo videos</iframe> */}
