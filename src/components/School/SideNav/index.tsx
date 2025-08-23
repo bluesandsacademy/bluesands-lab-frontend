@@ -2,26 +2,19 @@
 "use client"
 
 import Link from "next/link";
-import { sidebarLinks, sideNavLinks } from "@/lib/data";
+import { sidebarLinks } from "@/lib/data";
 import { usePathname } from "next/navigation";
 import { HiX } from "react-icons/hi";
 import { useUser } from "@/services/UserContext";
 import { useRouter } from "next/navigation";
 import NProgress from "nprogress";
 
-// interface SidebarItemObject {
-//     title: string
-//     url: string
-//     icon: string
-// }
-
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-
-export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
+export default function SideNav({ isOpen = true, onClose }: SidebarProps) {
     const pathname = usePathname();
     const { user, logout } = useUser();
     const router = useRouter();
@@ -66,23 +59,7 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 </div>
 
                 <div className="flex flex-col gap-y-3 w-full">
-                    {user?.role === "schoolAdmin" || user?.role === "SchoolAdmin" ? sideNavLinks.map((link, index) => {
-                        return (
-                            <Link 
-                                key={index} 
-                                href={link.url}
-                                className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${pathname === link.url ? "bg-bgBlue text-white" : ""}`}
-                                onClick={onClose} // Close sidebar on mobile when link is clicked
-                            >
-                                <img
-                                    src={link.icon}
-                                    alt={link.title}
-                                    className={`w-5 h-5 ${pathname === link.url ? "filter brightness-0 invert" : index === 0 ? "filter brightness-0" : ""}`}
-                                />
-                                {link.title}
-                            </Link>
-                        )
-                    }): sidebarLinks.map((link, index) => {
+                    {sidebarLinks.map((link, index) => {
                         return (
                             <Link 
                                 key={index} 

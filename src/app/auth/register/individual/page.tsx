@@ -20,6 +20,7 @@ export default function RegisterIndividualAccount() {
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [password, setPassword] = useState("");
+  const [couponCode, setCouponCode] = useState("");
   const [rememberPassword, setRememberPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function RegisterIndividualAccount() {
     gender,
     country,
     password,
+    couponCode,
   };
 
   function handleRememberPassword() {
@@ -39,7 +41,6 @@ export default function RegisterIndividualAccount() {
   }
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-
     e.preventDefault(); // Prevent default form submission
 
     if (isSubmitting) return; // Prevent multiple submissions
@@ -54,7 +55,9 @@ export default function RegisterIndividualAccount() {
       if (err.response?.status === 409) {
         toast.warning("User already exists. Try logging in instead.");
       } else {
-        toast.error("Registration failed. Please check your details and try again.");
+        toast.error(
+          "Registration failed. Please check your details and try again."
+        );
       }
       console.error("Registration failed", err);
     } finally {
@@ -82,7 +85,10 @@ export default function RegisterIndividualAccount() {
             </p>
           </div>
         </div>
-        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white" onSubmit={handleRegister}>
+        <form
+          className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white"
+          onSubmit={handleRegister}
+        >
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="fullName"
@@ -106,7 +112,7 @@ export default function RegisterIndividualAccount() {
             >
               Email Address
             </label>
-            <input   
+            <input
               type="email"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
               id="emailAddress"
@@ -132,13 +138,15 @@ export default function RegisterIndividualAccount() {
             />
           </div>
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
-            <label htmlFor="dob" className="font-medium text-gray-700 text-sm md:text-md">
+            <label
+              htmlFor="dob"
+              className="font-medium text-gray-700 text-sm md:text-md"
+            >
               DOB
             </label>
             <input
               type="date"
               className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
-              
               value={
                 dob.getFullYear().toString() +
                 "-" +
@@ -146,7 +154,6 @@ export default function RegisterIndividualAccount() {
                 "-" +
                 dob.getDate().toString().padStart(2, "0")
               }
-
               required
               id="dob"
               //   value={
@@ -222,6 +229,21 @@ export default function RegisterIndividualAccount() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
+            <label
+              htmlFor="couponCode"
+              className="font-medium text-gray-700 text-sm md:text-md"
+            >
+              Coupon Code
+            </label>
+            <input
+              type="text"
+              className="rounded-md border px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
+              id="couponCode"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+            />
+          </div>
           <div className="w-full flex gap-x-3 items-center">
             <input
               type="checkbox"
@@ -242,7 +264,9 @@ export default function RegisterIndividualAccount() {
               type="submit"
               disabled={isSubmitting}
               className={`text-center rounded-md py-1 md:py-3 lg:py-5 bg-bgBlue text-white w-full text-sm md:text-lg ${
-                isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'
+                isSubmitting
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-blue-600"
               }`}
             >
               {isSubmitting ? "Signing Up..." : "Sign Up"}

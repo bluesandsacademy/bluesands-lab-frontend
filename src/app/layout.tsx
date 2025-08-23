@@ -5,6 +5,7 @@ import LoadingBar from "@/components/LoadingBar";
 import { UserProvider } from "@/services/UserContext";
 import { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
+import AuthGuard from "@/services/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Blue Sands Stem Labs",
@@ -34,7 +35,7 @@ export default function RootLayout({
           draggable
           pauseOnHover
         />
-        <UserProvider> {children} </UserProvider>
+        <UserProvider><AuthGuard> {children} </AuthGuard></UserProvider>
       </body>
     </html>
   );
