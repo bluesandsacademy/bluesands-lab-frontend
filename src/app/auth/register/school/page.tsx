@@ -299,13 +299,11 @@
 //   );
 // }
 
-
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import NProgress from "nprogress";
 import { countries, workPositions } from "@/lib/data";
-import { useRouter } from "next/navigation";
 import { registerNewSchool, SchoolObject } from "@/services/auth-service";
 import { toast } from "react-toastify";
 
@@ -328,7 +326,7 @@ export default function RegisterSchoolAccount() {
   const [subdomain, setSubdomain] = useState(""); // Full domain with suffix
   const [rememberPassword, setRememberPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
 
   const DOMAIN_SUFFIX = ".bluesandstemlabs.com";
   const MAX_DOMAIN_LENGTH = 20; // Maximum length for the domain prefix
@@ -350,20 +348,24 @@ export default function RegisterSchoolAccount() {
     setRememberPassword(!rememberPassword);
   }
 
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
   // Handle domain input changes
   const handleSubdomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    
+
     // Remove whitespace
     value = value.replace(/\s/g, "");
-    
+
     // Convert to lowercase for consistency
     value = value.toLowerCase();
-    
+
     // Limit length
     if (value.length <= MAX_DOMAIN_LENGTH) {
       setSubdomainInput(value);
-      
+
       // Update the full domain
       if (value.trim()) {
         setSubdomain(value + DOMAIN_SUFFIX);
@@ -382,8 +384,10 @@ export default function RegisterSchoolAccount() {
 
     try {
       await registerNewSchool(payload);
-      toast.success("User created successfully.");
-      router.push("/auth/login");
+      setShowModal(true)
+      toast.success(
+        "User created successfully. Check your mail for verification link"
+      );
     } catch (err: any) {
       if (err.response?.status === 409) {
         toast.warning("User already exists. Try logging in instead.");
@@ -401,6 +405,24 @@ export default function RegisterSchoolAccount() {
 
   return (
     <>
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-300">
+            <h2 className="text-lg font-semibold text-center">
+              Sign Up Successful
+            </h2>
+            <p className="text-center">
+              Please check your email for the verification link.
+            </p>
+            <button
+              className="mt-4 bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition duration-200 mx-auto"
+              onClick={handleModalClose}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <section className="min-h-screen p-3 mb-10">
         <div className="w-full flex justify-center relative z-0">
           <img
@@ -585,11 +607,13 @@ export default function RegisterSchoolAccount() {
             </div>
             {subdomain && (
               <p className="text-sm text-gray-600 mt-1">
-                Your domain will be: <span className="font-medium text-blue-600">{subdomain}</span>
+                Your domain will be:{" "}
+                <span className="font-medium text-blue-600">{subdomain}</span>
               </p>
             )}
             <p className="text-xs text-gray-500">
-              Maximum {MAX_DOMAIN_LENGTH} characters. Only letters, numbers, and hyphens allowed.
+              Maximum {MAX_DOMAIN_LENGTH} characters. Only letters, numbers, and
+              hyphens allowed.
             </p>
           </div>
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
