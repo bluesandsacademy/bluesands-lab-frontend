@@ -680,3 +680,5 @@ export const courseIcons = {
   biology: "/images/icon/performance/biology.svg",
   organicChemistry: "/images/icon/performance/organic_chemistry.svg",
 };
+
+//end
