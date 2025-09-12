@@ -8,10 +8,10 @@ const VerifySuccess = () => {
   const { logout } = useUser();
 
   const handleLogin = () => {
-    nProgress.start;
+    nProgress.start();
     logout();
     router.push("/auth/login");
-    nProgress.done;
+    nProgress.done();
   };
 
   return (

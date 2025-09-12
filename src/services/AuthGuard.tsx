@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "./UserContext";
 import { resendVerification } from "./auth-service";
 import { toast } from "react-toastify";
-import nProgress from "nprogress";
+import NProgress from "nprogress";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -22,19 +22,19 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     "/auth/login",
     "/auth/register",
     "/auth/forgot-password",
-    "/auth/verify-email", 
+    "/auth/verify-email",
     "/",
-    "/auth/verify-success"
+    "/auth/verify-success",
   ];
 
   // routes that don't require email verification
   const noVerificationRoutes = [
     "/auth/login",
-    "/auth/register", 
+    "/auth/register",
     "/auth/forgot-password",
     "/auth/verify-email",
     "/",
-    "/auth/verify-success"
+    "/auth/verify-success",
   ];
 
   // Helper function to get role-based dashboard route
@@ -47,29 +47,31 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   // Helper function to request new verification email
   const handleRequestVerification = async () => {
+    NProgress.start();
     try {
-       // Check if user and email exist
+      // Check if user and email exist
       if (!user?.email) {
         toast.error("Email not found. Please try logging in again.");
         return;
       }
-      nProgress.start
       console.log("Requesting new verification email for:", user?.email);
       // API call:
       await resendVerification(user?.email)
       toast.success("Verification email sent! Please check your email inbox.");
-      nProgress.done
+      NProgress.done();
     } catch (error) {
       console.error("Error sending verification email:", error);
       toast.error("Failed to send verification email. Please try again.");
-      nProgress.done
+      NProgress.done();
     }
   };
 
   const handleLogout = () => {
-    logout()
-    router.push("/login")
-  }
+    NProgress.start();
+    logout();
+    router.push("/login");
+    NProgress.done();
+  };
 
   useEffect(() => {
     // Don't do anything until UserContext is initialized
@@ -111,14 +113,27 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     }
 
     // If user is logged in but not verified and trying to access protected route
-    if (isLoggedIn && token && user && !user.isVerified && requiresVerification) {
-      console.log("AuthGuard - User not verified, staying on verification screen");
+    if (
+      isLoggedIn &&
+      token &&
+      user &&
+      !user.isVerified &&
+      requiresVerification
+    ) {
+      console.log(
+        "AuthGuard - User not verified, staying on verification screen"
+      );
       setIsLoading(false);
       return;
     }
 
     // If user is logged in and trying to access auth pages, redirect to appropriate dashboard
-    if (isLoggedIn && token && pathname.startsWith("/auth/") && !pathname.startsWith("/auth/verify-email")) {
+    if (
+      isLoggedIn &&
+      token &&
+      pathname.startsWith("/auth/") &&
+      !pathname.startsWith("/auth/verify-email")
+    ) {
       const dashboardRoute = getDashboardRoute(user?.role);
       console.log(
         `AuthGuard - Redirecting to ${dashboardRoute} (already authenticated)`
@@ -152,7 +167,15 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
     console.log("AuthGuard - Setting loading to false");
     setIsLoading(false);
-  }, [isLoggedIn, token, pathname, router, isInitialized, user?.role, user?.isVerified]);
+  }, [
+    isLoggedIn,
+    token,
+    pathname,
+    router,
+    isInitialized,
+    user?.role,
+    user?.isVerified,
+  ]);
 
   // Add additional effect to handle browser back button after logout
   useEffect(() => {
@@ -194,10 +217,15 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   }
 
   // Show verification screen if user is logged in but not verified
-  if (isLoggedIn && user && !user.isVerified && !noVerificationRoutes.some(route => {
-    if (route === "/") return pathname === "/";
-    return pathname.startsWith(route);
-  })) {
+  if (
+    isLoggedIn &&
+    user &&
+    !user.isVerified &&
+    !noVerificationRoutes.some((route) => {
+      if (route === "/") return pathname === "/";
+      return pathname.startsWith(route);
+    })
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white flex flex-col p-8 items-center rounded-lg shadow-lg text-center max-w-md">
@@ -211,19 +239,26 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
               Email Verification Required
             </h2>
             <p className="text-gray-600 mb-6">
-              Your email has not been verified. Please click on the verification link sent to your email, or request a new verification email below.
+              Your email has not been verified. Please click on the verification
+              link sent to your email, or request a new verification email
+              below.
             </p>
             <p className="text-sm text-gray-500 mb-6">
               Email: <span className="font-medium">{user.email}</span>
             </p>
           </div>
-          <button 
+          <button
             onClick={handleRequestVerification}
             className="text-white bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-medium transition-colors duration-200"
           >
             Request New Verification Email
           </button>
-          <button className="text-blue-600 bg-slate-300 rounded-md px-2 mt-6 border border-blue-500" onClick={handleLogout}>Log out</button>
+          <button
+            className="text-blue-600 bg-slate-300 rounded-md px-2 mt-6 border border-blue-500"
+            onClick={handleLogout}
+          >
+            Log out
+          </button>
         </div>
       </div>
     );
