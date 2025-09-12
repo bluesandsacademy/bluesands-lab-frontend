@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import NProgress from "nprogress";
 import { countries, genderOptions } from "@/lib/data";
-import { useRouter } from "next/navigation";
 import { UserObject, registerNewUser } from "@/services/auth-service";
 import { toast } from "react-toastify";
 
@@ -23,7 +22,7 @@ export default function RegisterIndividualAccount() {
   const [couponCode, setCouponCode] = useState("");
   const [rememberPassword, setRememberPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
 
   const payload: UserObject = {
     fullName,
@@ -40,6 +39,10 @@ export default function RegisterIndividualAccount() {
     setRememberPassword(!rememberPassword);
   }
 
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission
 
@@ -49,8 +52,10 @@ export default function RegisterIndividualAccount() {
 
     try {
       await registerNewUser(payload);
-      toast.success("User created successfully.");
-      router.push("/auth/login");
+      setShowModal(true);
+      toast.success(
+        "User created successfully. Check your email for verification link"
+      );
     } catch (err: any) {
       if (err.response?.status === 409) {
         toast.warning("User already exists. Try logging in instead.");
@@ -68,6 +73,24 @@ export default function RegisterIndividualAccount() {
 
   return (
     <>
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-300">
+            <h2 className="text-lg font-semibold text-center">
+              Sign Up Successful
+            </h2>
+            <p className="text-center">
+              Please check your email for the verification link.
+            </p>
+            <button
+              className="mt-4 bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition duration-200 mx-auto"
+              onClick={handleModalClose}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <section className="min-h-screen p-3 mb-10">
         <div className="w-full flex justify-center relative z-0">
           <img
