@@ -1,6 +1,8 @@
+import ChangePassword from "@/components/Navbar/TopNav/UserProfile/ChangePassword"
+
 const DashboardChangePasswordPage = () => {
   return (
-    <div>change password page under construction...</div>
+    <ChangePassword/>
   )
 }
 

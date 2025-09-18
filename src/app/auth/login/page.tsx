@@ -76,9 +76,14 @@ export default function UserLogin() {
             className="w-full object-contain z-0"
             alt=""
           />
-          <div className="absolute h-full md:h-auto top-1 lg:top-0 flex flex-col justify-center items-center gap-y-1 lg:gap-y-5 md:text-center text-white max-w-lg lg:bottom-36 md:bottom-28 bottom-5 space-y-1 lg:space-y-3">
-            <h1 className="text-xl md:text-2xl lg:text-4xl font-normal">Welcome Back!</h1>
-            <p className="font-thin text-xs md:text-base lg:text-lg md:max-w-lg max-w-xs text-center">
+          <div className="absolute h-full md:h-auto top-1 lg:top-0 flex flex-col justify-center items-center gap-y-0 lg:gap-y-1 md:text-center text-white max-w-lg lg:max-w-none md:bottom-28 bottom-5 space-y-1 lg:space-y-3">
+            <img
+              src="/images/logo/blue_sands_white.png"
+              alt="Logo"
+              className="w-auto h-7 lg:h-12 mx-auto"
+            />
+            <h1 className="hidden md:flex text-xl md:text-2xl lg:text-4xl font-normal">Welcome Back!</h1>
+            <p className="font-thin text-xs lg:text-lg max-w-xs md:max-w-lg lg:max-w-none text-center">
               Transforming Education Through Innovation with Cutting-Edge STEM
               Learning Experiences
             </p>

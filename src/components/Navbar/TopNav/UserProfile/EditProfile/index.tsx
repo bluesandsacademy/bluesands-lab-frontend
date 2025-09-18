@@ -4,49 +4,32 @@ import Image from "next/image";
 
 const EditProfile = () => {
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
+    const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("")
    
 
   return (
-    <div className="m-5 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-3 lg:p-12 rounded-md">
-        <div className="flex flex-col gap-4 mx-auto md:w-40">
+    <div className="m-3 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-12 rounded-md">
+      <p className="text-sm md:text-base lg:text-lg font-semibold text-bgBlue">Profile Information</p>
+        {/* <div className="flex flex-col gap-4 mx-auto md:w-40">
             <Image src={"/images/avatar/user01.png"} alt="profile-avatar" className="w-20 md:w-24 lg:w-40 mx-auto rounded-full" width={160} height={160}/>
             <p className="text-bgBlue text-sm lg:text-base mx-auto">Change profile photo</p>
-        </div>
-        <form action="submit" className="grid md:grid-cols-2 gap-8">
+        </div> */}
+        <form action="submit" className="flex flex-col gap-8">
             <div className="flex flex-col w-full gap-y-1 md:gap-2 lg:gap-y-4">
             <label
               htmlFor="firstName"
               className="font-medium text-gray-700 text-sm md:text-md"
             >
-              First Name
+              Full Name
             </label>
             <input
               type="text"
               className="rounded-md border px-2 md:px-3 py-1 lg:py-2 w-full text-gray-600 text-sm md:text-base"
-              value={firstName}
+              value={fullName}
               id="firstName"
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            </div>
-
-            <div className="flex flex-col w-full gap-y-1 md:gap-2 lg:gap-y-4">
-            <label
-              htmlFor="lastName"
-              className="font-medium text-gray-700 text-sm md:text-md"
-            >
-              Last Name
-            </label>
-            <input
-              type="text"
-              className="rounded-md border px-2 md:px-3 py-1 lg:py-2 w-full text-gray-600 text-sm md:text-base"
-              value={lastName}
-              required
-              id="lastName"
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) => setFullName(e.target.value)}
             />
             </div>
 
@@ -84,9 +67,8 @@ const EditProfile = () => {
             />
           </div>
             
-            <div className="flex gap-2 lg:gap-4 mx-auto lg:mx-0">
-                <button className="bg-bgBlue p-1 lg:p-2 text-white rounded-md text-xs lg:text-sm">Save Changes</button>
-                <button className="bg-[#f5f6fa]  p-1 lg:p-2 px-4 lg:px-6 text-bgBlue text-xs lg:text-sm rounded-md">Cancel</button>
+            <div className="flex gap-2 lg:gap-4 mx-auto w-full">
+                <button className="bg-bgBlue w-full p-1 lg:p-2 text-white rounded-md text-xs lg:text-sm">Save Changes</button>
             </div>
         </form>
     </div>

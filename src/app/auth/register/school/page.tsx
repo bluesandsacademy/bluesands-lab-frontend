@@ -424,17 +424,20 @@ export default function RegisterSchoolAccount() {
         </div>
       )}
       <section className="min-h-screen p-3 mb-10">
-        <div className="w-full flex justify-center relative z-0">
+         <div className="w-full flex justify-center relative z-0">
           <img
             src="/images/bg/cover.png"
             className="w-full object-contain z-0"
             alt=""
           />
-          <div className="absolute flex flex-col items-center justify-center  top-1 md:top-0 text-center text-white max-w-lg md:bottom-28 lg:bottom-36 bottom-5 space-y-1 lg:space-y-3">
-            <h1 className="text-xl md:text-2xl lg:text-4xl font-normal">
-              Create your Account
-            </h1>
-            <p className="font-thin text-xs md:text-sm lg:text-lg md:max-w-lg max-w-xs">
+          <div className="absolute h-full md:h-auto top-1 lg:top-0 flex flex-col justify-center items-center gap-y-0 lg:gap-y-1 md:text-center text-white max-w-lg lg:max-w-none md:bottom-28 bottom-5 space-y-1 lg:space-y-3">
+            <img
+              src="/images/logo/blue_sands_white.png"
+              alt="Logo"
+              className="w-auto h-7 lg:h-12 mx-auto"
+            />
+            <h1 className="hidden md:flex text-xl md:text-2xl lg:text-4xl font-normal">Create Your Account</h1>
+            <p className="font-thin text-xs lg:text-lg max-w-xs md:max-w-lg lg:max-w-none text-center">
               Transforming Education Through Innovation with Cutting-Edge STEM
               Learning Experiences
             </p>
