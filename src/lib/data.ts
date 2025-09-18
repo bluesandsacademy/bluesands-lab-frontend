@@ -249,6 +249,16 @@ export const sidebarLinks: SidebarLinks[] = [
     icon: "/images/icon/quiz.svg",
   },
   {
+    title: "Badges & Rewards",
+    url: "/dashboard/rewards",
+    icon: "/images/icon/badge.svg",
+  },
+  {
+    title: "Leaderboard",
+    url: "/dashboard/leaderboard",
+    icon: "/images/icon/ic_outline-leaderboard.svg",
+  },
+  {
     title: "Report",
     url: "/dashboard/reports",
     icon: "/images/icon/report.svg",
@@ -331,7 +341,7 @@ export interface Stat {
 
 export const stats: Stat[] = [
   {
-    title: "Attendance",
+    title: "Lab Time",
     percentage: "90%",
     icon: "/images/icon/calendar.svg",
     trendIcon: "/images/icon/trend_up.svg",
@@ -339,7 +349,7 @@ export const stats: Stat[] = [
     timeFrame: "from last month",
   },
   {
-    title: "Lab Completion Rate",
+    title: "Completed Experiments",
     percentage: "75%",
     icon: "/images/icon/beaker_01.svg",
     trendIcon: "/images/icon/trend_up.svg",
@@ -355,7 +365,7 @@ export const stats: Stat[] = [
     timeFrame: "from last month",
   },
   {
-    title: "Experiment Attempts",
+    title: "Ranking",
     percentage: "20 Attempts",
     icon: "/images/icon/microscope.svg",
     trendIcon: "/images/icon/trend_up.svg",

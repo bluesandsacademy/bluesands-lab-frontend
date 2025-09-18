@@ -43,7 +43,6 @@
 //   );
 // }
 
-
 // 4. Updated DashboardPage Component
 "use client";
 
@@ -63,16 +62,23 @@ export default function DashboardHome() {
     <div className="p-3 md:p-5 space-y-6 md:space-y-10">
       {/* Welcome Section */}
       <div className="relative rounded-lg overflow-hidden">
-        <img 
-          src="/images/bg/welcome_cover.png" 
-          alt="welcome-background" 
+        <img
+          src="/images/bg/welcome_cover.png"
+          alt="welcome-background"
           className="w-full h-32 md:h-28 lg:h-20 object-cover"
         />
-        <div className="absolute top-1/2 -translate-y-1/2 text-white left-4 md:left-10">
-          <h3 className="font-medium leading-tight md:leading-none my-0 text-lg md:text-2xl lg:text-3xl">
-            Welcome Back, {firstName}
-          </h3>
-          <p className="my-0 text-sm md:text-md leading-normal md:leading-none">Ready for your next STEM adventure?</p>
+        <div className="absolute top-1/2 -translate-y-1/2 text-white left-4 md:left-10 w-[90%]">
+          <div className="flex flex-col gap-4 md:gap-0 md:flex-row w-full justify-between items-center md:items-baseline">
+            <div>
+              <h3 className="font-medium leading-tight md:leading-none my-0 text-lg md:text-2xl lg:text-3xl">
+                Welcome Back, {firstName}
+              </h3>
+              <p className="my-0 text-sm md:text-md leading-normal md:leading-none">
+                Ready for your next STEM adventure?
+              </p>
+            </div>
+            <button className="bg-bgBlue text-white text-xs md:text-sm p-2 rounded-md">Join Our Community</button>
+          </div>
         </div>
       </div>
 
@@ -99,7 +105,9 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      <p className="text-gray-500 text-sm md:text-base">Let's dive into your next STEM adventure!</p>
+      <p className="text-gray-500 text-sm md:text-base">
+        Let's dive into your next STEM adventure!
+      </p>
       {/* <button onClick={handleclick} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
         Show user
       </button> */}
