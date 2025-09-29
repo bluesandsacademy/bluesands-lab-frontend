@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "react-toastify/dist/ReactToastify.css"; 
+import "react-toastify/dist/ReactToastify.css";
 import LoadingBar from "@/components/LoadingBar";
 import { UserProvider } from "@/services/UserContext";
 import { Suspense } from "react";
@@ -35,7 +35,9 @@ export default function RootLayout({
           draggable
           pauseOnHover
         />
-        <UserProvider><AuthGuard> {children} </AuthGuard></UserProvider>
+        <UserProvider>
+          <AuthGuard> {children} </AuthGuard>
+        </UserProvider>
       </body>
     </html>
   );

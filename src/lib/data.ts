@@ -457,7 +457,7 @@ export const courseStats: Stat[] = [
     title: "Stem Courses",
     percentage: "0",
     icon: "/images/icon/grad.svg",
-    trendIcon: "/images/icon/add.svg",
+    trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
   },
@@ -543,6 +543,41 @@ export const schoolDashStats: Stat[] = [
   {
     title: "Average Quiz Score",
     percentage: "0",
+    icon: "/images/icon/clipboard.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+export const rewardStats: Stat[] = [
+  {
+    title: "Total Points",
+    percentage: "0",
+    icon: "/images/icon/kudos.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+    {
+    title: "Experiments",
+    percentage: "0",
+    icon: "/images/icon/beaker_01.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+    {
+    title: "Day Streak",
+    percentage: "0",
+    icon: "/images/icon/calendar.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "High Score",
+    percentage: "0%",
     icon: "/images/icon/clipboard.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",

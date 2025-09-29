@@ -5,13 +5,22 @@ import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import { expStats } from "@/lib/data";
 import CourseFilter from "@/services/FilterButton";
 import { useUser } from "@/services/UserContext";
+import Link from "next/link";
 import { useState } from "react";
+import { FaQuestionCircle } from "react-icons/fa";
+import { IoMdCalendar } from "react-icons/io";
+import { LuClock3 } from "react-icons/lu";
 
 export default function DashboardExperimentsPage() {
     const { user } = useUser();
     const firstName = user?.fullName?.split(" ")[0];
     const filters = ["All Experiments", "Physics", "Chemistry", "Biology"];
     const [activeFilter, setActiveFilter] = useState(filters[0]);
+
+    const description =
+    "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptates suscipit molestiae quos hic quod maiores, nihil nemo similique expedita provident neque possimus ea corrupti deserunt, accusantium quo soluta illum amet facere? Corrupti sunt consequuntur facilis, ab fuga, culpa id, fugiat quis aut nulla ratione eius? Fuga numquam magni quidem unde.";
+  const truncatedDesc = description.split(" ").slice(0, 15).join(" ") + "...";
+
 
     //  The function to filter courses 
     //  const filteredCourses =
@@ -25,17 +34,30 @@ export default function DashboardExperimentsPage() {
             <StatCards stats={expStats} />
             <CourseFilter filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter}/>
 
-            <div className="m-4">
-                {/* <iframe src="https://youtu.be/6R8EFrK0Vk0?si=1BTzaPa9C6UrS5Ye" className="rounded-sm"> Watch our demo videos</iframe> */}
-                 <iframe
-                    src="https://www.youtube.com/embed/6R8EFrK0Vk0"
-                    className="rounded-sm w-full md:w-96 h-52 md:h-80 lg:w-[560px] lg:h-[315px] m-1 md:m-2 lg:m-4 mb-32"
-                    width="560"
-                    height="315"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title="Demo Video"
-                ></iframe>
+            <div className="flex flex-wrap gap-4 m-4">
+
+                <div className="flex flex-col gap-2 rounded overflow-hidden w-80 bg-white">
+                    <div className="flex items-center justify-center w-full py-12 bg-black text-white">
+                        Example Experiment
+                    </div>
+                    <div className="flex flex-col gap-2 px-2">
+                        <p className="text-xs md:text-sm font-semibold">Example</p>
+                        <p className="text-xs">{
+                            description.length < 16 ? description : truncatedDesc
+                            }</p>
+                        <div className="flex justify-between">
+                            <div className="flex flex-col gap-1">
+                                <p className="text-xs text-gray-600 flex items-center gap-1"> <LuClock3 className="text-blue-600"/> 00:00</p>
+                                <p className="text-xs text-gray-600 flex items-center gap-1"> <IoMdCalendar className="text-blue-600"/> dd-mm-yyyy</p>
+                            </div>
+                            <p className="text-xs md:text-sm flex items-center gap-2"> <FaQuestionCircle className="text-blue-600"/> Unattempt</p>
+                        </div>
+                        {/* <Link href={"/dashboard/experiments/overview"}> */}
+                             <button className="bg-bgBlue text-white w-full p-2 rounded-md text-sm">Go to lab</button>
+                        {/* </Link>                        */}
+                    </div>
+                </div>
+
             </div>
         </div>
     )

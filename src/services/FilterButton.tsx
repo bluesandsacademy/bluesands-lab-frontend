@@ -6,7 +6,7 @@ interface FilterButtonProps {
 
 const FilterButton = ({ filters, onFilterChange, activeFilter }: FilterButtonProps) => {
   return (
-    <div className="flex gap-2 lg:gap-4 mx-auto lg:mx-0 bg-white rounded-md mt-4 p-3">
+    <div className="flex flex-wrap gap-2 lg:gap-4 mx-auto lg:mx-0 bg-white rounded-md mt-4 p-3">
       {filters.map((filter) => (
         <button
           key={filter}
