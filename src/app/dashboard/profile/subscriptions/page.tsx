@@ -1,5 +1,7 @@
 import Link from "next/link";
 import React from "react";
+import { BsBagPlusFill, BsCreditCardFill } from "react-icons/bs";
+import { MdDoNotDisturb } from "react-icons/md";
 
 const Subscriptions = () => {
   return (
@@ -43,9 +45,9 @@ const Subscriptions = () => {
         </div>
       </div>
 
-      <div className="flex ">
-        <div className="m-3 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md">
-          <div>icon</div>
+      <div className="flex flex-col md:flex-row">
+        <div className="m-3 flex flex-[1_1_30%] flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md">
+          <div className="p-3 bg-sky-200 w-max rounded-2xl"><BsBagPlusFill className="text-sky-600 text-xl lg:text-3xl"/></div>
           <div className="flex flex-col gap-1">
             <p className="text-sm md:text-base lg:text-lg font-semibold text-bgBlue">
               Change Plan
@@ -55,8 +57,8 @@ const Subscriptions = () => {
             </p>
           </div>
         </div>
-        <div className="m-3 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md">
-          <div>icon</div>
+        <div className="m-3 flex flex-[1_1_30%] flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md">
+          <div className="p-3 bg-lime-200 w-max rounded-2xl"><BsCreditCardFill className="text-lime-800 text-xl lg:text-3xl"/></div>
           <div className="flex flex-col gap-1">
             <p className="text-sm md:text-base lg:text-lg font-semibold text-bgBlue">
               Update Payment Method
@@ -66,8 +68,8 @@ const Subscriptions = () => {
             </p>
           </div>
         </div>
-        <div className="m-3 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md">
-          <div>icon</div>
+        <div className="m-3 flex flex-[1_1_30%] flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md">
+          <div className="p-3 bg-red-200 w-max rounded-2xl"><MdDoNotDisturb className="text-pink-600 text-xl lg:text-3xl" /></div>
           <div className="flex flex-col gap-1">
             <p className="text-sm md:text-base lg:text-lg font-semibold text-bgBlue">
               Cancel Subscription

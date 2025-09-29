@@ -49,22 +49,22 @@ const DashboardReportsPage = () => {
     "Experiments": {
       headings: ["Index", "Title", "Total Number", "Attempted", "Completed"],
       data: [
-        { index: "1", title: "Biology Lab", totalnumber: "5", attempted: "3", completed: "2" },
-        { index: "2", title: "Chemistry Lab", totalnumber: "4", attempted: "4", completed: "3" },
+        // { index: "1", title: "Biology Lab", totalnumber: "5", attempted: "3", completed: "2" },
+        // { index: "2", title: "Chemistry Lab", totalnumber: "4", attempted: "4", completed: "3" },
       ]
     },
     "Quizzes": {
       headings: ["Index", "Total Number", "Average Score", "Highest Score"],
       data: [
-        { index: "1", totalnumber: "10", averagescore: "85%", highestscore: "95%" },
-        { index: "2", totalnumber: "8", averagescore: "78%", highestscore: "92%" },
+        // { index: "1", totalnumber: "10", averagescore: "85%", highestscore: "95%" },
+        // { index: "2", totalnumber: "8", averagescore: "78%", highestscore: "92%" },
       ]
     },
     "STEM Courses": {
       headings: ["Index", "Title", "Hours Spent", "Completed", "Incomplete"],
       data: [
-        { index: "1", title: "Biology", hoursspent: "40", completed: "80%", incomplete: "20%" },
-        { index: "2", title: "Chemistry", hoursspent: "35", completed: "90%", incomplete: "10%" },
+        // { index: "1", title: "Biology", hoursspent: "40", completed: "80%", incomplete: "20%" },
+        // { index: "2", title: "Chemistry", hoursspent: "35", completed: "90%", incomplete: "10%" },
       ]
     }
   };

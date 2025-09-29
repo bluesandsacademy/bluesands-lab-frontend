@@ -2,7 +2,7 @@
 "use client"
 
 import Link from "next/link";
-import { sidebarLinks } from "@/lib/data";
+import { sideNavLinks } from "@/lib/data";
 import { usePathname } from "next/navigation";
 import { HiX } from "react-icons/hi";
 import { useUser } from "@/services/UserContext";
@@ -12,9 +12,10 @@ import NProgress from "nprogress";
 interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  navlinks: {}[]
 }
 
-export default function SideNav({ isOpen = true, onClose }: SidebarProps) {
+export default function SideNav({ isOpen = true, onClose, navlinks }: SidebarProps) {
     const pathname = usePathname();
     const { user, logout } = useUser();
     const router = useRouter();
@@ -59,7 +60,7 @@ export default function SideNav({ isOpen = true, onClose }: SidebarProps) {
                 </div>
 
                 <div className="flex flex-col gap-y-3 w-full">
-                    {sidebarLinks.map((link, index) => {
+                    {sideNavLinks.map((link, index) => {
                         return (
                             <Link 
                                 key={index} 
