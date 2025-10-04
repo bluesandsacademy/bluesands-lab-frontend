@@ -1,4 +1,3 @@
-
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -15,6 +14,10 @@ export interface User {
   role?: string;
   avatarUrl?: string;
   isVerified: boolean;
+  schoolId?: string;
+  subscription?: any; // or null
+  currentTier?: string | null;
+  promoApplied?: string | null;
 }
 
 interface UserContextType {
