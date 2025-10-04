@@ -26,9 +26,11 @@ interface UserContextType {
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   token: string | null;
   setToken: (token: string | null) => void;
   isInitialized: boolean;
+  isRefreshing: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -38,6 +40,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [token, setTokenState] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const router = useRouter();
 
   const logout = async () => {
@@ -58,6 +61,70 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       // Always clear local state regardless of API call success
       clearUserData();
       router.replace("/auth/login");
+    }
+  };
+
+  const refreshUser = async () => {
+    const currentToken = token || localStorage.getItem("token");
+    
+    if (!currentToken) {
+      console.log("UserContext - No token available for refresh");
+      return;
+    }
+
+    setIsRefreshing(true);
+    
+    try {
+      console.log("UserContext - Refreshing user data");
+      
+      // Replace with your actual API endpoint
+      const response = await fetch("/api/user/me", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${currentToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token is invalid, logout user
+          console.log("UserContext - Token invalid during refresh, logging out");
+          await logout();
+          return;
+        }
+        throw new Error(`Failed to refresh user: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      // Update user data
+      const updatedUser: User = {
+        userId: data.userId || data.id,
+        fullName: data.fullName || data.name,
+        email: data.email,
+        phone: data.phone,
+        gender: data.gender,
+        country: data.country,
+        dob: data.dob,
+        role: data.role,
+        avatarUrl: data.avatarUrl,
+        isVerified: data.isVerified,
+        schoolId: data.schoolId,
+        subscription: data.subscription,
+        currentTier: data.currentTier,
+        promoApplied: data.promoApplied,
+      };
+
+      setUserState(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      console.log("UserContext - User data refreshed successfully");
+    } catch (error) {
+      console.error("UserContext - Error refreshing user:", error);
+      // Don't logout on network errors, only on auth errors
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -181,7 +248,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <UserContext.Provider
-      value={{ user, setUser, isLoggedIn, setIsLoggedIn, logout, token, setToken, isInitialized, }}
+      value={{ 
+        user, 
+        setUser, 
+        isLoggedIn, 
+        setIsLoggedIn, 
+        logout, 
+        refreshUser,
+        token, 
+        setToken, 
+        isInitialized,
+        isRefreshing,
+      }}
     >
       {children}
     </UserContext.Provider>

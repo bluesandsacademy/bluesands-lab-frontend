@@ -8,7 +8,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 const SchoolStudentPaymentPage = () => {
-  const { user, logout } = useUser();
+  const { user, logout, token, refreshUser } = useUser();
   const router = useRouter();
   const [studentCount, setStudentCount] = useState(0);
   const VAT_RATE = 0.075; // 7.5%
@@ -159,15 +159,29 @@ const SchoolStudentPaymentPage = () => {
 
         // Register the payment details
         try {
-          await axios.post(`${baseUrl}/payments/register-payment`, {
-            reference: reference,
-            userId: user?.userId,
-            studentCount: studentCount,
-            pricePerStudent: pricePerStudent,
-            subtotal: subtotal,
-            vatAmount: vatAmount,
-            amount: totalAmount,
-          });
+          await axios.post(
+            `${baseUrl}/payments/register-payment`,
+            {
+              reference: reference,
+              userId: user?.userId,
+              studentCount: studentCount,
+              pricePerStudent: pricePerStudent,
+              subtotal: subtotal,
+              vatAmount: vatAmount,
+              amount: totalAmount,
+              promoCode: couponCode
+            },
+            {
+              headers: token
+                ? {
+                    Authorization: token,
+                  }
+                : {},
+            }
+          );
+
+          // Refresh user data to get updated subscription info
+          await refreshUser();
 
           // Reset coupon state after successful registration
           setCouponCode("");
