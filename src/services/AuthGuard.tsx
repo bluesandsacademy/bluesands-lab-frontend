@@ -37,6 +37,31 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     "/auth/verify-success",
   ];
 
+  // routes that don't require payment (can be accessed even without subscription)
+  const noPaymentRequiredRoutes = [
+    "/auth/login",
+    "/auth/register",
+    "/auth/forgot-password",
+    "/auth/verify-email",
+    "/",
+    "/auth/verify-success",
+    "/make-payment",
+    "/bulk-payment",
+  ];
+
+  // Helper function to check if user has paid
+  const hasActiveSubscription = (user: any) => {
+    return user?.subscription !== null && user?.subscription !== undefined;
+  };
+
+  // Helper function to get payment route based on role
+  const getPaymentRoute = (userRole?: string) => {
+    if (userRole === "schoolAdmin" || userRole === "SchoolAdmin") {
+      return "/bulk-payment";
+    }
+    return "/make-payment"; // default for students
+  };
+
   // Helper function to get role-based dashboard route
   const getDashboardRoute = (userRole?: string) => {
     if (userRole === "schoolAdmin" || userRole === "SchoolAdmin") {
@@ -56,7 +81,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       }
       console.log("Requesting new verification email for:", user?.email);
       // API call:
-      await resendVerification(user?.email)
+      await resendVerification(user?.email);
       toast.success("Verification email sent! Please check your email inbox.");
       NProgress.done();
     } catch (error) {
@@ -85,6 +110,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     console.log("AuthGuard - token exists:", !!token);
     console.log("AuthGuard - user role:", user?.role);
     console.log("AuthGuard - user verified:", user?.isVerified);
+    console.log("AuthGuard - user subscription:", user?.subscription);
 
     // Check if current route is public
     const isPublicRoute = publicRoutes.some((route) => {
@@ -102,8 +128,17 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       return pathname.startsWith(route);
     });
 
+    // Check if current route requires payment
+    const requiresPayment = !noPaymentRequiredRoutes.some((route) => {
+      if (route === "/") {
+        return pathname === "/";
+      }
+      return pathname.startsWith(route);
+    });
+
     console.log("AuthGuard - Is public route:", isPublicRoute);
     console.log("AuthGuard - Requires verification:", requiresVerification);
+    console.log("AuthGuard - Requires payment:", requiresPayment);
 
     // If user is not logged in and trying to access protected route
     if (!isLoggedIn && !token && !isPublicRoute) {
@@ -127,6 +162,23 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       return;
     }
 
+    // If user is verified but hasn't paid and trying to access protected route
+    if (
+      isLoggedIn &&
+      token &&
+      user &&
+      user.isVerified &&
+      !hasActiveSubscription(user) &&
+      requiresPayment
+    ) {
+      const paymentRoute = getPaymentRoute(user.role);
+      console.log(
+        `AuthGuard - User verified but no subscription, redirecting to ${paymentRoute}`
+      );
+      router.replace(paymentRoute);
+      return;
+    }
+
     // If user is logged in and trying to access auth pages, redirect to appropriate dashboard
     if (
       isLoggedIn &&
@@ -134,6 +186,16 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       pathname.startsWith("/auth/") &&
       !pathname.startsWith("/auth/verify-email")
     ) {
+      // Check if user needs to pay first
+      if (user && user.isVerified && !hasActiveSubscription(user)) {
+        const paymentRoute = getPaymentRoute(user.role);
+        console.log(
+          `AuthGuard - Redirecting to ${paymentRoute} (payment required)`
+        );
+        router.replace(paymentRoute);
+        return;
+      }
+
       const dashboardRoute = getDashboardRoute(user?.role);
       console.log(
         `AuthGuard - Redirecting to ${dashboardRoute} (already authenticated)`
@@ -142,7 +204,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       return;
     }
 
-    if (isLoggedIn && token && user && user.isVerified) {
+    if (isLoggedIn && token && user && user.isVerified && hasActiveSubscription(user)) {
       // Check if student is trying to access school admin routes
       if (user.role === "student" && pathname.startsWith("/school/")) {
         console.log(
@@ -152,7 +214,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
         return;
       }
 
-      // Check if school admin is trying to access student-only routes (if any)
+      // Check if school admin is trying to access student-only routes
       if (
         (user.role === "schoolAdmin" || user.role === "SchoolAdmin") &&
         pathname === "/dashboard"
@@ -161,6 +223,16 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
           "AuthGuard - School admin trying to access student dashboard, redirecting to school dashboard"
         );
         router.replace("/school/dashboard");
+        return;
+      }
+
+      // If user is on payment page but already has subscription, redirect to dashboard
+      if (pathname === "/make-payment" || pathname === "/bulk-payment") {
+        const dashboardRoute = getDashboardRoute(user.role);
+        console.log(
+          `AuthGuard - User already has subscription, redirecting to ${dashboardRoute}`
+        );
+        router.replace(dashboardRoute);
         return;
       }
     }
@@ -175,6 +247,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     isInitialized,
     user?.role,
     user?.isVerified,
+    user?.subscription,
   ]);
 
   // Add additional effect to handle browser back button after logout
