@@ -8,7 +8,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 const IndividualPaymentPage = () => {
-  const { user, logout } = useUser();
+  const { user, logout, token, refreshUser } = useUser();
   const router = useRouter();
 
   const [couponCode, setCouponCode] = useState("");
@@ -109,21 +109,32 @@ const IndividualPaymentPage = () => {
         },
       });
 
-      // Check if payment verification was successful (status 200)
-      if (res.status === 200) {
+       // Check if payment verification was successful (status 200)
+      if (res.status === 200 ) {
         toast.success("Payment successful!");
         
         // Register the payment details
         try {
-          await axios.post(`${baseUrl}/payments/register-payment`, {
-            reference: reference,
-            userId: user?.userId,
-            studentCount: 1,
-            pricePerStudent: amount,
-            subtotal: amount,
-            vatAmount: vatAmount,
-            amount: totalAmount,
-          });
+          await axios.post(
+            `${baseUrl}/payments/register-payment`,
+            {
+              reference: reference,
+              userId: user?.userId,
+              studentCount: 1,
+              pricePerStudent: amount,
+              subtotal: amount,
+              vatAmount: vatAmount,
+              amount: totalAmount,
+            },
+            {
+              headers: token ? {
+                Authorization: `Bearer ${token}`,
+              } : {},
+            }
+          );
+          
+          // Refresh user data to get updated subscription info
+          await refreshUser();
           
           // Reset coupon state after successful registration
           setCouponCode("");
