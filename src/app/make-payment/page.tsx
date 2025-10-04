@@ -15,7 +15,9 @@ const IndividualPaymentPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState("");
-  
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
   const VAT_RATE = 0.075; // 7.5%
   const baseAmount = 5000;
   const VALID_COUPON = "abjedtech2025";
@@ -39,14 +41,14 @@ const IndividualPaymentPage = () => {
 
     // Check if PaystackPop is loaded
     // @ts-ignore - PaystackPop is loaded via script tag
-    if (typeof window.PaystackPop === 'undefined') {
+    if (typeof window.PaystackPop === "undefined") {
       toast.error("Payment system not loaded. Please refresh the page.");
       return;
     }
 
     // @ts-ignore - PaystackPop is loaded via script tag
     const handler = window.PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY_TEST,
+      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
       email: user.email,
       amount: Math.round(totalAmount * 100), // convert to kobo and round
       currency: "NGN",
@@ -97,26 +99,44 @@ const IndividualPaymentPage = () => {
 
   const verifyPayment = async (reference: string) => {
     if (isProcessing) return;
-    
-    setIsProcessing(true);
-    
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/payments/verify`,
-        {
-          params: {
-            reference,
-          },
-        }
-      );
 
-      // Check for 'ok' property instead of 'status'
-      if (res.data && res.data.ok) {
+    setIsProcessing(true);
+
+    try {
+      const res = await axios.get(`${baseUrl}/payments/verify`, {
+        params: {
+          reference,
+        },
+      });
+
+      // Check if payment verification was successful (status 200)
+      if (res.status === 200) {
         toast.success("Payment successful!");
-        setCouponCode(""); // Reset form
-        setCouponApplied(false); // Reset coupon state
-        // Redirect
-        router.push("/dashboard");
+        
+        // Register the payment details
+        try {
+          await axios.post(`${baseUrl}/payments/register-payment`, {
+            reference: reference,
+            userId: user?.userId,
+            studentCount: 1,
+            pricePerStudent: amount,
+            subtotal: amount,
+            vatAmount: vatAmount,
+            amount: totalAmount,
+          });
+          
+          // Reset coupon state after successful registration
+          setCouponCode("");
+          setCouponApplied(false);
+          
+          // Redirect to dashboard
+          router.push("/dashboard");
+        } catch (error) {
+          console.error("Failed to register payment:", error);
+          toast.error("Payment successful but failed to register. Please contact support.");
+          // Still redirect even if registration fails since payment went through
+          setTimeout(() => router.push("/dashboard"), 2000);
+        }
       } else {
         // Log the response for debugging
         console.log("Verification response:", res.data);
@@ -141,7 +161,7 @@ const IndividualPaymentPage = () => {
   // Apply coupon code
   const applyCoupon = () => {
     setCouponError("");
-    
+
     if (!couponCode.trim()) {
       setCouponError("Please enter a coupon code");
       return;
@@ -164,22 +184,22 @@ const IndividualPaymentPage = () => {
     toast.info("Coupon removed");
   };
 
-    const handleLogout = () => {
-      nProgress.start();
-      logout();
-      nProgress.done();
-    };
+  const handleLogout = () => {
+    nProgress.start();
+    logout();
+    nProgress.done();
+  };
 
   return (
     <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 p-2 lg:p-8 mt-3 lg:mt-5">
-        <div className="flex justify-end">
-            <button
-            className="bg-white text-red-500 border-red-500 border hover:bg-red-500 hover:text-white px-2 md:px-3  p-1 md:p-2 text-xs rounded-lg font-medium transition-colors duration-200"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </div>
+      <div className="flex justify-end">
+        <button
+          className="bg-white text-red-500 border-red-500 border hover:bg-red-500 hover:text-white px-2 md:px-3  p-1 md:p-2 text-xs rounded-lg font-medium transition-colors duration-200"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </div>
       <div className="flex flex-col gap-2 lg:gap-3">
         <p className="lg:text-lg font-semibold">Student payment</p>
         <p className="text-sm">Add coupon code or proceed to payment</p>
@@ -223,9 +243,7 @@ const IndividualPaymentPage = () => {
               </button>
             )}
           </div>
-          {couponError && (
-            <p className="text-xs text-red-600">{couponError}</p>
-          )}
+          {couponError && <p className="text-xs text-red-600">{couponError}</p>}
           {couponApplied && (
             <p className="text-xs text-green-600 font-semibold">
               ✓ Coupon applied: 60% discount

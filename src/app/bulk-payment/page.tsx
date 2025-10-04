@@ -13,6 +13,8 @@ const SchoolStudentPaymentPage = () => {
   const [studentCount, setStudentCount] = useState(0);
   const VAT_RATE = 0.075; // 7.5%
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
   const [couponCode, setCouponCode] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [couponApplied, setCouponApplied] = useState(false);
@@ -88,7 +90,7 @@ const SchoolStudentPaymentPage = () => {
 
     // @ts-ignore - PaystackPop is loaded via script tag
     const handler = window.PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY_TEST,
+      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
       email: user.email,
       amount: Math.round(totalAmount * 100), // convert to kobo and round
       currency: "NGN",
@@ -145,26 +147,46 @@ const SchoolStudentPaymentPage = () => {
 
   const verifyPayment = async (reference: string) => {
     try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/payments/verify`,
-        {
-          params: {
-            reference,
-          },
-        }
-      );
+      const res = await axios.get(`${baseUrl}/payments/verify`, {
+        params: {
+          reference,
+        },
+      });
 
-      if (res.data && res.data.ok) {
+      // Check if payment verification was successful (status 200)
+      if (res.status === 200) {
         toast.success("Payment successful!");
-        setStudentCount(0);
-        setCouponCode("");
-        setCouponApplied(false);
-        setIsProcessing(false);
-        // Redirect
-        router.push("/school/dashboard");
+
+        // Register the payment details
+        try {
+          await axios.post(`${baseUrl}/payments/register-payment`, {
+            reference: reference,
+            userId: user?.userId,
+            studentCount: studentCount,
+            pricePerStudent: pricePerStudent,
+            subtotal: subtotal,
+            vatAmount: vatAmount,
+            amount: totalAmount,
+          });
+
+          // Reset coupon state after successful registration
+          setCouponCode("");
+          setCouponApplied(false);
+
+          // Redirect to dashboard
+          router.push("/dashboard");
+        } catch (error) {
+          console.error("Failed to register payment:", error);
+          toast.error(
+            "Payment successful but failed to register. Please contact support."
+          );
+          // Still redirect even if registration fails since payment went through
+          setTimeout(() => router.push("/dashboard"), 2000);
+        }
       } else {
+        // Log the response for debugging
+        console.log("Verification response:", res.data);
         toast.error("Payment verification failed. Please contact support.");
-        setIsProcessing(false);
       }
     } catch (error) {
       console.error("Verification failed:", error);
