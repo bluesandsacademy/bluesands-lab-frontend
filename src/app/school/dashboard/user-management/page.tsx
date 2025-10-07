@@ -6,6 +6,8 @@ import SchoolStudentTable from "@/components/School/Dashboard/UserMgt/StudentTab
 import SchoolTeacherTable from "@/components/School/Dashboard/UserMgt/TeacherTable";
 import { schoolUserMgtStats } from "@/lib/data";
 import React, { useState } from "react";
+import { FaPlus } from "react-icons/fa";
+import { FiUpload } from "react-icons/fi";
 import { IoSearch } from "react-icons/io5";
 
 const SchoolUserManagementPage = () => {
@@ -20,8 +22,8 @@ const SchoolUserManagementPage = () => {
         onFilterChange={setActiveFilter}
         activeFilter={activeFilter}
       />
-      <div className={`p-2 flex justify-between rounded-md lg:rounded-lg bg-white ${activeFilter === "Roles & Permissions" && "hidden"}`}>
-        <div className="flex gap-2 items-center bg-gray-100 border border-gray-200 text-xs md:text-sm px-3 rounded-md">
+      <div className={`p-2 flex rounded-md lg:rounded-lg bg-white  ${activeFilter === "Roles & Permissions"? "justify-end" : "justify-between"}`}>
+        <div className={`flex gap-2 items-center bg-gray-100 border border-gray-200 text-xs md:text-sm px-3 rounded-md  ${activeFilter === "Roles & Permissions" && "hidden"}`}>
           <IoSearch className="text-gray-400 text-lg" />
           <input
             type="text"
@@ -30,11 +32,11 @@ const SchoolUserManagementPage = () => {
           />
         </div>
         <div className="flex items-center gap-2 lg:gap-4">
-          <button className="bg-gray-200 text-blue-950 p-2 rounded-md text-xs md:text-sm">
-            bulk upload
+          <button className={`flex gap-1 items-center bg-gray-200 text-blue-950 p-2 rounded-md text-xs lg:text-sm  ${activeFilter === "Roles & Permissions" && "hidden"}`}>
+           <FiUpload /> bulk upload
           </button>
-          <button className="bg-blue-950 text-white p-2 rounded-md text-xs md:text-sm">
-            {activeFilter === "Teachers"? "Add Teacher": activeFilter === "Students"? "Add Student": activeFilter === "Classes"? "Add Class":""}
+          <button className="flex gap-1 items-center bg-blue-950 text-white p-2 rounded-md text-xs lg:text-sm">
+            <FaPlus />{activeFilter === "Teachers"? "Add Teacher": activeFilter === "Students"? "Add Student": activeFilter === "Classes"? "Add Class": activeFilter === "Roles & Permissions" ? "Create Role":""}
           </button>
         </div>
       </div>

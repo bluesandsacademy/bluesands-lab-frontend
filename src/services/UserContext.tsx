@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export interface User {
   userId: string;
@@ -42,6 +43,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
   const logout = async () => {
     try {
@@ -64,7 +66,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const refreshUser = async () => {
+const refreshUser = async () => {
     const currentToken = token || localStorage.getItem("token");
     
     if (!currentToken) {
@@ -77,26 +79,21 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       console.log("UserContext - Refreshing user data");
       
-      // Replace with your actual API endpoint
-      const response = await fetch("/api/user/me", {
-        method: "GET",
+      // Remove the fetch-style configuration from axios
+      const response = await axios.get(`${baseUrl}/auth/me`, {
         headers: {
           "Authorization": `Bearer ${currentToken}`,
           "Content-Type": "application/json",
         },
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          // Token is invalid, logout user
-          console.log("UserContext - Token invalid during refresh, logging out");
-          await logout();
-          return;
-        }
+      // Axios throws on non-2xx status codes, but if you need to check:
+      if (response.status !== 200) {
         throw new Error(`Failed to refresh user: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      // Axios automatically parses JSON, so response.data contains the parsed data
+      const data = response.data;
       
       // Update user data
       const updatedUser: User = {
@@ -122,6 +119,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("UserContext - User data refreshed successfully");
     } catch (error) {
       console.error("UserContext - Error refreshing user:", error);
+      
+      // Check if it's a 401 error and logout
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log("UserContext - Token invalid during refresh, logging out");
+        await logout();
+        return;
+      }
       // Don't logout on network errors, only on auth errors
     } finally {
       setIsRefreshing(false);
