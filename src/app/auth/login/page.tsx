@@ -17,7 +17,7 @@ export default function UserLogin() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  const { setUser, setToken, isLoggedIn } = useUser(); //also import isLoggedin 
+  const { setUser, setToken, isLoggedIn } = useUser(); //also import isLoggedin
 
   //Redirect if already logged in
   useEffect(() => {
@@ -28,32 +28,33 @@ export default function UserLogin() {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (isSubmitting) return;
     setIsSubmitting(true);
     NProgress.start();
 
     try {
       const { user, token } = await login(email, password);
-      
+
       // Set user and token in context (this will also save to localStorage)
       setUser(user);
       setToken(token);
-      
+
       toast.success(`Welcome back, ${user.fullName}!`);
-     
+
       if (user.role === "student") {
-      router.push("/dashboard");
-    } else if (user.role === "schoolAdmin" || user.role === "SchoolAdmin") {
-      router.push("/school/dashboard");
-    } else {
-      // Default fallback for any other roles
-      router.push("/dashboard");
-    }
-      
+        router.push("/dashboard");
+      } else if (user.role === "schoolAdmin" || user.role === "SchoolAdmin") {
+        router.push("/school/dashboard");
+      } else if (user.role === "globalAdmin" || user.role === "GlobalAdmin") {
+        router.push("/school/dashboard");
+      } else {
+        // Default fallback for any other roles
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       console.error("Login failed", err);
-      
+
       if (err.response?.status === 401) {
         toast.error("Invalid email or password. Please try again.");
       } else if (err.response?.status === 400) {
@@ -82,15 +83,18 @@ export default function UserLogin() {
               alt="Logo"
               className="w-auto h-7 lg:h-12 mx-auto"
             />
-            <h1 className="hidden md:flex text-xl md:text-2xl lg:text-4xl font-normal">Welcome Back!</h1>
+            <h1 className="hidden md:flex text-xl md:text-2xl lg:text-4xl font-normal">
+              Welcome Back!
+            </h1>
             <p className="font-thin text-xs lg:text-lg max-w-xs md:max-w-lg lg:max-w-none text-center">
               Transforming Education Through Innovation with Cutting-Edge STEM
               Learning Experiences
             </p>
           </div>
         </div>
-        <form className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white"
-              onSubmit={handleLogin}
+        <form
+          className="border max-w-2xl mx-auto flex flex-col gap-y-3 md:gap-y-5 py-5 px-3 md:px-10 rounded-lg shadow-sm mt-0 md:-mt-28 z-30 relative bg-white"
+          onSubmit={handleLogin}
         >
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
@@ -135,10 +139,12 @@ export default function UserLogin() {
               type="submit"
               disabled={isSubmitting}
               className={`text-center  rounded-md py-1 md:py-5 bg-bgBlue text-white w-full md:text-lg ${
-                isSubmitting ? 'opacity-50 cursor-not-allowed':'hover:bg-blue-600'}`}
-              
+                isSubmitting
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-blue-600"
+              }`}
             >
-              {isSubmitting? "Logging in...": "Login"}
+              {isSubmitting ? "Logging in..." : "Login"}
             </button>
             <p className="text-gray-500 text-center text-xs md:text-base">
               Don't have an account?{" "}

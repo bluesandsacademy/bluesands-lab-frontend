@@ -318,6 +318,44 @@ export const sideNavLinks: SidebarLinks[] = [
   },
 ];
 
+export const adminSideNavLinks: SidebarLinks[] = [
+  {
+    title: "Overview",
+    url: "/admin/dashboard",
+    icon: "/images/icon/home.svg",
+  },
+   {
+    title: "School Management",
+    url: "/admin/dashboard/school-management",
+    icon: "/images/icon/health-walk-supported.svg",
+  },
+  {
+    title: "User Management",
+    url: "/admin/dashboard/user-management",
+    icon: "/images/icon/user-bold.svg",
+  },
+  {
+    title: "Experiment & Content",
+    url: "/admin/dashboard/experiments",
+    icon: "/images/icon/beaker.svg",
+  },
+  {
+    title: "Payments & Finance",
+    url: "/admin/dashboard/payments",
+    icon: "/images/icon/card_payment.svg",
+  },
+  {
+    title: "Report & Analytics",
+    url: "/admin/dashboard/report",
+    icon: "/images/icon/report.svg",
+  },
+   {
+    title: "Leaderboard",
+    url: "/admin/dashboard/leaderboard",
+    icon: "/images/icon/ic_outline-leaderboard.svg",
+  },
+];
+
 export type Profile = {
   fullName: string;
   accountType: "Individual" | "School";
@@ -655,6 +693,113 @@ export const rewardStats: Stat[] = [
     timeFrame: "from last month",
   },
 ];
+
+export const AdminGeneralMetricStats: Stat[] = [
+  {
+    title: "Total Platform Users",
+    percentage: "0",
+    icon: "/images/icon/total_users.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Total Schools Registered",
+    percentage: "0",
+    icon: "/images/icon/total_schools.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Total Virtual lab experiments",
+    percentage: "0",
+    icon: "/images/icon/microscope.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Total Payments",
+    percentage: "NGN 0",
+    icon: "/images/icon/total_payments.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+export const AdminLearningMetricStats: Stat[] = [
+  {
+    title: "Total STEM Courses",
+    percentage: "0",
+    icon: "/images/icon/calendar.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Total lab practice time",
+    percentage: "0",
+    icon: "/images/icon/beaker_01.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Total Quiz Scores",
+    percentage: "0",
+    icon: "/images/icon/clipboard.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Total Experiment Attempts",
+    percentage: "0 Attempt(s)",
+    icon: "/images/icon/microscope.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+export const AdminUserOverviewStats: Stat[] = [
+  {
+    title: "Subscribed Users",
+    percentage: "0",
+    icon: "/images/icon/total_users.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Offline Users",
+    percentage: "0",
+    icon: "/images/icon/beaker_01.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Male Users",
+    percentage: "0",
+    icon: "/images/icon/clipboard.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Female Users",
+    percentage: "0",
+    icon: "/images/icon/microscope.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+
 
 interface UpcomingCourse {
   title: string;
