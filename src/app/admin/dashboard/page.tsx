@@ -23,12 +23,12 @@ import {
 
 // Sample data for charts
 const lineChartData = [
-  { month: "Jan", users: 400, schools: 2400 },
-  { month: "Feb", users: 300, schools: 2210 },
-  { month: "Mar", users: 600, schools: 2290 },
-  { month: "Apr", users: 800, schools: 2000 },
-  { month: "May", users: 700, schools: 2181 },
-  { month: "Jun", users: 900, schools: 2500 },
+  { month: "Jan", users: 0, schools: 0 },
+  { month: "Feb", users: 0, schools: 0 },
+  { month: "Mar", users: 0, schools: 0 },
+  { month: "Apr", users: 0, schools: 0 },
+  { month: "May", users: 0, schools: 0 },
+  { month: "Jun", users: 0, schools: 0 },
 ];
 
 const pieChartData = [
@@ -79,7 +79,7 @@ const Page = () => {
         <StatCards stats={AdminUserOverviewStats} />
       </div>
 
-      {/* Line Chart and Donut Chart Side by Side */}
+      {/* User Growth and user status charts */}
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Line Chart */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
@@ -109,7 +109,7 @@ const Page = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Donut Chart (Pie Chart with hole) */}
+        {/* Donut Chart */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-semibold mb-4">
             User Status Distribution
@@ -142,7 +142,7 @@ const Page = () => {
         </div>
       </div>
 
-      {/* Bar Chart and User Demographics */}
+      {/* Revenue Growth and User Demographics */}
       <div className="flex flex-col md:flex-row gap-4">
         {/* Bar Chart */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">

@@ -768,7 +768,7 @@ export const AdminUserOverviewStats: Stat[] = [
   {
     title: "Subscribed Users",
     percentage: "0",
-    icon: "/images/icon/total_users.svg",
+    icon: "/images/svg/subscribed.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
@@ -776,7 +776,7 @@ export const AdminUserOverviewStats: Stat[] = [
   {
     title: "Offline Users",
     percentage: "0",
-    icon: "/images/icon/beaker_01.svg",
+    icon: "/images/svg/offline.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
@@ -784,7 +784,7 @@ export const AdminUserOverviewStats: Stat[] = [
   {
     title: "Male Users",
     percentage: "0",
-    icon: "/images/icon/clipboard.svg",
+    icon: "/images/svg/male.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
@@ -792,7 +792,7 @@ export const AdminUserOverviewStats: Stat[] = [
   {
     title: "Female Users",
     percentage: "0",
-    icon: "/images/icon/microscope.svg",
+    icon: "/images/svg/female.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
