@@ -146,6 +146,10 @@ const SchoolStudentPaymentPage = () => {
   };
 
   const verifyPayment = async (reference: string) => {
+    if (isProcessing) return;
+
+    setIsProcessing(true);
+
     try {
       const res = await axios.get(`${baseUrl}/payments/verify`, {
         params: {
@@ -169,14 +173,15 @@ const SchoolStudentPaymentPage = () => {
               subtotal: subtotal,
               vatAmount: vatAmount,
               amount: totalAmount,
-              promoCode: couponCode
+              promoCode: couponCode,
             },
             {
               headers: token
                 ? {
-                    Authorization: token,
+                    Authorization: `Bearer ${token}`,
                   }
                 : {},
+              withCredentials: true,
             }
           );
 
@@ -188,14 +193,14 @@ const SchoolStudentPaymentPage = () => {
           setCouponApplied(false);
 
           // Redirect to dashboard
-          router.push("/dashboard");
+          router.push("/school/dashboard");
         } catch (error) {
           console.error("Failed to register payment:", error);
           toast.error(
             "Payment successful but failed to register. Please contact support."
           );
           // Still redirect even if registration fails since payment went through
-          setTimeout(() => router.push("/dashboard"), 2000);
+          setTimeout(() => router.push("/school/dashboard"), 2000);
         }
       } else {
         // Log the response for debugging
@@ -205,6 +210,7 @@ const SchoolStudentPaymentPage = () => {
     } catch (error) {
       console.error("Verification failed:", error);
       toast.error("An error occurred. Please contact support.");
+    } finally {
       setIsProcessing(false);
     }
   };

@@ -125,6 +125,7 @@ const IndividualPaymentPage = () => {
               subtotal: amount,
               vatAmount: vatAmount,
               amount: totalAmount,
+              promoCode: couponCode
             },
             {
               headers: token ? {

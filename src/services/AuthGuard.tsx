@@ -48,7 +48,8 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     "/auth/verify-success",
     "/make-payment",
     "/bulk-payment",
-    // "/school/dashboard",
+    "/school/dashboard",
+    "/dashboard"
   ];
 
   // Helper function to check if user has paid
