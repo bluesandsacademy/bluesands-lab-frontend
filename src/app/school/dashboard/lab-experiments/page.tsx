@@ -1,6 +1,5 @@
 "use client";
-import StatCards from "@/components/Dashboard/StatCards";
-import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
+import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import { Stat } from "@/lib/data";
 import { useUser } from "@/services/UserContext";
 import {
@@ -21,10 +20,10 @@ import {
 
 const SchoolLabPage = () => {
   const { user } = useUser();
-  const stats: Stat[] = [
+  const stats: StatCardData[] = [
     {
       title: "Total Experiment",
-      percentage: "90%",
+      value: "0",
       icon: "/images/icon/beaker_01.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -32,7 +31,7 @@ const SchoolLabPage = () => {
     },
     {
       title: "Average Completion Rate",
-      percentage: "75%",
+      value: "0%",
       icon: "/images/icon/chart.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -40,7 +39,7 @@ const SchoolLabPage = () => {
     },
     {
       title: "Resource Usage",
-      percentage: "85%",
+      value: "0%",
       icon: "/images/icon/clipboard.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -48,7 +47,7 @@ const SchoolLabPage = () => {
     },
     {
       title: "Active Users",
-      percentage: "20 Attempts",
+      value: "1",
       icon: "/images/icon/calendar.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",

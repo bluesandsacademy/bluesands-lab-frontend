@@ -1,5 +1,5 @@
 "use client";
-import StatCards from "@/components/Dashboard/StatCards";
+import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import { Stat } from "@/lib/data";
 import { useUser } from "@/services/UserContext";
 import {
@@ -20,10 +20,10 @@ import {
 
 const SchoolPerformanceAnalyticsPage = () => {
   const { user } = useUser();
-  const stats: Stat[] = [
+  const stats: StatCardData[] = [
     {
       title: "Total Assignments",
-      percentage: "90%",
+      value: "0",
       icon: "/images/icon/clipboard.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -31,7 +31,7 @@ const SchoolPerformanceAnalyticsPage = () => {
     },
     {
       title: "Average Feedback Time",
-      percentage: "75%",
+      value: "0",
       icon: "/images/icon/stopwatch.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -39,7 +39,7 @@ const SchoolPerformanceAnalyticsPage = () => {
     },
     {
       title: "Average Engagement Score",
-      percentage: "85%",
+      value: "0",
       icon: "/images/icon/total_payments.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -47,7 +47,7 @@ const SchoolPerformanceAnalyticsPage = () => {
     },
     {
       title: "Active Teachers",
-      percentage: "20 Attempts",
+      value: "0",
       icon: "/images/icon/active_teacher.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -73,7 +73,7 @@ const SchoolPerformanceAnalyticsPage = () => {
   ];
 
   const pieChartData = [
-    { name: "Excelent", value: 231 },
+    { name: "Excellent", value: 231 },
     { name: "Good", value: 175 },
     { name: "Needs Attention", value: 175 },
   ];
@@ -132,7 +132,8 @@ const SchoolPerformanceAnalyticsPage = () => {
 
       <p className="text-sm font-semibold">Individual Teacher Performance</p>
         <table className="bg-white rounded-md">
-          <tr className="border-b border-b-gray-200 text-xs text-gray-500">
+         <thead>
+           <tr className="border-b border-b-gray-200 text-xs text-gray-500">
             <td className="p-2">Teacher</td>
             <td className="p-2">Subject</td>
             <td className="p-2">Assignments Created</td>
@@ -140,6 +141,7 @@ const SchoolPerformanceAnalyticsPage = () => {
             <td className="p-2">Engagement Score</td>
             <td className="p-2">Status</td>
           </tr>
+         </thead>
           <tbody>
             <tr className="text-xs border-b border-b-gray-200">
               <td className="p-2">Mary</td>

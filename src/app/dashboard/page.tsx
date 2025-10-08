@@ -46,8 +46,7 @@
 // 4. Updated DashboardPage Component
 "use client";
 
-import { profile, stats } from "@/lib/data";
-import StatCards from "@/components/Dashboard/StatCards";
+import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import PerformanceByStemCourses from "@/components/Dashboard/Performance";
 import UpcomingStemCourses from "@/components/Dashboard/UpcomingStemCourses";
 import QuizPerformance from "@/components/Dashboard/Performance/Quiz";
@@ -57,6 +56,42 @@ import { useUser } from "@/services/UserContext";
 export default function DashboardHome() {
   const { user } = useUser();
   const firstName = user?.fullName?.split(" ")[0];
+
+  const stats: StatCardData[] = [
+    {
+      title: "Lab Time",
+      value: "0",
+      icon: "/images/icon/calendar.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+    {
+      title: "Completed Experiments",
+      value: "0",
+      icon: "/images/icon/beaker_01.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+    {
+      title: "Quiz Average ",
+      value: "0",
+      icon: "/images/icon/clipboard.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+    {
+      title: "Ranking",
+      value: "0",
+      icon: "/images/icon/microscope.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+  ];
+  
 
   return (
     <div className="p-3 md:p-5 space-y-6 md:space-y-10">

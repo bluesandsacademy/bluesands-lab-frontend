@@ -1,5 +1,5 @@
 "use client";
-import StatCards from "@/components/Dashboard/StatCards";
+import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import { Stat } from "@/lib/data";
 import { useUser } from "@/services/UserContext";
@@ -21,10 +21,10 @@ import {
 
 const SchoolPerformanceAnalyticsPage = () => {
   const { user } = useUser();
-  const stats: Stat[] = [
+  const stats: StatCardData[] = [
     {
       title: "Overall Average Score",
-      percentage: "90%",
+      value: "0",
       icon: "/images/icon/active_teacher.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -32,7 +32,7 @@ const SchoolPerformanceAnalyticsPage = () => {
     },
     {
       title: "Total Students",
-      percentage: "75%",
+      value: "0",
       icon: "/images/icon/student_dark.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -40,7 +40,7 @@ const SchoolPerformanceAnalyticsPage = () => {
     },
     {
       title: "Pass Rates",
-      percentage: "85%",
+      value: "0%",
       icon: "/images/icon/total_payments.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -48,7 +48,7 @@ const SchoolPerformanceAnalyticsPage = () => {
     },
     {
       title: "Subjects Tracked",
-      percentage: "20 Attempts",
+      value: "0",
       icon: "/images/icon/clipboard.svg",
       trendIcon: "/images/icon/trend_up.svg",
       percentageChange: "0%",
@@ -150,7 +150,8 @@ const SchoolPerformanceAnalyticsPage = () => {
 
       <p className="text-sm font-semibold">School-wide Performance Analysis</p>
         <table className="bg-white rounded-md">
-          <tr className="border-b border-b-gray-200 text-xs text-gray-500">
+         <thead>
+           <tr className="border-b border-b-gray-200 text-xs text-gray-500">
             <td className="p-2">Subject</td>
             <td className="p-2">Average Score</td>
             <td className="p-2">Pass Rate</td>
@@ -158,6 +159,7 @@ const SchoolPerformanceAnalyticsPage = () => {
             <td className="p-2">Trend</td>
             <td className="p-2">Status</td>
           </tr>
+         </thead>
           <tbody>
             <tr className="text-xs border-b border-b-gray-200">
               <td className="p-2">Biology</td>
