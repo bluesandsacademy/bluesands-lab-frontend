@@ -1,6 +1,5 @@
 "use client";
-import StatCards from "@/components/Dashboard/StatCards";
-import { rewardStats } from "@/lib/data";
+import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import React, { useState } from "react";
 import { FaCalendar, FaStar } from "react-icons/fa";
 import { ImCheckmark2 } from "react-icons/im";
@@ -10,6 +9,42 @@ const DashboardRewardsPage = () => {
   const [filter, setFilter] = useState("badges");
   const completedExp = 0;
   const currentStreak = 0;
+
+  const rewardStats: StatCardData[] = [
+    {
+      title: "Total Points",
+      value: "0",
+      icon: "/images/icon/kudos.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+      {
+      title: "Experiments",
+      value: "0",
+      icon: "/images/icon/beaker_01.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+      {
+      title: "Day Streak",
+      value: "0",
+      icon: "/images/icon/calendar.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+    {
+      title: "High Score",
+      value: "0%",
+      icon: "/images/icon/clipboard.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+  ];
+  
 
   return (
     <div className="mr-2 ml-2 lg:ml-5 lg:mr-5 flex flex-col gap-4 lg:gap-6">

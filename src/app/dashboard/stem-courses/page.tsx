@@ -1,7 +1,6 @@
 "use client";
-import StatCards from "@/components/Dashboard/StatCards";
+import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
-import { courseStats } from "@/lib/data";
 import { useUser } from "@/services/UserContext";
 import Link from "next/link";
 import { BiSolidEraser } from "react-icons/bi";
@@ -14,6 +13,42 @@ const DashboardStemCoursesPage = () => {
   const description =
     "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptates suscipit molestiae quos hic quod maiores, nihil nemo similique expedita provident neque possimus ea corrupti deserunt, accusantium quo soluta illum amet facere? Corrupti sunt consequuntur facilis, ab fuga, culpa id, fugiat quis aut nulla ratione eius? Fuga numquam magni quidem unde.";
   const truncatedDesc = description.split(" ").slice(0, 15).join(" ") + "...";
+
+  const courseStats: StatCardData[] = [
+    {
+      title: "Stem Courses",
+      value: "0",
+      icon: "/images/icon/grad.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+    {
+      title: "Course Experiments",
+      value: "0",
+      icon: "/images/icon/beaker_01.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+    {
+      title: "Hours Spent",
+      value: "0",
+      icon: "/images/icon/stopwatch.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+    {
+      title: "Average Grade",
+      value: "0",
+      icon: "/images/icon/chart.svg",
+      trendIcon: "/images/icon/trend_up.svg",
+      percentageChange: "0%",
+      timeFrame: "from last month",
+    },
+  ];
+  
 
   return (
     <div className="m-1">
