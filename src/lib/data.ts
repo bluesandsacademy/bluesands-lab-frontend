@@ -400,10 +400,10 @@ export interface Stat {
 }
 
 
-export const quizStats: Stat[] = [
+export const quizStats: StatCardData[] = [
   {
     title: "Total Quizzes Taken",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/grad.svg",
     trendIcon: "/images/icon/add.svg",
     percentageChange: "0%",
@@ -411,7 +411,7 @@ export const quizStats: Stat[] = [
   },
   {
     title: "Average Score Across Quizzes",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/chart.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -419,7 +419,7 @@ export const quizStats: Stat[] = [
   },
   {
     title: "High Scores",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/highscore.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -427,7 +427,7 @@ export const quizStats: Stat[] = [
   },
   {
     title: "Recent Quiz Performance",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/stopwatch.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -435,30 +435,30 @@ export const quizStats: Stat[] = [
   },
 ];
 
-export const quizResultStats: Stat[] = [
+export const quizResultStats: StatCardData[] = [
   {
     title: "Score",
-    percentage: "0/0",
+    value: "0/0",
     icon: "/images/icon/clipboard.svg",
   },
   {
     title: "Correct Answers",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/highscore.svg",
   },
   {
     title: "Incorrect Answers",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/add.svg",
   },
   {
     title: "Time taken",
-    percentage: "0 Minutes",
+    value: "0 Minutes",
     icon: "/images/icon/stopwatch.svg",
   },
   {
     title: "Result",
-    percentage: "Pass",
+    value: "Pass",
     icon: "/images/icon/grad.svg",
   },
 ];
