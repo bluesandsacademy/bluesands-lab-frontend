@@ -1,3 +1,5 @@
+import { StatCardData } from "@/components/Dashboard/StatCards";
+
 export const countries = [
   "--select--",
   "Afghanistan",
@@ -461,10 +463,10 @@ export const quizResultStats: Stat[] = [
   },
 ];
 
-export const AdminGeneralMetricStats: Stat[] = [
+export const AdminGeneralMetricStats: StatCardData[] = [
   {
     title: "Total Platform Users",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/total_users.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -472,7 +474,7 @@ export const AdminGeneralMetricStats: Stat[] = [
   },
   {
     title: "Total Schools Registered",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/total_schools.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -480,7 +482,7 @@ export const AdminGeneralMetricStats: Stat[] = [
   },
   {
     title: "Total Virtual lab experiments",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/microscope.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -488,7 +490,7 @@ export const AdminGeneralMetricStats: Stat[] = [
   },
   {
     title: "Total Payments",
-    percentage: "NGN 0",
+    value: "NGN 0",
     icon: "/images/icon/total_payments.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -496,10 +498,10 @@ export const AdminGeneralMetricStats: Stat[] = [
   },
 ];
 
-export const AdminLearningMetricStats: Stat[] = [
+export const AdminLearningMetricStats: StatCardData[] = [
   {
     title: "Total STEM Courses",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/calendar.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -507,7 +509,7 @@ export const AdminLearningMetricStats: Stat[] = [
   },
   {
     title: "Total lab practice time",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/beaker_01.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -515,7 +517,7 @@ export const AdminLearningMetricStats: Stat[] = [
   },
   {
     title: "Total Quiz Scores",
-    percentage: "0",
+    value: "0",
     icon: "/images/icon/clipboard.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -523,7 +525,7 @@ export const AdminLearningMetricStats: Stat[] = [
   },
   {
     title: "Total Experiment Attempts",
-    percentage: "0 Attempt(s)",
+    value: "0 Attempt(s)",
     icon: "/images/icon/microscope.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -531,10 +533,10 @@ export const AdminLearningMetricStats: Stat[] = [
   },
 ];
 
-export const AdminUserOverviewStats: Stat[] = [
+export const AdminUserOverviewStats: StatCardData[] = [
   {
     title: "Subscribed Users",
-    percentage: "0",
+    value: "0",
     icon: "/images/svg/subscribed.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -542,7 +544,7 @@ export const AdminUserOverviewStats: Stat[] = [
   },
   {
     title: "Offline Users",
-    percentage: "0",
+    value: "0",
     icon: "/images/svg/offline.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -550,7 +552,7 @@ export const AdminUserOverviewStats: Stat[] = [
   },
   {
     title: "Male Users",
-    percentage: "0",
+    value: "0",
     icon: "/images/svg/male.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -558,7 +560,7 @@ export const AdminUserOverviewStats: Stat[] = [
   },
   {
     title: "Female Users",
-    percentage: "0",
+    value: "0",
     icon: "/images/svg/female.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
