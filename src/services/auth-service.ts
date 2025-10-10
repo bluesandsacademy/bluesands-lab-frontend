@@ -1,4 +1,5 @@
 import axios from "@/services/axios-instance";
+import { User } from "./UserContext";
 
 export interface UserObject {
   fullName: string;
@@ -34,23 +35,28 @@ export interface LoginResponse {
   gender: string;
   country: string;
   role: string;
-  dob: string; // Assuming backend returns date as string
+  dob: string;
   isVerified: boolean;
+  schoolId?: string;
+  avatarUrl?: string;
+  subscription?: any;
+  currentTier?: string | null;
+  promoApplied?: string | null;
 }
 
-// Interface for user data used in app
-export interface User {
-  userId: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  gender: string;
-  country: string;
-  dob: string;
-  role?: string;
-  avatarUrl?: string;
-  isVerified: boolean;
-}
+// // Interface for user data used in app
+// export interface User {
+//   userId: string;
+//   fullName: string;
+//   email: string;
+//   phone: string;
+//   gender: string;
+//   country: string;
+//   dob: string;
+//   role?: string;
+//   avatarUrl?: string;
+//   isVerified: boolean;
+// }
 
 export async function registerNewUser(newUser: UserObject) {
   try {
@@ -83,7 +89,7 @@ export async function login(
 
     const loginResponse: LoginResponse = res.data;
 
-    // Transform backend response to match our User interface
+    // Transform backend response to match UserContext User interface
     const user: User = {
       userId: loginResponse.userId,
       fullName: loginResponse.fullName,
@@ -92,9 +98,13 @@ export async function login(
       gender: loginResponse.gender,
       country: loginResponse.country,
       dob: loginResponse.dob,
-      role: loginResponse.role, // Default role, adjust as at when needed
-      avatarUrl: "", // Default empty, adjust as when needed
+      role: loginResponse.role,
+      avatarUrl: loginResponse.avatarUrl || "",
       isVerified: loginResponse.isVerified,
+      schoolId: loginResponse.schoolId,
+      subscription: loginResponse.subscription || null,
+      currentTier: loginResponse.currentTier || null,
+      promoApplied: loginResponse.promoApplied || null,
     };
 
     return {

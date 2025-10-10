@@ -1,43 +1,12 @@
 "use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
+import SchoolReportClassAnalytics from "@/components/School/Dashboard/Reports/SchoolReportClassAnalytics";
+import SchoolReportExports from "@/components/School/Dashboard/Reports/SchoolReportExports";
+import SchoolReportOverview from "@/components/School/Dashboard/Reports/SchoolReportOverview";
+import SchoolReportTeacherComparison from "@/components/School/Dashboard/Reports/SchoolReportTeacherComparison";
 import SchoolFilterButton from "@/components/School/Dashboard/SchoolFilterButton";
 import React, { useState } from "react";
 import { FaDownload } from "react-icons/fa";
-
-const statsConfig: StatCardData[] = [
-  {
-    title: "Average Score",
-    value: "0",
-    icon: "/images/icon/active_teacher.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-  {
-    title: "Total Students",
-    value: "0",
-    icon: "/images/icon/student_dark.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-  {
-    title: "Attendance Rate",
-    value: "0",
-    icon: "/images/icon/clipboard.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-  {
-    title: "Active Classes",
-    value: "0",
-    icon: "/images/icon/card_teacher.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-];
 
 const SchoolReportAnalyticsPage = () => {
   const filters = [
@@ -71,7 +40,7 @@ const SchoolReportAnalyticsPage = () => {
         activeFilter={activeFilter}
       />
 
-      <StatCards stats={statsConfig} />
+      {activeFilter === "Overview" ? <SchoolReportOverview/>: activeFilter === "Class Analytics" ? <SchoolReportClassAnalytics/>: activeFilter === "Teacher Comparison" ? <SchoolReportTeacherComparison/>:activeFilter === "Report & Export" ? <SchoolReportExports/> : <SchoolReportOverview/>  }
     </div>
   );
 };
