@@ -16,11 +16,11 @@ const ReportTable = ({
   totalItems 
 }: ReportTableProps) => {
   return (
-    <div className="bg-white rounded-md shadow-sm">
+    <div className="bg-white rounded-md shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-blue-50 border">
+            <tr className="bg-blue-50 border rounded-md">
               {headings.map((heading, index) => (
                 <th key={index} className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                   {heading}

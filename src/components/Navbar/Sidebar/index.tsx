@@ -185,16 +185,16 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
             ))}
 
           <Link
-            href={"/dashboard/support"}
+           href={user?.role === "schoolAdmin" || user?.role === "SchoolAdmin"? "/school/dashboard/contact-support" : "/dashboard/support"}
             className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
-              pathname === "/dashboard/support" ? "bg-bgBlue text-white" : ""
+              pathname === "/dashboard/support" ? "bg-bgBlue text-white" : pathname === "/school/dashboard/contact-support" ? "bg-blue-950 text-white" : ""
             }`}
           >
             <img
               src="/images/icon/ic_sharp-support-agent.svg"
               alt="support-agent"
               className={`w-5 h-5 ${
-                pathname === "/dashboard/support"
+                pathname === "/dashboard/support" ||  pathname === "/school/dashboard/contact-support"
                   ? "filter brightness-0 invert"
                   : ""
               }`}
