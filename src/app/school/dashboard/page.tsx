@@ -90,7 +90,7 @@ const SchoolDashboardPage = () => {
         },
         {
           title: statsConfig[2].title,
-          value: `${data.activity7d.experiments}`, // ✅ Convert to string
+          value: `${data.activity7d.experiments}`, 
           icon: statsConfig[2].icon,
           trendIcon: statsConfig[2].trendIcon,
           percentageChange: statsConfig[2].percentageChange,
@@ -106,7 +106,7 @@ const SchoolDashboardPage = () => {
         },
         {
           title: statsConfig[4].title,
-          value: `${data.activity7d.activeUsers}`, // ✅ Use actual data
+          value: `${data.activity7d.activeUsers}`, 
           icon: "/images/icon/student_dark.svg",
           trendIcon: "/images/icon/trend_up.svg",
           percentageChange: "0%",

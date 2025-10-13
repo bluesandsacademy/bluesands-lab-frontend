@@ -280,7 +280,7 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
     email: "",
     phone: "09000123456",
     country: "Nigeria",
-   // assignClass: "",
+    // assignClass: "",
   });
 
   const handleChange = (e: any) => {
@@ -493,6 +493,312 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
             className="px-4 py-2 text-sm bg-blue-950 text-white rounded-md hover:bg-blue-900"
           >
             Add Class
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+// Add Role Modal
+export const AddRoleModal = ({ isOpen, onClose }: any) => {
+  const [formData, setFormData] = useState({
+    roleName: "",
+    roleColor: "",
+    description: "",
+  });
+
+  const [permissions, setPermissions] = useState({
+    viewUsers: true,
+    addUsers: false,
+    editUsers: false,
+    deleteUsers: false,
+    viewCourses: true,
+    editCourses: true,
+    createCourses: false,
+    gradeStudent: false,
+    viewAnalytics: true,
+    systemSettings: true,
+    manageRoles: false,
+    bulkOperations: false,
+    viewReports: true,
+    studentRecords: true,
+    financialReports: false,
+    exportData: false,
+  });
+
+  const handleChange = (e: any) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handlePermissionChange = (e: any) => {
+    setPermissions({ ...permissions, [e.target.name]: e.target.checked });
+  };
+
+  const handleSubmit = () => {
+    console.log("Adding role:", { ...formData, permissions });
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Create New Role">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Role Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="roleName"
+              value={formData.roleName}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
+              placeholder="e.g., Teacher"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Role Color
+            </label>
+            <select
+              name="roleColor"
+              id="roleColor"
+              value={formData.roleColor}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
+            >
+              <option value="">Select a color</option>
+              <option value="purple">Purple</option>
+              <option value="red">Red</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+              <option value="yellow">Yellow</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Description
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
+            placeholder="e.g., teaches the laboratory sessions and equipment management"
+          />
+        </div>
+
+        {/* Permissions Section */}
+        <div className="border-2 border-blue-950 rounded-md p-4">
+          <h3 className="text-sm font-semibold text-blue-950 mb-3">PERMISSIONS</h3>
+          
+          {/* User Management */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">User Management</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="viewUsers"
+                  checked={permissions.viewUsers}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                View Users
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="addUsers"
+                  checked={permissions.addUsers}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Add users
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="editUsers"
+                  checked={permissions.editUsers}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Edit users
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="deleteUsers"
+                  checked={permissions.deleteUsers}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Delete Users
+              </label>
+            </div>
+          </div>
+
+          {/* Course Management */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">Course Management</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="viewCourses"
+                  checked={permissions.viewCourses}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                View Courses
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="editCourses"
+                  checked={permissions.editCourses}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Edit Courses
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="createCourses"
+                  checked={permissions.createCourses}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Create Courses
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="gradeStudent"
+                  checked={permissions.gradeStudent}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Grade Student
+              </label>
+            </div>
+          </div>
+
+          {/* System Administration */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">System Administration</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="viewAnalytics"
+                  checked={permissions.viewAnalytics}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                View Analytics
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="systemSettings"
+                  checked={permissions.systemSettings}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                System Settings
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="manageRoles"
+                  checked={permissions.manageRoles}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Manage Roles
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="bulkOperations"
+                  checked={permissions.bulkOperations}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Bulk Operations
+              </label>
+            </div>
+          </div>
+
+          {/* Reports & data */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">Reports & data</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="viewReports"
+                  checked={permissions.viewReports}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                View reports
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="studentRecords"
+                  checked={permissions.studentRecords}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Student records
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="financialReports"
+                  checked={permissions.financialReports}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Financial reports
+              </label>
+              <label className="flex items-center text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  name="exportData"
+                  checked={permissions.exportData}
+                  onChange={handlePermissionChange}
+                  className="mr-2 h-4 w-4 text-blue-950 border-gray-300 rounded focus:ring-blue-950"
+                />
+                Export data
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 justify-end pt-4 border-t">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 text-sm bg-blue-950 text-white rounded-md hover:bg-blue-900"
+          >
+            Create Role
           </button>
         </div>
       </div>

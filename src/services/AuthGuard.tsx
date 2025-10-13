@@ -35,7 +35,8 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     "/auth/verify-email",
     "/",
     "/auth/verify-success",
-    "/admin/dashboard"
+    "/admin/dashboard",
+    "/teacher/dashboard",
   ];
 
   // routes that don't require payment (can be accessed even without subscription)
@@ -48,8 +49,10 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     "/auth/verify-success",
     "/make-payment",
     "/bulk-payment",
-    "/school/dashboard",
-    "/dashboard"
+    "/school/dashboard", //remove this
+    "/dashboard", //remove this
+    "/admin/dashboard",
+    "/teacher/dashboard",
   ];
 
   // Helper function to check if user has paid
@@ -69,8 +72,10 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
   const getDashboardRoute = (userRole?: string) => {
     if (userRole === "schoolAdmin" || userRole === "SchoolAdmin") {
       return "/school/dashboard";
-    } else if (userRole === "globalAdmin"|| userRole === "GlobalAdmin"){
-      return "/admin/dashboard"
+    } else if (userRole === "globalAdmin" || userRole === "GlobalAdmin") {
+      return "/admin/dashboard";
+    }  else if (userRole === "teacher" || userRole === "Teacher") {
+      return "/teacher/dashboard";
     }
     return "/dashboard"; // default for students and other roles
   };
@@ -209,7 +214,13 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       return;
     }
 
-    if (isLoggedIn && token && user && user.isVerified && hasActiveSubscription(user)) {
+    if (
+      isLoggedIn &&
+      token &&
+      user &&
+      user.isVerified &&
+      hasActiveSubscription(user)
+    ) {
       // Check if student is trying to access school admin routes
       if (user.role === "student" && pathname.startsWith("/school/")) {
         console.log(

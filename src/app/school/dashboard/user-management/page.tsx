@@ -2,8 +2,10 @@
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import SchoolFilterButton from "@/components/School/Dashboard/SchoolFilterButton";
 import SchoolClassTable from "@/components/School/Dashboard/UserMgt/ClassTable";
+import SchoolRolesContainer from "@/components/School/Dashboard/UserMgt/SchoolRolesContainer";
 import {
   AddClassModal,
+  AddRoleModal,
   AddStudentModal,
   AddTeacherModal,
   BulkUploadModal,
@@ -206,7 +208,7 @@ const SchoolUserManagementPage = () => {
       ) : activeFilter === "Classes" ? (
         <SchoolClassTable />
       ) : activeFilter === "Roles & Permissions" ? (
-        ""
+        <SchoolRolesContainer />
       ) : (
         ""
       )}
@@ -218,26 +220,20 @@ const SchoolUserManagementPage = () => {
       />
 
       {modalType === "Teachers" && (
-        <AddTeacherModal
-          isOpen={isAddModalOpen}
-          onClose={handleCloseModal}
-        />
+        <AddTeacherModal isOpen={isAddModalOpen} onClose={handleCloseModal} />
       )}
 
       {modalType === "Students" && (
-        <AddStudentModal
-          isOpen={isAddModalOpen}
-          onClose={handleCloseModal}
-        />
+        <AddStudentModal isOpen={isAddModalOpen} onClose={handleCloseModal} />
       )}
 
       {modalType === "Classes" && (
-        <AddClassModal
-          isOpen={isAddModalOpen}
-          onClose={handleCloseModal}
-        />
+        <AddClassModal isOpen={isAddModalOpen} onClose={handleCloseModal} />
       )}
 
+      {modalType === "Roles & Permissions" && (
+        <AddRoleModal isOpen={isAddModalOpen} onClose={handleCloseModal} />
+      )}
     </div>
   );
 };
