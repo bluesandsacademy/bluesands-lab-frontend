@@ -1,7 +1,9 @@
+import { useUser } from '@/services/UserContext'
 import Link from 'next/link'
 import React from 'react'
 
 const SubscriptionStatus = () => {
+  const {user} = useUser()
   return (
     <div className="m-3 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-12 rounded-md">
         <p className="text-sm md:text-base lg:text-lg font-semibold text-bgBlue">Subscription Status</p>

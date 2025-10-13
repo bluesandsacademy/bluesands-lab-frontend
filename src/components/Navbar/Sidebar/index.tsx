@@ -1,7 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { adminSideNavLinks, sidebarLinks, sideNavLinks } from "@/lib/data";
+import {
+  adminSideNavLinks,
+  sidebarLinks,
+  sideNavLinks,
+  teacherSideNavLinks,
+} from "@/lib/data";
 import { usePathname } from "next/navigation";
 import { HiX } from "react-icons/hi";
 import { useUser } from "@/services/UserContext";
@@ -134,6 +139,32 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                   </Link>
                 );
               })
+            : user?.role === "teacher" || user?.role === "Teacher"
+            ? teacherSideNavLinks.map((link, index) => {
+                return (
+                  <Link
+                    key={index}
+                    href={link.url}
+                    className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
+                      pathname === link.url ? "bg-[#303C48] text-white" : ""
+                    }`}
+                    onClick={onClose} // Close sidebar on mobile when link is clicked
+                  >
+                    <img
+                      src={link.icon}
+                      alt={link.title}
+                      className={`w-5 h-5 ${
+                        pathname === link.url
+                          ? "filter brightness-0 invert"
+                          : index === 0
+                          ? "filter brightness-0"
+                          : ""
+                      }`}
+                    />
+                    {link.title}
+                  </Link>
+                );
+              })
             : sidebarLinks.map((link, index) => {
                 return (
                   <Link
@@ -185,16 +216,30 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
             ))}
 
           <Link
-           href={user?.role === "schoolAdmin" || user?.role === "SchoolAdmin"? "/school/dashboard/contact-support" : "/dashboard/support"}
+            href={
+              user?.role === "schoolAdmin" || user?.role === "SchoolAdmin"
+                ? "/school/dashboard/contact-support"
+                : user?.role === "teacher" || user?.role === "Teacher"
+                ? "/teacher/dashboard/contact-support"
+                : "/dashboard/support"
+            }
             className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
-              pathname === "/dashboard/support" ? "bg-bgBlue text-white" : pathname === "/school/dashboard/contact-support" ? "bg-blue-950 text-white" : ""
+              pathname === "/dashboard/support"
+                ? "bg-bgBlue text-white"
+                : pathname === "/school/dashboard/contact-support"
+                ? "bg-blue-950 text-white"
+                : pathname === "/teacher/dashboard/contact-support"
+                ? "bg-[#303C48] text-white"
+                : ""
             }`}
           >
             <img
               src="/images/icon/ic_sharp-support-agent.svg"
               alt="support-agent"
               className={`w-5 h-5 ${
-                pathname === "/dashboard/support" ||  pathname === "/school/dashboard/contact-support"
+                pathname === "/dashboard/support" ||
+                pathname === "/school/dashboard/contact-support" ||
+                pathname === "/teacher/dashboard/contact-support"
                   ? "filter brightness-0 invert"
                   : ""
               }`}

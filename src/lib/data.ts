@@ -320,6 +320,60 @@ export const sideNavLinks: SidebarLinks[] = [
   },
 ];
 
+export const teacherSideNavLinks: SidebarLinks[] = [
+  {
+    title: "Overview",
+    url: "/teacher/dashboard",
+    icon: "/images/icon/home.svg",
+  },
+  {
+    title: "Class Management",
+    url: "/teacher/dashboard/classes",
+    icon: "/images/icon/mdi_teacher.svg",
+  },
+  {
+    title: "Student Engagement",
+    url: "/teacher/dashboard/students",
+    icon: "/images/icon/studentgrad.svg",
+  },
+  {
+    title: "Experiment Mgt",
+    url: "/teacher/dashboard/experiments",
+    icon: "/images/icon/beaker.svg",
+  },
+  {
+    title: "Performance Metrics",
+    url: "/teacher/dashboard/performance",
+    icon: "/images/icon/analytic.svg",
+  },
+  {
+    title: "Quiz & Assessments",
+    url: "/teacher/dashboard/quizzes",
+    icon: "/images/icon/quiz.svg",
+  },
+   {
+    title: "Communication Metrics",
+    url: "/teacher/dashboard/comms",
+    icon: "/images/icon/communication.svg",
+  },
+   {
+    title: "Report & Analytics",
+    url: "/teacher/dashboard/reports",
+    icon: "/images/icon/report.svg",
+  },
+   {
+    title: "Leaderboard",
+    url: "/teacher/dashboard/leaderboard",
+    icon: "/images/icon/ic_outline-leaderboard.svg",
+  },
+   {
+    title: "Teachers Forum",
+    url: "/teacher/dashboard/forum",
+    icon: "/images/icon/forum.svg",
+  },
+];
+
+
 export const adminSideNavLinks: SidebarLinks[] = [
   {
     title: "Overview",
@@ -385,6 +439,32 @@ export const profileDropdown: ProfileDropdown[] = [
   {
     title: "Change Password",
     url: "/dashboard/change-password",
+    imgSrc: "/images/icon/change_password.svg",
+  },
+];
+
+export const schoolProfileDropdown: ProfileDropdown[] = [
+  {
+    title: "Profile",
+    url: "/school/dashboard/profile",
+    imgSrc: "/images/icon/profile.svg",
+  },
+  {
+    title: "Change Password",
+    url: "/school/dashboard/change-password",
+    imgSrc: "/images/icon/change_password.svg",
+  },
+];
+
+export const teacherProfileDropdown: ProfileDropdown[] = [
+  {
+    title: "Profile",
+    url: "/teacher/dashboard/profile",
+    imgSrc: "/images/icon/profile.svg",
+  },
+  {
+    title: "Change Password",
+    url: "/teacher/dashboard/change-password",
     imgSrc: "/images/icon/change_password.svg",
   },
 ];

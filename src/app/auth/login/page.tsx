@@ -47,7 +47,9 @@ export default function UserLogin() {
       } else if (user.role === "schoolAdmin" || user.role === "SchoolAdmin") {
         router.push("/school/dashboard");
       } else if (user.role === "globalAdmin" || user.role === "GlobalAdmin") {
-        router.push("/school/dashboard");
+        router.push("/admin/dashboard");
+      } else if (user.role === "teacher" || user.role === "Teacher") {
+        router.push("/teacher/dashboard");
       } else {
         // Default fallback for any other roles
         router.push("/dashboard");
