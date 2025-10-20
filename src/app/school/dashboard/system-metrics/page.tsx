@@ -1,5 +1,8 @@
 "use client";
-import React from "react";
+import { StatCardData } from "@/components/Dashboard/StatCards";
+import { getSchoolAdminSystemMetrics } from "@/services/dashboard-service";
+import { useUser } from "@/services/UserContext";
+import React, { useEffect, useState } from "react";
 import { FaRegClock } from "react-icons/fa";
 import { FaCircleCheck } from "react-icons/fa6";
 import { RiErrorWarningFill } from "react-icons/ri";
@@ -19,7 +22,38 @@ import {
   PieChart,
 } from "recharts";
 
+interface StemMetricsResponse {
+  peakUsageTimes: [
+    {
+      hour: number;
+      count: number;
+    }
+  ];
+  deviceBreakdown: [
+    {
+      name: string;
+      count: number;
+    }
+  ];
+  browserBreakdown: [
+    {
+      name: string;
+      count: number;
+    }
+  ];
+  downtimeOrErrorEvents: [
+    {
+      date: string;
+      count: number;
+    }
+  ];
+}
+
 const SchoolSystemMetricsPage = () => {
+  const [metricsData, setMetricsData] = useState<StemMetricsResponse>();
+ // const [isLoading, setIsLoading] = useState(true);
+  const { user, token } = useUser();
+
   const COLORS = ["#10B981", "#3B82F6", "#F59E0B", "#00B69B"];
 
   const lineChartData = [
@@ -65,10 +99,22 @@ const SchoolSystemMetricsPage = () => {
     { month: "Dec", downtime: 0 },
   ];
 
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const data = await getSchoolAdminSystemMetrics(token);
+        setMetricsData(data);
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+      }
+    }
+    fetchStats();
+  }, [user, token]);
+
   return (
     <div className="flex flex-col gap-4 p-2 lg:p-4">
       {/* Card Container */}
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 justify-center ">
         {/* Cards */}
         <div className="flex flex-col justify-between p-4 rounded-md bg-green-100 h-32 w-60">
           <div className="flex justify-between ">
@@ -129,15 +175,15 @@ const SchoolSystemMetricsPage = () => {
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-semibold mb-4">Peak Usage Time </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={lineChartData}>
+            <LineChart data={metricsData?.peakUsageTimes}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+              <XAxis dataKey="hour" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
               <Legend />
               <Line
                 type="monotone"
-                dataKey="usage"
+                dataKey="count"
                 stroke="#003A6C"
                 strokeWidth={2}
                 dot={{ r: 4 }}
@@ -148,13 +194,11 @@ const SchoolSystemMetricsPage = () => {
 
         {/* Donut Chart (Pie Chart with hole) */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-semibold mb-4">
-            Device Usage
-          </h3>
+          <h3 className="text-sm font-semibold mb-4">Device Usage</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={deviceUsageChartData}
+                data={metricsData?.deviceBreakdown}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -164,7 +208,7 @@ const SchoolSystemMetricsPage = () => {
                 outerRadius={80}
                 innerRadius={50}
                 fill="#8884d8"
-                dataKey="value"
+                dataKey="count"
               >
                 {deviceUsageChartData.map((entry, index) => (
                   <Cell
@@ -182,30 +226,26 @@ const SchoolSystemMetricsPage = () => {
       <div className="flex flex-col lg:flex-row gap-4">
         {/* Bar chart */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-semibold mb-4">
-            Downtime History
-          </h3>
+          <h3 className="text-sm font-semibold mb-4">Downtime History</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barChartData}>
+            <BarChart data={metricsData?.downtimeOrErrorEvents}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <XAxis dataKey="date" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="downtime" fill="red" />
+              <Bar dataKey="count" fill="red" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         {/* Donut Chart (Pie Chart with hole) */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-semibold mb-4">
-            Browser Usage Stats
-          </h3>
+          <h3 className="text-sm font-semibold mb-4">Browser Usage Stats</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={browserUsageChartData}
+                data={metricsData?.browserBreakdown}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -215,7 +255,7 @@ const SchoolSystemMetricsPage = () => {
                 outerRadius={80}
                 innerRadius={50}
                 fill="#8884d8"
-                dataKey="value"
+                dataKey="count"
               >
                 {browserUsageChartData.map((entry, index) => (
                   <Cell
@@ -230,31 +270,30 @@ const SchoolSystemMetricsPage = () => {
         </div>
       </div>
 
-       <p className="text-sm font-semibold">Recent Error Reports</p>
-        <table className="bg-white rounded-md">
-         <thead>
-           <tr className="border-b border-b-gray-200 text-xs text-gray-500">
+      <p className="text-sm font-semibold">Recent Error Reports</p>
+      <table className="bg-white rounded-md">
+        <thead>
+          <tr className="border-b border-b-gray-200 text-xs text-gray-500">
             <td className="p-2">Error Type</td>
             <td className="p-2">Time</td>
             <td className="p-2">Severity</td>
             <td className="p-2">Status</td>
-           </tr>
-         </thead>
-          <tbody>
-            <tr className="text-xs border-b border-b-gray-200">
-              <td className="p-2">API Timeout</td>
-              <td className="p-2">3 Hours Ago</td>
-              <td className="p-2">
-                <p className="flex w-max p-0.5 px-2 bg-green-200 text-green-600 items-center justify-center rounded-md">
-                  {" "}
-                  Low
-                </p>
-              </td>
-             <td className="p-2">Resolved</td>
-            </tr>
-          </tbody>
-        </table>
-
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="text-xs border-b border-b-gray-200">
+            <td className="p-2">API Timeout</td>
+            <td className="p-2">3 Hours Ago</td>
+            <td className="p-2">
+              <p className="flex w-max p-0.5 px-2 bg-green-200 text-green-600 items-center justify-center rounded-md">
+                {" "}
+                Low
+              </p>
+            </td>
+            <td className="p-2">Resolved</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };

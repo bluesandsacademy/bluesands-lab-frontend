@@ -4,29 +4,50 @@ import { BsBagPlusFill, BsCreditCardFill } from "react-icons/bs";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdDoNotDisturb } from "react-icons/md";
 
-const SchoolPaymentOverview = () => {
+interface OverviewProps {
+  currentSub: string | undefined;
+  daysRemaining: number | undefined;
+  seats: number | undefined;
+  isActive: boolean | undefined
+}
+
+const SchoolPaymentOverview = ({
+  isActive,
+  currentSub,
+  daysRemaining,
+  seats,
+}: OverviewProps) => {
   return (
     <div className="flex flex-col gap-4 lg:gap-6 mt-3 lg:mt-5">
       <div className="flex flex-col p-2 bg-white rounded-lg gap-4 lg:gap-6">
         <div className="flex flex-col md:flex-row justify-between mb-4">
           <div className="flex flex-col gap-4 lg:gap-6">
             <strong className="lg:text-lg">Current Subscription</strong>
-            <p className="text-sm">Professional Plan <strong className="text-blue-950">$229</strong>/month</p>
+            {/* <p className="text-sm">Professional Plan <strong className="text-blue-950">$229</strong>/month</p> */}
+            <p className="text-sm">{currentSub ? currentSub : ""}</p>
           </div>
           <div>
-            <p className="text-emerald-500 font-semibold flex gap-1 items-center"><IoMdCheckmarkCircleOutline /> Active</p>
+            {isActive && (
+              <p className="text-emerald-500 font-semibold flex gap-1 items-center">
+                <IoMdCheckmarkCircleOutline /> Active
+              </p>
+            )}
             <p className="lg:text-lg font-semibold">Next Billing</p>
-            <p className="text-sm">29 Days remaining</p>
+            <p className="text-sm">
+              {daysRemaining ? daysRemaining : "0"} Day(s) remaining
+            </p>
           </div>
         </div>
         <div className="flex justify-between">
           <div className="bg-gray-200 p-2 lg:p-3 w-full md:w-[48%] rounded-md">
-            <p className="text-sm lg:text-base font-semibold">500</p>
+            <p className="text-sm lg:text-base font-semibold">
+              {seats ? seats : "0"}
+            </p>
             <p className="text-xs lg:text-sm">Student Limit</p>
           </div>
 
           <div className="bg-gray-200 p-2 lg:p-3 w-full md:w-[48%] rounded-md">
-            <p className="text-sm lg:text-base font-semibold">87%</p>
+            <p className="text-sm lg:text-base font-semibold">0%</p>
             <p className="text-xs lg:text-sm">Usage this month</p>
           </div>
         </div>
@@ -34,8 +55,18 @@ const SchoolPaymentOverview = () => {
           <p className="text-sm lg:text-base font-semibold">
             Included Features
           </p>
-          <p className="text-emerald-500 text-xs md:text-sm flex gap-1 items-center"> <IoMdCheckmarkCircleOutline /> Unlimited Classes</p>
-          <p className="text-emerald-500 text-xs md:text-sm flex gap-1 items-center"> <IoMdCheckmarkCircleOutline /> Parent portal</p>
+          {isActive && (
+            <div>
+              <p className="text-emerald-500 text-xs md:text-sm flex gap-1 items-center">
+                {" "}
+                <IoMdCheckmarkCircleOutline /> Unlimited Classes
+              </p>
+              <p className="text-emerald-500 text-xs md:text-sm flex gap-1 items-center">
+                {" "}
+                <IoMdCheckmarkCircleOutline /> Parent portal
+              </p>
+            </div>
+          )}
         </div>
         <div className="flex flex-col gap-2 items-center">
           <button className="bg-blue-950 text-white p-2 textxs md:text-sm rounded-md w-full">

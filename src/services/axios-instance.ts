@@ -31,6 +31,7 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const apiClient = axios.create({
   baseURL: baseUrl,
+    // baseURL: "/api",
   headers: {
     'Content-Type': 'application/json',
   },

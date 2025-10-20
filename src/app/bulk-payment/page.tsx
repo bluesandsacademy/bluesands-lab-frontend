@@ -1,7 +1,7 @@
 "use client";
 
+import axios, { apiClient } from "@/services/axios-instance";
 import { useUser } from "@/services/UserContext";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import nProgress from "nprogress";
 import { useState } from "react";
@@ -151,7 +151,7 @@ const SchoolStudentPaymentPage = () => {
     setIsProcessing(true);
 
     try {
-      const res = await axios.get(`${baseUrl}/payments/verify`, {
+      const res = await apiClient.get(`/api/payments/verify`, {
         params: {
           reference,
         },
@@ -163,8 +163,8 @@ const SchoolStudentPaymentPage = () => {
 
         // Register the payment details
         try {
-          await axios.post(
-            `${baseUrl}/payments/register-payment`,
+          await apiClient.post(
+            `/api/payments/register-payment`,
             {
               reference: reference,
               userId: user?.userId,

@@ -117,17 +117,17 @@ import {
 export default function QuizPerformance() {
   const [quizData, setQuizData] = useState([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await getQuizPerformance();
-        setQuizData(res);
-      } catch (err) {
-        console.error("Error fetching data", err);
-      }
-    }
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const res = await getQuizPerformance();
+  //       setQuizData(res);
+  //     } catch (err) {
+  //       console.error("Error fetching data", err);
+  //     }
+  //   }
+  //   fetchData();
+  // }, []);
 
   // Group by month
   const monthlyScores: Record<string, number[]> = {};
