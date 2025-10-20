@@ -1,5 +1,4 @@
 import { courseIcons } from "@/lib/data";
-import { getCourseTable } from "@/services/dashboard-service";
 import { useEffect, useState } from "react";
 
 export default function PerformanceByStemCourses() {
