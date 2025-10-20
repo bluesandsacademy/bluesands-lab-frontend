@@ -1,22 +1,87 @@
 import axios, { apiClient } from "@/services/axios-instance";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+// const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function getDashboard(token?: string) {
   const config = {
     withCredentials: true,
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   };
-  const res = await axios.get(`${baseUrl}/dashboard`, config);
+  const res = await axios.get(`/api/dashboard`, config);
   return res.data;
 }
 
+
+// S C H O O L - A D M I N //
 export async function getSchoolAdminDashboard(token?: string | null) {
   const config = {
     withCredentials: true,
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   };
-  const res = await axios.get(`${baseUrl}/dashboard/school-admin`, config);
+  const res = await apiClient.get(`/api/dashboard/school-admin`, config);
+  return res.data;
+}
+
+export async function getSchoolAdminOverview(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/overview", config);
+  return res.data;
+}
+
+export async function getSchoolAdminExperiments(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/experiments-and-courses", config);
+  return res.data;
+}
+
+export async function getSchoolAdminPerformance(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/performance", config);
+  return res.data;
+}
+
+export async function getSchoolAdminTeacherActivity(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/teacher-activity", config);
+  return res.data;
+}
+
+export async function getSchoolAdminSystemMetrics(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/system-metrics", config);
+  return res.data;
+}
+
+export async function getSchoolAdminBilling(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/billing", config);
+  return res.data;
+}
+
+export async function getSchoolAdminLeaderboard(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/leaderboard", config);
   return res.data;
 }
 
@@ -43,7 +108,7 @@ export async function addSchoolStudent(
 
   try {
     const res = await apiClient.post(
-      "/schools/users/students/upsert",
+      "/api/schools/users/students/upsert",
       studentData,
       {
         params: { schoolId },
@@ -69,7 +134,7 @@ export async function addSchoolTeacher(
 ) {
   try {
     const res = await apiClient.post(
-      '/schools/users/teachers/upsert',
+      '/api/schools/users/teachers/upsert',
       teacherData,
       {
         params: { schoolId },
@@ -83,102 +148,71 @@ export async function addSchoolTeacher(
   }
 }
 
-// *** This is for adding Classes (just update) *** //
 
-// export async function addSchoolStudent(
-//   studentData: {
-//     email: string;
-//     fullName: string;
-//     phone: string;
-//     country: string;
-//   },
-//   schoolId: string,
-//   token?: string | null
-// ) {
-//   const config = {
-//     withCredentials: true,
-//     headers: {
-//       "Content-Type": "application/json",
-//       ...(token && { Authorization: `Bearer ${token}` }),
-//     },
-//     params: {
-//       schoolId,
-//     },
-//   };
-
-//   try {
-//     const res = await axios.post(
-//       `${baseUrl}/schools/users/students/upsert`,
-//       studentData,
-//       config
-//     );
-//     return res.data;
-//   } catch (error) {
-//     console.error("Failed to register student:", error);
-//     throw error;
-//   }
-// }
-
-export async function getLoginRate() {
-  // const res = await axios.get("/dashboard/monthly-login-rate", {
-  //   withCredentials: true,
-  // });
-  // return res.data;
-  console.log("get")
-}
-
-export async function getLabRate() {
-  // const res = await axios.get("/dashboard/lab-completion-rate", {
-  //   withCredentials: true,
-  // });
-  // return res.data;
-   console.log("get")
-}
-
-export async function getExperimentRate() {
-  // const res = await axios.get("/dashboard/experiment-attempt-rate", {
-  //   withCredentials: true,
-  // });
-  // return res.data;
-   console.log("get")
-}
-
-export async function getQuizAverage() {
-  // const res = await axios.get("/dashboard/quiz-average", {
-  //   withCredentials: true,
-  // });
-  // return res.data;
-   console.log("get")
-}
-
-export async function getTimeSpentOnPlatform() {
-  const res = await axios.get("/dashboard/time-spent-platform", {
+export async function addClass(
+  classData: {
+    name: string;
+    subject: string;
+  },
+  token?: string | null
+) {
+  const config = {
     withCredentials: true,
-  });
-  return res.data;
-   console.log("get")
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    // params: {
+    //   schoolId,
+    // },
+  };
+
+  try {
+    const res = await apiClient.post(
+      "/api/classes",
+      classData,
+      config
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Failed to register class:", error);
+    throw error;
+  }
 }
 
-export async function getTimeSpentOnCourses() {
-  const res = await axios.get("/dashboard/time-spent-course", {
+
+// I N D I V I D U A L  U S E R / S T U D E N T //
+
+export async function getStudentOverview(token?: string | null) {
+  const config = {
     withCredentials: true,
-  });
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/student/v1/overview", config);
   return res.data;
-   console.log("get")
 }
 
-export async function getQuizPerformance() {
-  const res = await axios.get("/dashboard/quiz-performance", {
+export async function getStudentExperiment(token?: string | null) {
+  const config = {
     withCredentials: true,
-  });
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/student/v1/experiments", config);
   return res.data;
-   console.log("get")
 }
 
-export async function getCourseTable() {
-  const res = await axios.get("/dashboard/course-table", {
+export async function getStudentRewards(token?: string | null) {
+  const config = {
     withCredentials: true,
-  });
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/student/v1/badges", config);
   return res.data;
-   console.log("get")
 }
+
+
+
+
+
+
+

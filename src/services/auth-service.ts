@@ -60,7 +60,7 @@ export interface LoginResponse {
 
 export async function registerNewUser(newUser: UserObject) {
   try {
-    const res = await axios.post("/auth/register", newUser);
+    const res = await axios.post("/api/auth/register", newUser);
     return res.data;
   } catch (error) {
     throw error;
@@ -69,7 +69,7 @@ export async function registerNewUser(newUser: UserObject) {
 
 export async function registerNewSchool(newSchool: SchoolObject) {
   try {
-    const res = await axios.post("/auth/register/school", newSchool);
+    const res = await axios.post("/api/auth/register/school", newSchool);
     return res.data;
   } catch (error) {
     throw error;
@@ -82,7 +82,7 @@ export async function login(
 ): Promise<{ user: User; token: string; isVerified: boolean }> {
   try {
     const res = await axios.post(
-      "/auth/login",
+      "/api/auth/login",
       { email, password },
       { withCredentials: true }
     );
@@ -130,7 +130,7 @@ export async function login(
 export async function resendVerification(email: string) {
   try {
     await axios.post(
-      "/auth/resend-verification",
+      "/api/auth/resend-verification",
       { email },
       { withCredentials: true }
     );

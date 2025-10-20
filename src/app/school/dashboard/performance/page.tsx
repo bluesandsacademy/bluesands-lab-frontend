@@ -1,11 +1,9 @@
 "use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
-import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
-import { Stat } from "@/lib/data";
+import { getSchoolAdminPerformance } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
+import { useEffect, useState } from "react";
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
   Cell,
   Legend,
@@ -19,9 +17,32 @@ import {
   YAxis,
 } from "recharts";
 
+interface PerformanceResponse {
+  overallAverageScore: number;
+  passRatePercent: number;
+  subjectTrends: [
+    {
+      subject: string;
+      average: number;
+      samples: number;
+    }
+  ];
+  classAverages: [
+    {
+      classroomId: string;
+      className: string;
+      average: number;
+      samples: number;
+    }
+  ];
+}
+
 const SchoolPerformanceAnalyticsPage = () => {
-  const { user } = useUser();
-  const stats: StatCardData[] = [
+  const [stats, setStats] = useState<StatCardData[]>([]);
+  const [performanceData, setPerformanceData] = useState<PerformanceResponse>();
+  const [isLoading, setIsLoading] = useState(true);
+  const { user, token } = useUser();
+  const statsConfig: StatCardData[] = [
     {
       title: "Overall Average Score",
       value: "0",
@@ -78,6 +99,72 @@ const SchoolPerformanceAnalyticsPage = () => {
     { name: "fail", value: 175 },
   ];
 
+  useEffect(() => {
+    if (!user || !token) return;
+
+    async function fetchStats() {
+      setIsLoading(true);
+      try {
+        const data = await getSchoolAdminPerformance(token);
+
+        const statsData: StatCardData[] = [
+          {
+            title: statsConfig[0].title,
+            value: `${data.overallAverageScore}`,
+            icon: statsConfig[0].icon,
+            trendIcon: statsConfig[0].trendIcon,
+            percentageChange: statsConfig[0].percentageChange,
+            timeFrame: statsConfig[0].timeFrame,
+          },
+          {
+            title: statsConfig[1].title,
+            value: statsConfig[1].value,
+            icon: statsConfig[1].icon,
+            trendIcon: statsConfig[1].trendIcon,
+            percentageChange: statsConfig[1].percentageChange,
+            timeFrame: statsConfig[1].timeFrame,
+          },
+          {
+            title: statsConfig[2].title,
+            value: `${data.passRatePercent}`,
+            icon: statsConfig[2].icon,
+            trendIcon: statsConfig[2].trendIcon,
+            percentageChange: statsConfig[2].percentageChange,
+            timeFrame: statsConfig[2].timeFrame,
+          },
+          {
+            title: statsConfig[3].title,
+            value: statsConfig[3].value,
+            icon: statsConfig[3].icon,
+            trendIcon: statsConfig[3].trendIcon,
+            percentageChange: statsConfig[3].percentageChange,
+            timeFrame: statsConfig[3].timeFrame,
+          },
+        ];
+
+        setStats(statsData);
+        setPerformanceData(data);
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+
+        const fallbackStats: StatCardData[] = statsConfig.map((stat) => ({
+          title: stat.title,
+          value: "0",
+          icon: stat.icon,
+          trendIcon: stat.trendIcon,
+          percentageChange: stat.percentageChange,
+          timeFrame: stat.timeFrame,
+        }));
+
+        setStats(fallbackStats);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchStats();
+  }, [user, token]);
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <StatCards stats={stats} />
@@ -87,13 +174,13 @@ const SchoolPerformanceAnalyticsPage = () => {
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-semibold mb-4">Performance Trends </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={lineChartData}>
+            <LineChart data={performanceData?.subjectTrends}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+              <XAxis dataKey="subject" tick={{ fontSize: 12 }} />
               <YAxis tick={{ fontSize: 12 }} />
               <Tooltip />
               <Legend />
-              <Line
+              {/* <Line
                 type="monotone"
                 dataKey="attendance"
                 stroke="#0483E2"
@@ -111,6 +198,20 @@ const SchoolPerformanceAnalyticsPage = () => {
                 type="monotone"
                 dataKey="quiz_score"
                 stroke="#003A6C"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+              /> */}
+               <Line
+                type="monotone"
+                dataKey="average"
+                stroke="#0483E2"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="samples"
+                stroke="#10B981"
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />
@@ -149,9 +250,9 @@ const SchoolPerformanceAnalyticsPage = () => {
       </div>
 
       <p className="text-sm font-semibold">School-wide Performance Analysis</p>
-        <table className="bg-white rounded-md">
-         <thead>
-           <tr className="border-b border-b-gray-200 text-xs text-gray-500">
+      <table className="bg-white rounded-md">
+        <thead>
+          <tr className="border-b border-b-gray-200 text-xs text-gray-500">
             <td className="p-2">Subject</td>
             <td className="p-2">Average Score</td>
             <td className="p-2">Pass Rate</td>
@@ -159,28 +260,28 @@ const SchoolPerformanceAnalyticsPage = () => {
             <td className="p-2">Trend</td>
             <td className="p-2">Status</td>
           </tr>
-         </thead>
-          <tbody>
-            <tr className="text-xs border-b border-b-gray-200">
-              <td className="p-2">Biology</td>
-              <td className="p-2">85.2%</td>
-              <td className="p-2">89%</td>
-              <td className="p-2">243</td>
-              <td className="p-2 text-green-600">Improving</td>
-              <td className="p-2">
-                <p className="flex w-max p-0.5 px-2 bg-green-200 text-green-600 items-center justify-center rounded-md">
-                  {" "}
-                  Excellent
-                </p>
-              </td>
-              <td className="p-2">
-                <button className=" flex gap-1 items-center">
-                  {/* <SlOptionsVertical /> */}
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        </thead>
+        <tbody>
+          <tr className="text-xs border-b border-b-gray-200">
+            <td className="p-2">Biology</td>
+            <td className="p-2">85.2%</td>
+            <td className="p-2">89%</td>
+            <td className="p-2">243</td>
+            <td className="p-2 text-green-600">Improving</td>
+            <td className="p-2">
+              <p className="flex w-max p-0.5 px-2 bg-green-200 text-green-600 items-center justify-center rounded-md">
+                {" "}
+                Excellent
+              </p>
+            </td>
+            <td className="p-2">
+              <button className=" flex gap-1 items-center">
+                {/* <SlOptionsVertical /> */}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };

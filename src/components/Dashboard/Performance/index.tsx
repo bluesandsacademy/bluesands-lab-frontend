@@ -5,17 +5,17 @@ import { useEffect, useState } from "react";
 export default function PerformanceByStemCourses() {
   const [performanceArray, setPerformanceArray] = useState<any[]>([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await getCourseTable();
-        setPerformanceArray(response);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    }
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       const response = await getCourseTable();
+  //       setPerformanceArray(response);
+  //     } catch (error) {
+  //       console.error("Error fetching data", error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, []);
 
   return (
     <section className="bg-white rounded-2xl p-5 col-span-3 min-h-full space-y-10">

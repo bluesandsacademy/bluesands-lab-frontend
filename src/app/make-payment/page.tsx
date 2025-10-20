@@ -1,5 +1,6 @@
 "use client";
 
+import apiClient from "@/services/axios-instance";
 import { useUser } from "@/services/UserContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -48,7 +49,7 @@ const IndividualPaymentPage = () => {
 
     // @ts-ignore - PaystackPop is loaded via script tag
     const handler = window.PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
+      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY_TEST,
       email: user.email,
       amount: Math.round(totalAmount * 100), // convert to kobo and round
       currency: "NGN",
@@ -103,7 +104,7 @@ const IndividualPaymentPage = () => {
     setIsProcessing(true);
 
     try {
-      const res = await axios.get(`${baseUrl}/payments/verify`, {
+      const res = await apiClient.get(`${baseUrl}/api/payments/verify`, {
         params: {
           reference,
         },
@@ -115,8 +116,8 @@ const IndividualPaymentPage = () => {
         
         // Register the payment details
         try {
-          await axios.post(
-            `${baseUrl}/payments/register-payment`,
+          await apiClient.post(
+            `${baseUrl}/api/payments/register-payment`,
             {
               reference: reference,
               userId: user?.userId,

@@ -2,9 +2,44 @@
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import SchoolWelcomeBanner from "@/components/School/Dashboard/SchoolWelcomeBanner";
 import SchoolWideTrend from "@/components/School/Dashboard/SchoolWideTrend";
-import { getSchoolAdminDashboard } from "@/services/dashboard-service";
+import {
+  getSchoolAdminDashboard,
+  getSchoolAdminOverview,
+} from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
 import { useEffect, useState } from "react";
+
+interface OverviewResponse {
+  totals: {
+    activeTeachers: number;
+    activeStudents: number;
+    experiments: number;
+    quizzes: number;
+    newRegistrations30d: number;
+  };
+  subscription: {
+    isActive: boolean;
+    tier: string;
+    seats: number;
+    daysRemaining: number;
+  };
+  billing: {
+    status: string;
+  };
+  license: {
+    allocated: number;
+    used: number;
+    percent: number;
+  };
+  verification: {
+    verified: number;
+    unverified: number;
+    ratePercent: number;
+  };
+  loginFrequency7d: {
+    dailyActiveUsers: number[];
+  };
+}
 
 const statsConfig: StatCardData[] = [
   {
@@ -59,90 +94,93 @@ const statsConfig: StatCardData[] = [
 
 const SchoolDashboardPage = () => {
   const [stats, setStats] = useState<StatCardData[]>([]);
+  const [overviewData, setOverviewData] = useState<OverviewResponse>();
   const [isLoading, setIsLoading] = useState(true);
   const { user, token } = useUser();
   const firstName = user?.fullName?.split(" ")[0];
 
   useEffect(() => {
-  if (!user || !token) return;
+    if (!user || !token) return;
 
-  async function fetchStats() {
-    setIsLoading(true);
-    try {
-      const data = await getSchoolAdminDashboard(token);
+    async function fetchStats() {
+      setIsLoading(true);
+      try {
+        const data = await getSchoolAdminDashboard(token);
+        const data2 = await getSchoolAdminOverview(token);
 
-      const statsData: StatCardData[] = [
-        {
-          title: statsConfig[0].title,
-          value: `${data.counts.students}`,
-          icon: statsConfig[0].icon,
-          trendIcon: statsConfig[0].trendIcon,
-          percentageChange: statsConfig[0].percentageChange,
-          timeFrame: statsConfig[0].timeFrame,
-        },
-        {
-          title: statsConfig[1].title,
-          value: `${data.counts.teachers}`,
-          icon: statsConfig[1].icon,
-          trendIcon: statsConfig[1].trendIcon,
-          percentageChange: statsConfig[1].percentageChange,
-          timeFrame: statsConfig[1].timeFrame,
-        },
-        {
-          title: statsConfig[2].title,
-          value: `${data.activity7d.experiments}`, 
-          icon: statsConfig[2].icon,
-          trendIcon: statsConfig[2].trendIcon,
-          percentageChange: statsConfig[2].percentageChange,
-          timeFrame: statsConfig[2].timeFrame,
-        },
-        {
-          title: statsConfig[3].title,
-          value: `${data.activity7d.quizzes}`,
-          icon: statsConfig[3].icon,
-          trendIcon: statsConfig[3].trendIcon,
-          percentageChange: statsConfig[3].percentageChange,
-          timeFrame: statsConfig[3].timeFrame,
-        },
-        {
-          title: statsConfig[4].title,
-          value: `${data.activity7d.activeUsers}`, 
-          icon: "/images/icon/student_dark.svg",
-          trendIcon: "/images/icon/trend_up.svg",
-          percentageChange: "0%",
-          timeFrame: "from last month",
-        },
-        {
-          title: statsConfig[5].title,
-          value: "0", // Wait for backend to provide this data
-          icon: "/images/icon/active_teacher.svg",
-          trendIcon: "/images/icon/trend_up.svg",
-          percentageChange: "0%",
-          timeFrame: "from last month",
-        },
-      ];
+        const statsData: StatCardData[] = [
+          {
+            title: statsConfig[0].title,
+            value: `${data.counts.students}`,
+            icon: statsConfig[0].icon,
+            trendIcon: statsConfig[0].trendIcon,
+            percentageChange: statsConfig[0].percentageChange,
+            timeFrame: statsConfig[0].timeFrame,
+          },
+          {
+            title: statsConfig[1].title,
+            value: `${data.counts.teachers}`,
+            icon: statsConfig[1].icon,
+            trendIcon: statsConfig[1].trendIcon,
+            percentageChange: statsConfig[1].percentageChange,
+            timeFrame: statsConfig[1].timeFrame,
+          },
+          {
+            title: statsConfig[2].title,
+            value: `${data.activity7d.experiments}`,
+            icon: statsConfig[2].icon,
+            trendIcon: statsConfig[2].trendIcon,
+            percentageChange: statsConfig[2].percentageChange,
+            timeFrame: statsConfig[2].timeFrame,
+          },
+          {
+            title: statsConfig[3].title,
+            value: `${data.activity7d.quizzes}`,
+            icon: statsConfig[3].icon,
+            trendIcon: statsConfig[3].trendIcon,
+            percentageChange: statsConfig[3].percentageChange,
+            timeFrame: statsConfig[3].timeFrame,
+          },
+          {
+            title: statsConfig[4].title,
+            value: `${data2.totals.activeStudents}`,
+            icon: "/images/icon/student_dark.svg",
+            trendIcon: "/images/icon/trend_up.svg",
+            percentageChange: "0%",
+            timeFrame: "from last month",
+          },
+          {
+            title: statsConfig[5].title,
+            value: `${data2.totals.activeTeachers}`,
+            icon: "/images/icon/active_teacher.svg",
+            trendIcon: "/images/icon/trend_up.svg",
+            percentageChange: "0%",
+            timeFrame: "from last month",
+          },
+        ];
 
-      setStats(statsData);
-    } catch (err) {
-      console.error("Error fetching stats:", err);
+        setStats(statsData);
+        setOverviewData(data2);
+      } catch (err) {
+        console.error("Error fetching stats:", err);
 
-      const fallbackStats: StatCardData[] = statsConfig.map((stat) => ({
-        title: stat.title,
-        value: "0",
-        icon: stat.icon,
-        trendIcon: stat.trendIcon,
-        percentageChange: stat.percentageChange,
-        timeFrame: stat.timeFrame,
-      }));
+        const fallbackStats: StatCardData[] = statsConfig.map((stat) => ({
+          title: stat.title,
+          value: "0",
+          icon: stat.icon,
+          trendIcon: stat.trendIcon,
+          percentageChange: stat.percentageChange,
+          timeFrame: stat.timeFrame,
+        }));
 
-      setStats(fallbackStats);
-    } finally {
-      setIsLoading(false);
+        setStats(fallbackStats);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
 
-  fetchStats();
-}, [user, token]); 
+    fetchStats();
+  }, [user, token]);
 
   return (
     <div className="p-4 space-y-4">
@@ -155,11 +193,24 @@ const SchoolDashboardPage = () => {
             Subscription
           </strong>
           <div className="flex flex-col gap-2">
-            <p className="text-sm">Plan Type</p>
-            <p className="text-green-400 text-xs md:text-sm">
-              Active: renews in mont dd, yyyy
+            <p className="text-sm">
+              {overviewData?.subscription?.tier
+                ? overviewData?.subscription.tier
+                : "Plan Type"}
             </p>
-            <p className="text-xs md:text-sm">Payment: cardtype card***num</p>
+
+            {overviewData?.subscription.isActive ? (
+              <p className="text-green-400 text-xs md:text-sm">
+                Active(Renews in ${overviewData.subscription.daysRemaining}{" "}
+                days){" "}
+              </p>
+            ) : (
+              <p className="text-red-400 text-xs md:text-sm">
+                Subscription not active
+              </p>
+            )}
+
+            <p className="text-xs md:text-sm">Payment: cardtype ***num</p>
           </div>
           <button className="text-white bg-blue-950 rounded-md p-2 text-sm">
             Manage subscription
