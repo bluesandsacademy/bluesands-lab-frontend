@@ -1,4 +1,5 @@
-import axios from "@/services/axios-instance";
+
+import apiClient from "./axios-instance";
 import { User } from "./UserContext";
 
 export interface UserObject {
@@ -60,7 +61,7 @@ export interface LoginResponse {
 
 export async function registerNewUser(newUser: UserObject) {
   try {
-    const res = await axios.post("/api/auth/register", newUser);
+    const res = await apiClient.post("/api/auth/register", newUser);
     return res.data;
   } catch (error) {
     throw error;
@@ -69,7 +70,7 @@ export async function registerNewUser(newUser: UserObject) {
 
 export async function registerNewSchool(newSchool: SchoolObject) {
   try {
-    const res = await axios.post("/api/auth/register/school", newSchool);
+    const res = await apiClient.post("/api/auth/register/school", newSchool);
     return res.data;
   } catch (error) {
     throw error;
@@ -81,7 +82,7 @@ export async function login(
   password: string
 ): Promise<{ user: User; token: string; isVerified: boolean }> {
   try {
-    const res = await axios.post(
+    const res = await apiClient.post(
       "/api/auth/login",
       { email, password },
       { withCredentials: true }
@@ -129,7 +130,7 @@ export async function login(
 
 export async function resendVerification(email: string) {
   try {
-    await axios.post(
+    await apiClient.post(
       "/api/auth/resend-verification",
       { email },
       { withCredentials: true }
