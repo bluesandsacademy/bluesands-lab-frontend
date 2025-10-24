@@ -41,9 +41,9 @@ export default function TimeSpentImproved() {
         <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-1">
           Time Spent on Platform
         </h2>
-        <span className="text-sm text-green-500 font-medium">
+        {/* <span className="text-sm text-green-500 font-medium">
           (+23) than last week
-        </span>
+        </span> */}
       </div>
       
       <div className="h-[200px] md:h-[240px] lg:h-[240px]">

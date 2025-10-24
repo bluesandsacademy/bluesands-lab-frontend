@@ -211,6 +211,15 @@ export async function getStudentRewards(token?: string | null) {
 }
 
 
+export async function getStudentLeaderboard(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/student/v1/leaderboard", config);
+  return res.data;
+}
+
 
 
 
