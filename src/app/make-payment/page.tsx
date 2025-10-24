@@ -49,7 +49,7 @@ const IndividualPaymentPage = () => {
 
     // @ts-ignore - PaystackPop is loaded via script tag
     const handler = window.PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY_TEST,
+      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
       email: user.email,
       amount: Math.round(totalAmount * 100), // convert to kobo and round
       currency: "NGN",
