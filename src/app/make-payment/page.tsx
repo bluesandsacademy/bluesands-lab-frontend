@@ -27,8 +27,8 @@ const IndividualPaymentPage = () => {
   // Calculate discount and amounts
   const discount = couponApplied ? baseAmount * COUPON_DISCOUNT : 0;
   const amount = baseAmount - discount;
-  const vatAmount = amount * VAT_RATE;
-  const totalAmount = amount + vatAmount;
+  // const vatAmount = amount * VAT_RATE;
+  const totalAmount = amount; //+ vatAmount;
 
   const payWithPaystack = () => {
     if (!user?.email) {
@@ -75,11 +75,11 @@ const IndividualPaymentPage = () => {
             variable_name: "price_per_student",
             value: amount,
           },
-          {
-            display_name: "VAT Amount",
-            variable_name: "vat_amount",
-            value: vatAmount,
-          },
+          // {
+          //   display_name: "VAT Amount",
+          //   variable_name: "vat_amount",
+          //   value: vatAmount,
+          // },
           {
             display_name: "Coupon Code",
             variable_name: "coupon_code",
@@ -110,10 +110,10 @@ const IndividualPaymentPage = () => {
         },
       });
 
-       // Check if payment verification was successful (status 200)
-      if (res.status === 200 ) {
+      // Check if payment verification was successful (status 200)
+      if (res.status === 200) {
         toast.success("Payment successful!");
-        
+
         // Register the payment details
         try {
           await apiClient.post(
@@ -124,29 +124,33 @@ const IndividualPaymentPage = () => {
               studentCount: 1,
               pricePerStudent: amount,
               subtotal: amount,
-              vatAmount: vatAmount,
+              // vatAmount: vatAmount,
               amount: totalAmount,
-              promoCode: couponCode
+              promoCode: couponCode,
             },
             {
-              headers: token ? {
-                Authorization: `Bearer ${token}`,
-              } : {},
+              headers: token
+                ? {
+                    Authorization: `Bearer ${token}`,
+                  }
+                : {},
             }
           );
-          
+
           // Refresh user data to get updated subscription info
           await refreshUser();
-          
+
           // Reset coupon state after successful registration
           setCouponCode("");
           setCouponApplied(false);
-          
+
           // Redirect to dashboard
           router.push("/dashboard");
         } catch (error) {
           console.error("Failed to register payment:", error);
-          toast.error("Payment successful but failed to register. Please contact support.");
+          toast.error(
+            "Payment successful but failed to register. Please contact support."
+          );
           // Still redirect even if registration fails since payment went through
           setTimeout(() => router.push("/dashboard"), 2000);
         }
@@ -265,7 +269,7 @@ const IndividualPaymentPage = () => {
           <div className="text-xs space-y-1">
             <p className="font-semibold">Pricing Tiers:</p>
             <p> ₦5,000/student</p>
-            <p className="text-gray-500 mt-2">*Prices exclude 7.5% VAT</p>
+            {/* <p className="text-gray-500 mt-2">*Prices exclude 7.5% VAT</p> */}
           </div>
         </div>
 
@@ -287,10 +291,10 @@ const IndividualPaymentPage = () => {
             <p className="text-sm">₦{formatCurrency(amount)}</p>
           </div>
 
-          <div className="flex justify-between">
+          {/* <div className="flex justify-between">
             <p className="text-sm">VAT (7.5%):</p>
             <p className="text-sm">₦{formatCurrency(vatAmount)}</p>
-          </div>
+          </div> */}
 
           <div className="flex justify-between mt-4 border-t border-t-gray-200 pt-2">
             <p className="text-sm font-semibold">Total:</p>
@@ -300,7 +304,7 @@ const IndividualPaymentPage = () => {
           </div>
 
           <p className="text-xs text-gray-600 mt-2">
-            ₦{formatCurrency(amount + vatAmount)} per student (incl. VAT)
+            ₦{formatCurrency(amount)} per student
           </p>
         </div>
       </div>
