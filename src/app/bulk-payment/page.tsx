@@ -11,7 +11,7 @@ const SchoolStudentPaymentPage = () => {
   const { user, logout, token, refreshUser } = useUser();
   const router = useRouter();
   const [studentCount, setStudentCount] = useState(0);
-  const VAT_RATE = 0.075; // 7.5%
+  // const VAT_RATE = 0.075; // 7.5%
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -37,9 +37,9 @@ const SchoolStudentPaymentPage = () => {
   const subtotal = studentCount * pricePerStudent;
   const discountAmount = couponApplied ? subtotal * COUPON_DISCOUNT : 0;
   const subtotalAfterDiscount = subtotal - discountAmount;
-  const vatAmount = subtotalAfterDiscount * VAT_RATE;
-  const totalAmount = subtotalAfterDiscount + vatAmount;
-  const pricePerStudentWithVAT = pricePerStudent + pricePerStudent * VAT_RATE;
+  // const vatAmount = subtotalAfterDiscount * VAT_RATE;
+  const totalAmount = subtotalAfterDiscount; //+ vatAmount;
+  // const pricePerStudentWithVAT = pricePerStudent + pricePerStudent * VAT_RATE;
 
   // Handle coupon application
   const applyCoupon = () => {
@@ -126,11 +126,11 @@ const SchoolStudentPaymentPage = () => {
             variable_name: "discount_amount",
             value: discountAmount,
           },
-          {
-            display_name: "VAT Amount",
-            variable_name: "vat_amount",
-            value: vatAmount,
-          },
+          // {
+          //   display_name: "VAT Amount",
+          //   variable_name: "vat_amount",
+          //   value: vatAmount,
+          // },
         ],
       },
       onClose: function () {
@@ -171,7 +171,7 @@ const SchoolStudentPaymentPage = () => {
               studentCount: studentCount,
               pricePerStudent: pricePerStudent,
               subtotal: subtotal,
-              vatAmount: vatAmount,
+              // vatAmount: vatAmount,
               amount: totalAmount,
               promoCode: couponCode,
             },
@@ -261,11 +261,11 @@ const SchoolStudentPaymentPage = () => {
           />
           <div className="text-xs space-y-1">
             <p className="font-semibold">Pricing Tiers:</p>
-            <p>50-100 students: ₦5,000/student</p>
+            <p>1-100 students: ₦5,000/student</p>
             <p>101-300 students: ₦4,500/student</p>
             <p>301-500 students: ₦4,000/student</p>
             <p>501-1000 students: ₦3,500/student</p>
-            <p className="text-gray-500 mt-2">*Prices exclude 7.5% VAT</p>
+            {/* <p className="text-gray-500 mt-2">*Prices exclude 7.5% VAT</p> */}
           </div>
 
           {/* Coupon Code Section */}
@@ -353,10 +353,10 @@ const SchoolStudentPaymentPage = () => {
             </div>
           )}
 
-          <div className="flex justify-between">
+          {/* <div className="flex justify-between">
             <p className="text-sm">VAT (7.5%):</p>
             <p className="text-sm">₦{formatCurrency(vatAmount)}</p>
-          </div>
+          </div> */}
 
           <div className="flex justify-between mt-4 border-t border-t-gray-200 pt-2">
             <p className="text-sm font-semibold">Total:</p>
@@ -376,8 +376,7 @@ const SchoolStudentPaymentPage = () => {
           {couponApplied && discountAmount > 0 && (
             <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded">
               <p className="text-xs text-green-700 font-semibold text-center">
-                You're saving ₦
-                {formatCurrency(discountAmount + discountAmount * VAT_RATE)}!
+                You're saving ₦{formatCurrency(discountAmount)}!
               </p>
             </div>
           )}
