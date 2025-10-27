@@ -203,10 +203,10 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 }`}
               >
                 <img
-                  src="/images/icon/ic_sharp-support-agent.svg"
+                  src="/images/icon/settings.svg"
                   alt="support-agent"
                   className={`w-5 h-5 ${
-                    pathname === "/dashboard/support"
+                    pathname === "/admin/dashboard/system-settings"
                       ? "filter brightness-0 invert"
                       : ""
                   }`}
@@ -221,6 +221,8 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 ? "/school/dashboard/contact-support"
                 : user?.role === "teacher" || user?.role === "Teacher"
                 ? "/teacher/dashboard/contact-support"
+                : user?.role === "globalAdmin" || user?.role === "GlobalAdmin"
+                ? "/admin/dashboard/customer-support"
                 : "/dashboard/support"
             }
             className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
@@ -230,6 +232,8 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 ? "bg-blue-950 text-white"
                 : pathname === "/teacher/dashboard/contact-support"
                 ? "bg-[#303C48] text-white"
+                : pathname === "/admin/dashboard/customer-support"
+                ? "bg-bgBlue text-white"
                 : ""
             }`}
           >
@@ -239,12 +243,19 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
               className={`w-5 h-5 ${
                 pathname === "/dashboard/support" ||
                 pathname === "/school/dashboard/contact-support" ||
-                pathname === "/teacher/dashboard/contact-support"
+                pathname === "/teacher/dashboard/contact-support" ||
+                pathname === "/admin/dashboard/customer-support"
                   ? "filter brightness-0 invert"
                   : ""
               }`}
             />
-            <p>Admin Support</p>
+            <p>
+              {user?.role === "schoolAdmin" || user?.role === "SchoolAdmin"
+                ? "Contact Support"
+                : user?.role === "globalAdmin" || user?.role === "GlobalAdmin"
+                ? "Customer Support"
+                : "Admin Support"}
+            </p>
           </Link>
           <button
             className="flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-3 rounded-md w-full"

@@ -94,6 +94,7 @@ export default function DashboardExperimentsPage() {
     fetchStats();
   }, [user, token]);
 
+
   const expStats: StatCardData[] = [
     {
       title: "Average Grade",

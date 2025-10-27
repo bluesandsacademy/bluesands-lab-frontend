@@ -1,9 +1,9 @@
 import React from 'react'
 
-const AdminSupportPage = () => {
+const GlobalAdminSupportPage = () => {
   return (
     <div>AdminSupportPage</div>
   )
 }
 
-export default AdminSupportPage
+export default GlobalAdminSupportPage
