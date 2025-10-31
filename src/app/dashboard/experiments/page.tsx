@@ -1,10 +1,12 @@
 "use client";
 
+import ExperimentCard from "@/components/Dashboard/Experiments/ExperimentCards";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import { getStudentExperiment } from "@/services/dashboard-service";
 import CourseFilter from "@/services/FilterButton";
 import { useUser } from "@/services/UserContext";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import { IoMdCalendar } from "react-icons/io";
@@ -20,48 +22,58 @@ interface ExperimentResponse {
   endedAt: string;
 }
 
-  const statsConfig: StatCardData[] = [
-    {
-      title: "Average Grade",
-      value: "0%",
-      icon: "/images/icon/grad.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Number of Experiments",
-      value: "0",
-      icon: "/images/icon/test-tube.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Number of Attempts",
-      value: "0",
-      icon: "/images/icon/clipboard.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Pre-Experiment Assessments",
-      value: "0",
-      icon: "/images/icon/beaker_01.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Post-Experiment Assessments",
-      value: "0",
-      icon: "/images/icon/microscope.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-  ];
+const statsConfig: StatCardData[] = [
+  {
+    title: "Average Grade",
+    value: "0%",
+    icon: "/images/icon/grad.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Number of Experiments",
+    value: "0",
+    icon: "/images/icon/test-tube.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Number of Attempts",
+    value: "0",
+    icon: "/images/icon/clipboard.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Pre-Experiment Assessments",
+    value: "0",
+    icon: "/images/icon/beaker_01.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+  {
+    title: "Post-Experiment Assessments",
+    value: "0",
+    icon: "/images/icon/microscope.svg",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "from last month",
+  },
+];
+
+const PhETSimulations = [
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_en.html",
+    title: "Circuit Construction Kit",
+    description:
+      "A simulation of an electric circuit construction. Students are provided with different materials to play around with.",
+  },
+];
 
 export default function DashboardExperimentsPage() {
   const [experimentData, setExperimentData] = useState<ExperimentResponse[]>(
@@ -71,6 +83,7 @@ export default function DashboardExperimentsPage() {
   const firstName = user?.fullName?.split(" ")[0];
   const filters = ["All Experiments", "Physics", "Chemistry", "Biology"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const router = useRouter();
 
   const description =
     "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptates suscipit molestiae quos hic quod maiores, nihil nemo similique expedita provident neque possimus ea corrupti deserunt, accusantium quo soluta illum amet facere? Corrupti sunt consequuntur facilis, ab fuga, culpa id, fugiat quis aut nulla ratione eius? Fuga numquam magni quidem unde.";
@@ -93,7 +106,6 @@ export default function DashboardExperimentsPage() {
     }
     fetchStats();
   }, [user, token]);
-
 
   const expStats: StatCardData[] = [
     {
@@ -149,41 +161,57 @@ export default function DashboardExperimentsPage() {
       />
 
       <div className="flex flex-wrap gap-4 m-4">
-        {experimentData.map((lab, index)=>(
-          <div className="flex flex-col gap-2 rounded overflow-hidden w-80 bg-white" key={index}>
-          <div className="flex items-center justify-center w-full bg-gray-400 text-white rounded-sm">
-            <img src="\images\pictures\lab-img.jpg" alt="lab-image" />
-          </div>
-          <div className="flex flex-col gap-2 px-2">
-            <p className="text-xs md:text-sm font-semibold">{lab.experimentName}</p>
-            {/* <p className="text-xs">
+        {experimentData.map((lab, index) => (
+          <div
+            className="flex flex-col gap-2 rounded overflow-hidden w-80 bg-white"
+            key={index}
+          >
+            <div className="flex items-center justify-center w-full bg-gray-400 text-white rounded-sm">
+              <img src="\images\pictures\lab-img.jpg" alt="lab-image" />
+            </div>
+            <div className="flex flex-col gap-2 px-2">
+              <p className="text-xs md:text-sm font-semibold">
+                {lab.experimentName}
+              </p>
+              {/* <p className="text-xs">
               {description.length < 16 ? description : truncatedDesc}
             </p> */}
-            <p className="text-xs">{lab.subject}</p>
-            <div className="flex justify-between">
-              <div className="flex flex-col gap-1">
-                <p className="text-xs text-gray-600 flex items-center gap-1">
+              <p className="text-xs">{lab.subject}</p>
+              <div className="flex justify-between">
+                <div className="flex flex-col gap-1">
+                  <p className="text-xs text-gray-600 flex items-center gap-1">
+                    {" "}
+                    <LuClock3 className="text-blue-600" /> {lab.mode}
+                  </p>
+                  <p className="text-xs text-gray-600 flex items-center gap-1">
+                    {" "}
+                    <IoMdCalendar className="text-blue-600" /> dd-mm-yyyy
+                  </p>
+                </div>
+                <p className="text-xs md:text-sm flex items-center gap-2">
                   {" "}
-                  <LuClock3 className="text-blue-600" /> {lab.mode}
-                </p>
-                <p className="text-xs text-gray-600 flex items-center gap-1">
-                  {" "}
-                  <IoMdCalendar className="text-blue-600" /> dd-mm-yyyy
+                  <FaQuestionCircle className="text-blue-600" /> Unattempt
                 </p>
               </div>
-              <p className="text-xs md:text-sm flex items-center gap-2">
-                {" "}
-                <FaQuestionCircle className="text-blue-600" /> Unattempt
-              </p>
+              {/* <Link href={"/dashboard/experiments/overview"}> */}
+              <button className="bg-bgBlue text-white w-full p-2 rounded-md text-sm">
+                Go to lab
+              </button>
+              {/* </Link>                        */}
             </div>
-            {/* <Link href={"/dashboard/experiments/overview"}> */}
-            <button className="bg-bgBlue text-white w-full p-2 rounded-md text-sm">
-              Go to lab
-            </button>
-            {/* </Link>                        */}
           </div>
-        </div>
-         ))} 
+        ))}
+
+        {PhETSimulations.map((lab, index) => (
+          <ExperimentCard
+            key={index}
+            lab={{
+              title: lab.title,
+              url: lab.simulationUrl,
+              description: lab.description,
+            }}
+          />
+        ))}
       </div>
     </div>
   );

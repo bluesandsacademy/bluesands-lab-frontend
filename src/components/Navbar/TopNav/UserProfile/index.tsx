@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { RxCaretDown } from "react-icons/rx";
-import { profileDropdown, schoolProfileDropdown, teacherProfileDropdown } from "@/lib/data";
+import {
+  profileDropdown,
+  schoolProfileDropdown,
+  teacherProfileDropdown,
+} from "@/lib/data";
 import { useUser } from "@/services/UserContext";
 import { useRouter } from "next/navigation";
 
@@ -73,6 +77,7 @@ export default function UserProfile() {
           />
         )}
         <div className="hidden text-left lg:block">
+          {/* <h4 className="truncate text-sm lg:text-base">{user?.role === "schoolAdmin"|| user?.role === "SchoolAdmin" ? user.schoolName : user?.fullName}</h4> */}
           <h4 className="truncate text-sm lg:text-base">{user?.fullName}</h4>
           <p className="text-gray-400 font-medium text-xs lg:text-sm">
             Account: {user?.role}
