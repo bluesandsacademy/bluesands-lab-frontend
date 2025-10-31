@@ -6,25 +6,25 @@ const QuizTable = () => {
       <table className="bg-white rounded-md">
         <thead>
           <tr className="border-b border-b-gray-200 text-xs text-gray-500">
-            <td className="p-2">User</td>
-            <td className="p-2">Email</td>
-            <td className="p-2">School</td>
-            <td className="p-2">Role</td>
+            <td className="p-2">Title</td>
+            <td className="p-2">Subject</td>
+            <td className="p-2">Author</td>
+            <td className="p-2">Submitted</td>
+            <td className="p-2">Content</td>
             <td className="p-2">Status</td>
+            <td className="p-2">Engagement</td>
             <td className="p-2">Action</td>
           </tr>
         </thead>
         <tbody>
           <tr className="text-xs border-b border-b-gray-200">
-            <td className="p-2">User's Name</td>
-            <td className="p-2">email</td>
-            <td className="p-2">School Name</td>
-            <td className="p-2">Teacher</td>
-            <td className="p-2">
-              <p className="p-1 px-1.5 rounded-3xl bg-green-100 text-green-600 flex w-max">
-                Active
-              </p>
-            </td>
+            <td className="p-2">Algebra</td>
+            <td className="p-2">Mathematics</td>
+            <td className="p-2">Author Name</td>
+            <td className="p-2">dd-mm-yyyy</td>
+            <td className="p-2">17 Lessons, 8 Quizzes</td>
+            <td className="p-2">Draft or Approved</td>
+            <td className="p-2">1250</td>
             <td className="p-2">
               <button className=" flex gap-1 items-center">
                 <SlOptionsVertical />

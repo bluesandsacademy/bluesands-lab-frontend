@@ -221,24 +221,51 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       user.isVerified &&
       hasActiveSubscription(user)
     ) {
-      // Check if student is trying to access school admin routes
-      if (user.role === "student" && pathname.startsWith("/school/")) {
+      // Check if student is trying to access unauthorized routes
+      if (
+        (user.role === "student" || user.role === "Student") &&
+        (pathname.startsWith("/school/") || pathname.startsWith("/admin/") || pathname.startsWith("/teacher"))
+      ) {
         console.log(
-          "AuthGuard - Student trying to access school routes, redirecting to dashboard"
+          "AuthGuard - Student trying to access unauthorized dashboard, redirecting to student dashboard"
         );
         router.replace("/dashboard");
         return;
       }
 
-      // Check if school admin is trying to access student-only routes
+      // Check if school admin is trying to access unauthorized routes
       if (
         (user.role === "schoolAdmin" || user.role === "SchoolAdmin") &&
-        pathname === "/dashboard"
+        (pathname.startsWith("/teacher/") || pathname.startsWith("/admin/") || pathname.startsWith("/dashboard"))
       ) {
         console.log(
-          "AuthGuard - School admin trying to access student dashboard, redirecting to school dashboard"
+          "AuthGuard - School Admin trying to access unauthorized dashboard, redirecting to school dashboard"
         );
         router.replace("/school/dashboard");
+        return;
+      }
+
+      // Check if teacher is trying to access unauthorized routes
+      if (
+        (user.role === "teacher" || user.role === "Teacher") &&
+        (pathname.startsWith("/school/") || pathname.startsWith("/admin/") || pathname.startsWith("/dashboard"))
+      ) {
+        console.log(
+          "AuthGuard - Teacher trying to access unauthorized dashboard, redirecting to teacher dashboard"
+        );
+        router.replace("/teacher/dashboard");
+        return;
+      }
+
+      // Check if Global Admin is trying to access unauthorized routes
+      if (
+        (user.role === "globalAdmin" || user.role === "GlobalAdmin") &&
+        (pathname.startsWith("/school/") || pathname.startsWith("/teacher/") || pathname.startsWith("/dashboard"))
+      ) {
+        console.log(
+          "AuthGuard - Global Admin trying to access unauthorized dashboard, redirecting to admin dashboard"
+        );
+        router.replace("/admin/dashboard");
         return;
       }
 
