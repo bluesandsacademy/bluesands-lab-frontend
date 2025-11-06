@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
 import { IoMdCalendar } from "react-icons/io";
 import { LuClock3 } from "react-icons/lu";
+import { PhETSimulations } from "@/lib/data";
 
 interface ExperimentResponse {
   launchId: string;
@@ -62,16 +63,6 @@ const statsConfig: StatCardData[] = [
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
-  },
-];
-
-const PhETSimulations = [
-  {
-    simulationUrl:
-      "https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_en.html",
-    title: "Circuit Construction Kit",
-    description:
-      "A simulation of an electric circuit construction. Students are provided with different materials to play around with.",
   },
 ];
 
@@ -160,8 +151,8 @@ export default function DashboardExperimentsPage() {
         onFilterChange={setActiveFilter}
       />
 
-      <div className="flex flex-wrap gap-4 m-4">
-        {experimentData.map((lab, index) => (
+      <div className="flex flex-wrap gap-4 m-4 justify-evenly">
+        {/* {experimentData.map((lab, index) => (
           <div
             className="flex flex-col gap-2 rounded overflow-hidden w-80 bg-white"
             key={index}
@@ -173,9 +164,9 @@ export default function DashboardExperimentsPage() {
               <p className="text-xs md:text-sm font-semibold">
                 {lab.experimentName}
               </p>
-              {/* <p className="text-xs">
+               <p className="text-xs">
               {description.length < 16 ? description : truncatedDesc}
-            </p> */}
+            </p> 
               <p className="text-xs">{lab.subject}</p>
               <div className="flex justify-between">
                 <div className="flex flex-col gap-1">
@@ -193,25 +184,67 @@ export default function DashboardExperimentsPage() {
                   <FaQuestionCircle className="text-blue-600" /> Unattempt
                 </p>
               </div>
-              {/* <Link href={"/dashboard/experiments/overview"}> */}
+              <Link href={"/dashboard/experiments/overview"}>
               <button className="bg-bgBlue text-white w-full p-2 rounded-md text-sm">
                 Go to lab
               </button>
-              {/* </Link>                        */}
+              </Link>                       
             </div>
           </div>
-        ))}
+        ))} */}
 
-        {PhETSimulations.map((lab, index) => (
-          <ExperimentCard
-            key={index}
-            lab={{
-              title: lab.title,
-              url: lab.simulationUrl,
-              description: lab.description,
-            }}
-          />
-        ))}
+        {activeFilter === "Physics"
+          ? PhETSimulations.map(
+              (lab, index) =>
+                lab.subject === "Physics" && (
+                  <ExperimentCard
+                    key={index}
+                    lab={{
+                      title: lab.title,
+                      url: lab.simulationUrl,
+                      description: lab.description,
+                    }}
+                  />
+                )
+            )
+          : activeFilter === "Chemistry"
+          ? PhETSimulations.map(
+              (lab, index) =>
+                lab.subject === "Chemistry" && (
+                  <ExperimentCard
+                    key={index}
+                    lab={{
+                      title: lab.title,
+                      url: lab.simulationUrl,
+                      description: lab.description,
+                    }}
+                  />
+                )
+            )
+          : activeFilter === "Biology"
+          ? PhETSimulations.map(
+              (lab, index) =>
+                lab.subject === "Biology" && (
+                  <ExperimentCard
+                    key={index}
+                    lab={{
+                      title: lab.title,
+                      url: lab.simulationUrl,
+                      description: lab.description,
+                    }}
+                  />
+                )
+            )
+          : PhETSimulations.map((lab, index) => (
+              <ExperimentCard
+                key={index}
+                lab={{
+                  title: lab.title,
+                  url: lab.simulationUrl,
+                  description: lab.description,
+                }}
+              />
+            ))}
       </div>
     </div>
   );

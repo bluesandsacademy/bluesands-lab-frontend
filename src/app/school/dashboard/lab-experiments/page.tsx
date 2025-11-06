@@ -97,8 +97,6 @@ const SchoolLabPage = () => {
   ];
 
   const pieChartData = [
-    // { name: "remaining", value: 400 },
-    // { name: "completed", value: 100 },
     { name: "remaining", value: 0 },
     { name: "completed", value: 0 },
   ];

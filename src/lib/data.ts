@@ -298,22 +298,22 @@ export const sideNavLinks: SidebarLinks[] = [
     url: "/school/dashboard/system-metrics",
     icon: "/images/icon/system.svg",
   },
-   {
+  {
     title: "Report & Analytics",
     url: "/school/dashboard/report",
     icon: "/images/icon/report.svg",
   },
-   {
+  {
     title: "Payment & Sub",
     url: "/school/dashboard/payments",
     icon: "/images/icon/card_payment.svg",
   },
-   {
+  {
     title: "Leaderboard",
     url: "/school/dashboard/leaderboard",
     icon: "/images/icon/ic_outline-leaderboard.svg",
   },
-   {
+  {
     title: "Support & Training",
     url: "/school/dashboard/support-training",
     icon: "/images/icon/health-walk-supported.svg",
@@ -351,28 +351,27 @@ export const teacherSideNavLinks: SidebarLinks[] = [
     url: "/teacher/dashboard/quizzes",
     icon: "/images/icon/quiz.svg",
   },
-   {
+  {
     title: "Communication Metrics",
     url: "/teacher/dashboard/comms",
     icon: "/images/icon/communication.svg",
   },
-   {
+  {
     title: "Report & Analytics",
     url: "/teacher/dashboard/reports",
     icon: "/images/icon/report.svg",
   },
-   {
+  {
     title: "Leaderboard",
     url: "/teacher/dashboard/leaderboard",
     icon: "/images/icon/ic_outline-leaderboard.svg",
   },
-   {
+  {
     title: "Teachers Forum",
     url: "/teacher/dashboard/forum",
     icon: "/images/icon/forum.svg",
   },
 ];
-
 
 export const adminSideNavLinks: SidebarLinks[] = [
   {
@@ -380,7 +379,7 @@ export const adminSideNavLinks: SidebarLinks[] = [
     url: "/admin/dashboard",
     icon: "/images/icon/home.svg",
   },
-   {
+  {
     title: "School Management",
     url: "/admin/dashboard/school-management",
     icon: "/images/icon/health-walk-supported.svg",
@@ -405,7 +404,7 @@ export const adminSideNavLinks: SidebarLinks[] = [
     url: "/admin/dashboard/report",
     icon: "/images/icon/report.svg",
   },
-   {
+  {
     title: "Leaderboard",
     url: "/admin/dashboard/leaderboard",
     icon: "/images/icon/ic_outline-leaderboard.svg",
@@ -478,7 +477,6 @@ export interface Stat {
   percentageChange?: string;
   timeFrame?: string;
 }
-
 
 export const quizStats: StatCardData[] = [
   {
@@ -648,8 +646,6 @@ export const AdminUserOverviewStats: StatCardData[] = [
   },
 ];
 
-
-
 interface UpcomingCourse {
   title: string;
   timeline: string;
@@ -790,5 +786,170 @@ export const courseIcons = {
   biology: "/images/icon/performance/biology.svg",
   organicChemistry: "/images/icon/performance/organic_chemistry.svg",
 };
+
+export const PhETSimulations = [
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/forces-and-motion-basics_en.html",
+    title: "Forces and Motion (Basics)",
+    description:
+      "A simulation where students practically learn about Newton's Laws of motion",
+    subject: "Physics",
+    class: "ss1",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/energy-forms-and-changes/latest/energy-forms-and-changes_en.html",
+    title: "Energy Forms and Changes",
+    description:
+      "Learn how energy is transformed from one state to another",
+    subject: "Physics",
+    class: "ss1",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/acid-base-solutions/latest/acid-base-solutions_en.html",
+    title: "Acid-Base Solutions",
+    description:
+      "Learn to do titration experiments and the characteristics of acids and bases",
+    subject: "Chemistry",
+    class: "ss1",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/build-an-atom/latest/build-an-atom_en.html",
+    title: "Build an Atom",
+    description:
+      "Learn about the components of an atom alongside atomic configurations",
+    subject: "Chemistry",
+    class: "ss1",
+  },
+  // {
+  //   simulationUrl:
+  //     "",
+  //   title: "",
+  //   description:
+  //     "",
+  //   subject: "Biology",
+  //   class: "ss1",
+  // },
+  // {
+  //   simulationUrl:
+  //     "",
+  //   title: "",
+  //   description:
+  //     "",
+  //   subject: "Biology",
+  //   class: "ss1",
+  // },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/conductivity/latest/conductivity_en.html",
+    title: "Conductivity",
+    description:
+      "Practice with, and learn about the conductivity of different materials",
+    subject: "Physics",
+    class: "ss2",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_en.html",
+    title: "Circuit Construction Kit",
+    description:
+      "A simulation of an electric circuit construction. Students are provided with different materials to play around with.",
+    subject: "Physics",
+    class: "ss2",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/states-of-matter/latest/states-of-matter_en.html",
+    title: "States of Matter",
+    description:
+      "Learn about the different states of matter and their transformations",
+    subject: "Chemistry",
+    class: "ss2",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/isotopes-and-atomic-mass/latest/isotopes-and-atomic-mass_en.html",
+    title: "Isotopes and Atomic Mass",
+    description:
+      "Learn about Isotoy and simulations of atomic mass",
+    subject: "Chemistry",
+    class: "ss2",
+  },
+  // {
+  //   simulationUrl:
+  //     "",
+  //   title: "",
+  //   description:
+  //     "",
+  //   subject: "Biology",
+  //   class: "ss2",
+  // },
+  // {
+  //   simulationUrl:
+  //     "",
+  //   title: "",
+  //   description:
+  //     "",
+  //   subject: "Biology",
+  //   class: "ss2",
+  // },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/bending-light/latest/bending-light_en.html",
+    title: "Bending Light",
+    description:
+      "Learn about light's refraction, reflection and wavelength",
+    subject: "Physics",
+    class: "ss3",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/resistance-in-a-wire/latest/resistance-in-a-wire_en.html",
+    title: "Resistance in a wire",
+    description:
+      "A practical simulation to understand resistance and how it works",
+    subject: "Physics",
+    class: "ss3",
+  },
+  {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/reactants-products-and-leftovers/latest/reactants-products-and-leftovers_en.html",
+    title: "Reactants, Products and Leftovers",
+    description:
+      "A simulation of chemical reactions, showing their end products as well as their by-products",
+    subject: "Chemistry",
+    class: "ss3",
+  },
+   {
+    simulationUrl:
+      "https://phet.colorado.edu/sims/html/sugar-and-salt-solutions/latest/sugar-and-salt-solutions_en.html",
+    title: "Sugar and Salt Solutions",
+    description:
+      "Learn about the complexity of Sugars and Salts",
+    subject: "Chemistry",
+    class: "ss3",
+  },
+  //  {
+  //   simulationUrl:
+  //     "",
+  //   title: "",
+  //   description:
+  //     "",
+  //   subject: "Biology",
+  //   class: "ss3",
+  // },
+  //  {
+  //   simulationUrl:
+  //     "",
+  //   title: "",
+  //   description:
+  //     "",
+  //   subject: "Biology",
+  //   class: "ss3",
+  // },
+];
 
 //end
