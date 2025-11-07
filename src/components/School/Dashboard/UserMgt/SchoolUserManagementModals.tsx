@@ -1,5 +1,6 @@
 "use client";
 import {
+  addClass,
   addSchoolStudent,
   addSchoolTeacher,
 } from "@/services/dashboard-service";
@@ -387,19 +388,32 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
 // Add Class Modal
 export const AddClassModal = ({ isOpen, onClose }: any) => {
   const [formData, setFormData] = useState({
-    className: "",
+    name: "",
     subject: "",
-    description: "",
-    schedule: "",
-    capacity: "",
+    // description: "",
+    // schedule: "",
+    // capacity: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Adding class:", formData);
+    try {
+      setIsLoading(true);
+      const res = await addClass(formData);
+      console.log(res);
+      setIsLoading(false);
+      onClose();
+      toast.success("Class added successfully");
+    } catch (error) {
+      console.error("Error adding Class:", error);
+      setIsLoading(false);
+      toast.error("Failed to add Class");
+    }
     onClose();
   };
 
@@ -413,8 +427,8 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
             </label>
             <input
               type="text"
-              name="className"
-              value={formData.className}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
               placeholder="e.g., Biology 101"
@@ -436,7 +450,7 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Description
           </label>
@@ -479,7 +493,7 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
               min="1"
             />
           </div>
-        </div>
+        </div> */}
 
         <div className="flex gap-3 justify-end pt-4 border-t">
           <button
@@ -490,9 +504,23 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 text-sm bg-blue-950 text-white rounded-md hover:bg-blue-900"
+            disabled={isLoading}
+            className={`px-4 py-2 text-sm rounded-md flex items-center justify-center gap-2
+                        ${
+                          isLoading
+                            ? "bg-blue-800 cursor-not-allowed"
+                            : "bg-blue-950 hover:bg-blue-900"
+                        } 
+                        text-white transition duration-200`}
           >
-            Add Class
+            {isLoading ? (
+              <>
+                <FaSpinner className="animate-spin h-4 w-4" />
+                <span>Processing...</span>
+              </>
+            ) : (
+              "Add Class"
+            )}
           </button>
         </div>
       </div>
@@ -595,11 +623,15 @@ export const AddRoleModal = ({ isOpen, onClose }: any) => {
 
         {/* Permissions Section */}
         <div className="border-2 border-blue-950 rounded-md p-4">
-          <h3 className="text-sm font-semibold text-blue-950 mb-3">PERMISSIONS</h3>
-          
+          <h3 className="text-sm font-semibold text-blue-950 mb-3">
+            PERMISSIONS
+          </h3>
+
           {/* User Management */}
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-gray-900 mb-2">User Management</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+              User Management
+            </h4>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center text-sm text-gray-700">
                 <input
@@ -646,7 +678,9 @@ export const AddRoleModal = ({ isOpen, onClose }: any) => {
 
           {/* Course Management */}
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-gray-900 mb-2">Course Management</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+              Course Management
+            </h4>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center text-sm text-gray-700">
                 <input
@@ -693,7 +727,9 @@ export const AddRoleModal = ({ isOpen, onClose }: any) => {
 
           {/* System Administration */}
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-gray-900 mb-2">System Administration</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+              System Administration
+            </h4>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center text-sm text-gray-700">
                 <input
@@ -740,7 +776,9 @@ export const AddRoleModal = ({ isOpen, onClose }: any) => {
 
           {/* Reports & data */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-2">Reports & data</h4>
+            <h4 className="text-sm font-semibold text-gray-900 mb-2">
+              Reports & data
+            </h4>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex items-center text-sm text-gray-700">
                 <input
