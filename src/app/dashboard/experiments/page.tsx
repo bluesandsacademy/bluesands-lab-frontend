@@ -151,7 +151,7 @@ export default function DashboardExperimentsPage() {
         onFilterChange={setActiveFilter}
       />
 
-      <div className="flex flex-wrap gap-4 m-4 justify-evenly">
+      <div className="flex flex-wrap gap-4 m-4">
         {/* {experimentData.map((lab, index) => (
           <div
             className="flex flex-col gap-2 rounded overflow-hidden w-80 bg-white"
