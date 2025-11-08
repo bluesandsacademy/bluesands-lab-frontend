@@ -8,7 +8,7 @@ import CourseFilter from "@/services/FilterButton";
 import { useUser } from "@/services/UserContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaQuestionCircle } from "react-icons/fa";
+import { FaFilter, FaQuestionCircle } from "react-icons/fa";
 import { IoMdCalendar } from "react-icons/io";
 import { LuClock3 } from "react-icons/lu";
 import { PhETSimulations } from "@/lib/data";
@@ -74,6 +74,7 @@ export default function DashboardExperimentsPage() {
   const firstName = user?.fullName?.split(" ")[0];
   const filters = ["All Experiments", "Physics", "Chemistry", "Biology"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
+  const [classFilter, setClassFilter] = useState("allClasses");
   const router = useRouter();
 
   const description =
@@ -85,6 +86,18 @@ export default function DashboardExperimentsPage() {
   // activeFilter === "All Experiments"
   //   ? courseData
   //   : courseData.filter((course) => course.subject === activeFilter);
+
+  const handleFilterChange = (e: any) => {
+    setClassFilter(e.target.value);
+  };
+
+  const filteredSimulations = PhETSimulations.filter((lab) => {
+    const subjectMatch =
+      activeFilter === "All Experiments" || lab.subject === activeFilter;
+    const classMatch =
+      classFilter === "allClasses" || lab.class === classFilter;
+    return subjectMatch && classMatch;
+  });
 
   useEffect(() => {
     async function fetchStats() {
@@ -145,6 +158,21 @@ export default function DashboardExperimentsPage() {
     <div className="m-1">
       <WelcomeBanner firstName={firstName ? firstName : ""} />
       <StatCards stats={expStats} />
+      <div className="flex justify-end p-2">
+        <div className="flex gap-2 items-center text-xs lg:text-sm p-2 rounded-md border border-gray-200 bg-white text-gray-500">
+          <FaFilter className="text-gray-600"/>
+          <select
+            name="classFilter"
+            id="classFilter"
+            onChange={handleFilterChange}
+          >
+            <option value="allClasses">All Classes</option>
+            <option value="ss1">SS 1</option>
+            <option value="ss2">SS 2</option>
+            <option value="ss3">SS 3</option>
+          </select>
+        </div>
+      </div>
       <CourseFilter
         filters={filters}
         activeFilter={activeFilter}
@@ -193,58 +221,16 @@ export default function DashboardExperimentsPage() {
           </div>
         ))} */}
 
-        {activeFilter === "Physics"
-          ? PhETSimulations.map(
-              (lab, index) =>
-                lab.subject === "Physics" && (
-                  <ExperimentCard
-                    key={index}
-                    lab={{
-                      title: lab.title,
-                      url: lab.simulationUrl,
-                      description: lab.description,
-                    }}
-                  />
-                )
-            )
-          : activeFilter === "Chemistry"
-          ? PhETSimulations.map(
-              (lab, index) =>
-                lab.subject === "Chemistry" && (
-                  <ExperimentCard
-                    key={index}
-                    lab={{
-                      title: lab.title,
-                      url: lab.simulationUrl,
-                      description: lab.description,
-                    }}
-                  />
-                )
-            )
-          : activeFilter === "Biology"
-          ? PhETSimulations.map(
-              (lab, index) =>
-                lab.subject === "Biology" && (
-                  <ExperimentCard
-                    key={index}
-                    lab={{
-                      title: lab.title,
-                      url: lab.simulationUrl,
-                      description: lab.description,
-                    }}
-                  />
-                )
-            )
-          : PhETSimulations.map((lab, index) => (
-              <ExperimentCard
-                key={index}
-                lab={{
-                  title: lab.title,
-                  url: lab.simulationUrl,
-                  description: lab.description,
-                }}
-              />
-            ))}
+        {filteredSimulations.map((lab, index) => (
+          <ExperimentCard
+            key={index}
+            lab={{
+              title: lab.title,
+              url: lab.simulationUrl,
+              description: lab.description,
+            }}
+          />
+        ))}
       </div>
     </div>
   );
