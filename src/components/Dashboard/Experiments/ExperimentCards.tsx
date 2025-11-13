@@ -1,3 +1,4 @@
+import { startExperiment } from "@/services/dashboard-service";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { FaQuestionCircle } from "react-icons/fa";
@@ -20,6 +21,8 @@ const ExperimentCard = ({ lab }: { lab: PhETSimulationData }) => {
     }).toString();
 
     router.push(`/dashboard/experiments/launch?${query}`);
+    //start experiment endpoint here
+    //startExperiment()
   };
   return (
     <div className="flex flex-col gap-2 rounded overflow-hidden w-80 bg-white">
