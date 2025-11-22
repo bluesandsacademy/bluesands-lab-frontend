@@ -4,7 +4,7 @@ import { MdSearch } from "react-icons/md";
 
 const TeachersForumsPage = () => {
   return (
-    <p className="text-blue-500 font-semibold text-center m-4">Page Checked out for maintenance</p>
+    <p className="text-blue-500 font-semibold text-center m-4">Coming Soon...</p>
     // <div>
     //   <div className="flex flex-col border-b border-gray-300 items-center justify-center p-2 gap-2">
     //     <p className="font-semibold lg:text-lg">Teacher Community</p>

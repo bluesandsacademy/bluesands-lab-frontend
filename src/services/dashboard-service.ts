@@ -194,12 +194,41 @@ export async function getStudentOverview(token?: string | null) {
   return res.data;
 }
 
-export async function getStudentExperiment(token?: string | null) {
+interface GetPhetSimulationsParams {
+  // topic?: string;
+  // gradeLevel?: string;
+  physics?: string;
+  chemistry?: string;
+  math?: string;
+  biology?: string;
+  earthSpace?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export async function getPhetSimulations(
+  token?: string | null,
+  param: GetPhetSimulationsParams = {}
+) {
   const config = {
     withCredentials: true,
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+    params: {
+      // topic: param.topic,
+      // gradeLevel: param.gradeLevel,
+      physics: param.physics,
+      chemistry: param.chemistry,
+      math: param.math,
+      biology: param.biology,
+      earthSpace: param.earthSpace,
+      search: param.search,
+      page: param.page || 1,
+      pageSize: param.pageSize || 20,
+    },
   };
-  const res = await apiClient.get("/api/student/v1/experiments", config);
+
+  const res = await apiClient.get("/api/phet/simulations", config);
   return res.data;
 }
 
