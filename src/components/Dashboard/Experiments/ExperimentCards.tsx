@@ -24,6 +24,13 @@ const ExperimentCard = ({ lab }: { lab: PhETSimulationData }) => {
     //start experiment endpoint here
     //startExperiment()
   };
+
+  function truncateDesc(str: string) {
+  const words = str.split(/\s+/);
+  // Slice the first 16 words and join them back into a string
+  const wordStr = words.slice(0, 20).join(' ');
+  return wordStr + "..."
+}
   return (
     <div className="flex flex-col gap-2 rounded overflow-hidden w-80 bg-white">
       <div className="flex items-center justify-center w-full bg-gray-400 text-white rounded-sm">
@@ -31,15 +38,15 @@ const ExperimentCard = ({ lab }: { lab: PhETSimulationData }) => {
       </div>
       <div className="flex flex-col gap-2 px-2">
         <p className="text-xs md:text-sm font-semibold">{lab.title}</p>
-        {/* <p className="text-xs">
-              {description.length < 16 ? description : truncatedDesc}
-            </p> */}
-        <p className="text-xs">{lab.description}</p>
+        <p className="text-xs">
+              {lab.description.length < 20 ? lab.description : truncateDesc(lab.description)}
+            </p>
+        {/* <p className="text-xs">{lab.description}</p> */}
         <div className="flex justify-between">
           <div className="flex flex-col gap-1">
             <p className="text-xs text-gray-600 flex items-center gap-1">
               {" "}
-              <LuClock3 className="text-blue-600" /> {}
+              <LuClock3 className="text-blue-600" /> {"90 Mins"}
             </p>
             <p className="text-xs text-gray-600 flex items-center gap-1">
               {" "}
@@ -48,7 +55,7 @@ const ExperimentCard = ({ lab }: { lab: PhETSimulationData }) => {
           </div>
           <p className="text-xs md:text-sm flex items-center gap-2">
             {" "}
-            <FaQuestionCircle className="text-blue-600" /> Unattempt
+            {/* <FaQuestionCircle className="text-blue-600" /> Unattempt */}
           </p>
         </div>
         <button
