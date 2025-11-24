@@ -3,6 +3,7 @@ import TeacherExperimentCard from "./TeacherExperimentCard";
 import { getPhetSimulations } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
 import { FaChevronLeft, FaChevronRight, FaFilter } from "react-icons/fa";
+import { AssignExperimentModal } from "./AssignExperimentModal";
 
 interface ExperimentResponse {
   id: string;
@@ -39,6 +40,15 @@ const AssignExperiments = () => {
     []
   );
   const { token } = useUser();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const handleAddClick = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsAddModalOpen(false);
+  };
 
   useEffect(() => {
     async function fetchExperiments() {
@@ -76,7 +86,6 @@ const AssignExperiments = () => {
       earthSpace: e.target.value === "earthSpace" ? "true" : "",
     });
     setPage(1);
-    
   };
 
   const handlePageChange = (newPage: number) => {
@@ -148,6 +157,10 @@ const AssignExperiments = () => {
           </div>
         </form>
       </div>
+
+      {
+        isAddModalOpen && <AssignExperimentModal isOpen={isAddModalOpen} onClose={handleCloseModal}/>
+      }
 
       <div className="flex flex-col md:flex-row flex-wrap gap-3">
         {experimentData.map((lab) => (
