@@ -296,3 +296,40 @@ export async function completeExperiment(
     throw error;
   }
 }
+
+// T E A C H E R   D A S H B O A R D //
+
+export async function assignExperiment(
+  assignmentData: {
+    title: string,
+    classID: string,
+    dueDate: string,
+    resourceCode: string,
+  },
+  schoolId?: string | null,
+  token?: string | null
+) {
+  try {
+    const res = await apiClient.post(
+      "/api/assignments",
+      assignmentData,
+      {
+        params: { schoolId },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Failed to assign experiment:", error);
+    throw error;
+  }
+}
+
+// export async function getClasses(token?: string | null) {
+//   const config = {
+//     withCredentials: true,
+//     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+//   };
+//   const res = await apiClient.get("", config);
+//   return res.data;
+// }

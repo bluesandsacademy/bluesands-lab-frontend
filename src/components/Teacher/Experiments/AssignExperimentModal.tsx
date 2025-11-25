@@ -1,4 +1,5 @@
 import { Modal } from "@/components/School/Dashboard/UserMgt/SchoolUserManagementModals";
+import { assignExperiment } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
 import { useState } from "react";
 import { FaSpinner, FaPlus, FaTrash } from "react-icons/fa";
@@ -7,14 +8,13 @@ import { toast } from "react-toastify";
 export const AssignExperimentModal = ({ isOpen, onClose }: any) => {
   const { user, token } = useUser();
   const [isLoading, setIsLoading] = useState(false);
-
   const [formData, setFormData] = useState({
-    experimentTitle: "",
+    title: "",
     classID: "",
-    points: "",
     dueDate: "",
-    instructions: "",
+    resourceCode: "",
   });
+  const [classList, setClassList] = useState([])
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,21 +22,25 @@ export const AssignExperimentModal = ({ isOpen, onClose }: any) => {
 
   const handleSubmit = async () => {
     // console.log("Assigning experiment:", formData);
-    
+
     // Validation
-    if (!formData.experimentTitle || !formData.instructions || !formData.dueDate) {
+    if (
+      !formData.title ||
+      !formData.resourceCode ||
+      !formData.dueDate
+    ) {
       toast.error("Please fill in all required fields");
       return;
     }
 
     try {
       setIsLoading(true);
-      // const res = await addQuiz(formData, user?.schoolId, token);
+     // const res = await assignExperiment(formData, user?.schoolId, token);
       // console.log(res);
-      
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       setIsLoading(false);
       onClose();
       toast.success("Experiment assigned successfully");
@@ -57,8 +61,8 @@ export const AssignExperimentModal = ({ isOpen, onClose }: any) => {
             </label>
             <input
               type="text"
-              name="experimentTitle"
-              value={formData.experimentTitle}
+              name="title"
+              value={formData.title}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
               placeholder="Enter Experiment title"
@@ -79,32 +83,34 @@ export const AssignExperimentModal = ({ isOpen, onClose }: any) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Assign To
+            </label>
+            <input
+              type="text"
+              name="classID"
+              value={formData.classID}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
+              placeholder="100"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Instructions <span className="text-red-500">*</span>
             </label>
             <textarea
-              name="instructions"
-              value={formData.instructions}
+              name="resourceCode"
+              value={formData.resourceCode}
               onChange={handleChange}
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
               placeholder="Instructions for the students"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Add Points
-            </label>
-            <input
-              type="number"
-              name="points"
-              value={formData.points}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
-              placeholder="100"
             />
           </div>
         </div>
