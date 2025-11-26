@@ -161,7 +161,7 @@ const SchoolStudentPaymentPage = () => {
       if (res.status === 200) {
         toast.success("Payment successful!");
 
-        // Register the payment details
+      // Register the payment details
         try {
           await apiClient.post(
             `/api/payments/register-payment`,
@@ -171,7 +171,7 @@ const SchoolStudentPaymentPage = () => {
               studentCount: studentCount,
               pricePerStudent: pricePerStudent,
               subtotal: subtotal,
-              // vatAmount: vatAmount,
+              vatAmount: 0,
               amount: totalAmount,
               promoCode: couponCode,
             },
@@ -199,7 +199,7 @@ const SchoolStudentPaymentPage = () => {
           toast.error(
             "Payment successful but failed to register. Please contact support."
           );
-          // Still redirect even if registration fails since payment went through
+        // Still redirect even if registration fails since payment went through
           setTimeout(() => router.push("/school/dashboard"), 2000);
         }
       } else {
@@ -368,7 +368,7 @@ const SchoolStudentPaymentPage = () => {
           {studentCount > 0 && (
             <p className="text-xs text-gray-600 mt-2">
               ₦{formatCurrency(totalAmount / studentCount)} per student (final
-              price incl. VAT & discount)
+              price incl. discount)
             </p>
           )}
 
