@@ -261,6 +261,11 @@ export const sidebarLinks: SidebarLinks[] = [
     icon: "/images/icon/ic_outline-leaderboard.svg",
   },
   {
+    title: "Payment & Sub",
+    url: "/dashboard/payments",
+    icon: "/images/icon/card_payment.svg",
+  },
+  {
     title: "Report",
     url: "/dashboard/reports",
     icon: "/images/icon/report.svg",
