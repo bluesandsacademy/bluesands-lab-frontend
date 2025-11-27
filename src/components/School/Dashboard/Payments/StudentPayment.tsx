@@ -299,7 +299,7 @@ const SchoolStudentPayment = () => {
 
     // @ts-ignore - PaystackPop is loaded via script tag
     const handler = window.PaystackPop.setup({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY_TEST,
+      key: process.env.NEXT_PUBLIC_PAYSTACK_KEY,
       email: user.email,
       amount: Math.round(totalAmount * 100), // convert to kobo and round
       currency: "NGN",
@@ -420,7 +420,7 @@ const SchoolStudentPayment = () => {
             <p>101-300 students: ₦4,500/student</p>
             <p>301-500 students: ₦4,000/student</p>
             <p>501-1000 students: ₦3,500/student</p>
-            <p className="text-gray-500 mt-2">*Prices exclude 7.5% VAT</p>
+            {/* <p className="text-gray-500 mt-2">*Prices exclude 7.5% VAT</p> */}
           </div>
 
           {/* Coupon Code Section */}
@@ -513,7 +513,7 @@ const SchoolStudentPayment = () => {
 
           {studentCount > 0 && (
             <p className="text-xs text-gray-600 mt-2">
-              ₦{formatCurrency(totalAmount / studentCount)} per student (final price incl. VAT & discount)
+              ₦{formatCurrency(totalAmount / studentCount)} per student (final price incl. discount)
             </p>
           )}
 

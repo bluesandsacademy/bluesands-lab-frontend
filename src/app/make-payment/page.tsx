@@ -124,7 +124,7 @@ const IndividualPaymentPage = () => {
               studentCount: 1,
               pricePerStudent: amount,
               subtotal: amount,
-              // vatAmount: vatAmount,
+              vatAmount: 0,
               amount: totalAmount,
               promoCode: couponCode,
             },
@@ -151,7 +151,7 @@ const IndividualPaymentPage = () => {
           toast.error(
             "Payment successful but failed to register. Please contact support."
           );
-          // Still redirect even if registration fails since payment went through
+      //     // Still redirect even if registration fails since payment went through
           setTimeout(() => router.push("/dashboard"), 2000);
         }
       } else {
