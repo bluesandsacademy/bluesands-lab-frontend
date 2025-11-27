@@ -1,152 +1,159 @@
-import { FaDotCircle } from "react-icons/fa";
-import { GoDotFill } from "react-icons/go";
+"use client";
+
+import { useState } from "react";
+import CommunityFeed from "@/components/Teacher/Forum/feed";
 import { MdSearch } from "react-icons/md";
 
 const TeachersForumsPage = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
-    <p className="text-blue-500 font-semibold text-center m-4">Coming Soon...</p>
-    // <div>
-    //   <div className="flex flex-col border-b border-gray-300 items-center justify-center p-2 gap-2">
-    //     <p className="font-semibold lg:text-lg">Teacher Community</p>
-    //     <p className="text-sm text-gray-500">
-    //       A space where teachers learn from teachers
-    //     </p>
-    //     <div className="bg-white rounded-md flex items-center gap-3 pl-2 md:w-[28rem]">
-    //       <MdSearch className="text-gray-400 text-lg" />
-    //       <input
-    //         type="search"
-    //         className="p-2 text-sm md:w-96"
-    //         placeholder="Search discussions, resources or tips"
-    //       />
-    //     </div>
-    //   </div>
-    //   <div className="flex">
-    //     <div className="flex p-4 border-r border-gray-400">
-    //       <div className="w-60 h-max rounded-md bg-white flex flex-col gap-2 p-2">
-    //         <p className="text-[#3749A6] font-semibold">Quick Stats</p>
-    //         <div className="text-sm flex justify-between">
-    //           <p className="font-semibold">Active Teachers</p>
-    //           <p>1,246</p>
-    //         </div>
+    <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Header Section */}
+      <div className="flex flex-col border-b border-gray-300 items-center justify-center p-4 md:py-6 gap-2 md:gap-3 bg-white">
+        <h1
+          className="font-semibold text-lg md:text-xl lg:text-2xl text-center"
+          style={{ fontFamily: "var(--font-jarkata)" }}
+        >
+          Teacher Community
+        </h1>
+        <p
+          className="text-xs md:text-sm text-gray-500 text-center px-4"
+          style={{ fontFamily: "var(--font-jarkata)" }}
+        >
+          A space where teachers learn from teachers
+        </p>
 
-    //         <div className="text-sm flex justify-between">
-    //           <p className="font-semibold">Discussions</p>
-    //           <p>2,320</p>
-    //         </div>
+        {/* Search Bar */}
+        <div className="w-full max-w-md px-4 md:px-0">
+          <div className="bg-white rounded-lg flex items-center gap-2 px-3 py-2.5 shadow-sm border border-gray-200 w-full">
+            <MdSearch className="text-gray-400 text-xl flex-shrink-0" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 text-sm outline-none border-none bg-transparent text-gray-700 placeholder:text-gray-400"
+              placeholder="Search discussions, resources or tips"
+              style={{ fontFamily: "var(--font-jarkata)" }}
+            />
+          </div>
+        </div>
+      </div>
 
-    //         <div className="text-sm flex justify-between">
-    //           <p className="font-semibold">Resources shared</p>
-    //           <p>3,150</p>
-    //         </div>
-    //       </div>
-    //     </div>
+      {/* Main Content */}
+      <div className="flex flex-col lg:flex-row gap-4 p-4 max-w-[1400px] mx-auto">
+        {/* Left Sidebar - Quick Stats */}
+        <aside className="w-full lg:w-72 flex-shrink-0">
+          <div className="flex flex-col gap-4 p-4 rounded-xl bg-white shadow-sm sticky top-4">
+            <h2
+              className="text-[#313D4F] font-semibold text-lg md:text-xl"
+              style={{ fontFamily: "var(--font-jarkata)" }}
+            >
+              Quick Stats
+            </h2>
 
-        
-    //     <div className="w-full flex flex-col h-screen overflow-scroll p-4 gap-4">
-    //         {/* What's on your mind */}
-    //       <form action="" className="flex flex-col gap-3 w-full p-2 bg-white rounded-md">
-    //          {/* dp and name section */}
-    //         <div className="flex gap-1">
-    //           <div className="rounded-full bg-gray-400 h-10 w-10"></div>
-    //         </div>
-    //         <div className="flex flex-col gap-1">
-    //             <textarea name="post" id="post" placeholder="What do you want to talk about?"></textarea>
-    //             <div className="flex justify-between">
-    //                 <div>attachments</div>
-    //                 <button className="bg-slate-200 rounded-full text-slate-600 p-1.5 px-3 text-xs">post</button>
-    //             </div>
-    //         </div>
-    //       </form>
+            <div className="text-sm flex justify-between">
+              <p className="font-semibold text-gray-600">Active Teachers</p>
+              <p className="text-gray-600 font-semibold">1,246</p>
+            </div>
 
-    //      {/* Other people's Post */}
-    //       <div className="flex flex-col gap-3 w-full p-2 bg-white rounded-md">
+            <div className="text-sm flex justify-between font-semibold text-gray-600">
+              <p className="font-semibold text-gray-600">Discussions</p>
+              <p>2,320</p>
+            </div>
 
-    //          {/* dp and name section */}
-    //         <div className="flex gap-1">
-    //           <div className="rounded-full bg-gray-400 h-10 w-10"></div>
-    //           <div className="flex flex-col gap-1">
-    //             <p className="text-sm font-semibold">Name Surname</p>
-    //             <div className="text-xs flex gap-1 items-center">
-    //               <p>7th Grade math</p>{" "}
-    //               <p className="flex items-center">
-    //                 <GoDotFill /> 2 hours ago
-    //               </p>
-    //             </div>
-    //           </div>
-    //         </div>
+            <div className="text-sm flex justify-between font-semibold text-gray-600">
+              <p className="font-semibold text-gray-600">Resources shared</p>
+              <p className="text-gray-600">3,150</p>
+            </div>
+          </div>
+        </aside>
 
-    //         {/* Topic and desc */}
-    //         <div className="flex flex-col gap-1 text-slate-700">
-    //           <p className="font-semibold">
-    //             How do you keep your students engaged during virtual lessons?
-    //           </p>
-    //           <p className="text-xs">
-    //             Just discovered some fantastic online tools and printables that
-    //             make fraction concepts click for students...
-    //           </p>
-    //         </div>
+        {/* Center - Community Feed */}
+        <main className="flex-1 min-w-0">
+          <CommunityFeed searchQuery={searchQuery} />
+        </main>
 
-    //         {/* tags & reactions */}
-    //         <div className="flex justify-between items-center">
-    //           <div>
-    //             <p className="rounded-full bg-gray-200 text-gray-600 text-xs p-2">
-    //               Class management
-    //             </p>
-    //           </div>
-    //           <div>Likes section</div>
-    //         </div>
-    //       </div>
-    //     </div>
+        {/* Right Sidebar - Trending & Categories */}
+        <aside className="w-full lg:w-72 flex-shrink-0 flex flex-col gap-4">
+          {/* Trending Topics */}
+          <div className="rounded-xl bg-white flex flex-col gap-4 p-4 shadow-sm">
+            <h2
+              className="text-[#3749A6] text-lg md:text-xl font-semibold"
+              style={{ fontFamily: "var(--font-jarkata)" }}
+            >
+              Trending Topics
+            </h2>
 
-    //     <div className="flex flex-col p-4 gap-4 border-l border-gray-400">
-    //       <div className="w-60 h-64 rounded-md bg-white flex flex-col gap-2 p-2">
-    //         <p className="text-[#3749A6] font-semibold">Trending Topics</p>
-    //         <div className="text-sm">
-    //           <p className="font-semibold">Best Free Math Resources</p>
-    //           <p>{"(149 discussions this week)"}</p>
-    //         </div>
+            <div className="text-sm space-y-3">
+              <div>
+                <p className="font-semibold text-gray-900">
+                  Best Free Math Resources
+                </p>
+                <p className="text-gray-500 text-xs">
+                  (149 discussions this week)
+                </p>
+              </div>
 
-    //         <div className="text-sm">
-    //           <p className="font-semibold">Best Free Math Resources</p>
-    //           <p>{"(149 discussions this week)"}</p>
-    //         </div>
+              <div>
+                <p className="font-semibold text-gray-900">
+                  Gamification in Learning
+                </p>
+                <p className="text-gray-500 text-xs">
+                  (112 discussions this week)
+                </p>
+              </div>
 
-    //         <div className="text-sm">
-    //           <p className="font-semibold">Best Free Math Resources</p>
-    //           <p>{"(149 discussions this week)"}</p>
-    //         </div>
-    //       </div>
+              <div>
+                <p className="font-semibold text-gray-900">
+                  Managing Large Classrooms
+                </p>
+                <p className="text-gray-500 text-xs">
+                  (98 discussions this week)
+                </p>
+              </div>
+            </div>
+          </div>
 
-    //       <div className="w-60 h-64 rounded-md bg-white flex flex-col gap-2 p-2">
-    //         <p className=" font-semibold">Categories</p>
-    //         <div className="text-sm flex justify-between text-gray-600">
-    //           <p className="text-gray-600">Classroom Management</p>
-    //           <p>{"49 Post(s)"}</p>
-    //         </div>
+          {/* Categories */}
+          <div className="rounded-xl bg-white flex flex-col gap-3 p-4 shadow-sm">
+            <h2
+              className="font-semibold text-gray-900"
+              style={{ fontFamily: "var(--font-jarkata)" }}
+            >
+              Categories
+            </h2>
 
-    //         <div className="text-sm flex justify-between text-gray-600">
-    //           <p className="text-gray-600">Lesson Planning</p>
-    //           <p>{"49 Post(s)"}</p>
-    //         </div>
+            <div className="space-y-2.5">
+              <div className="text-sm flex justify-between text-gray-600 hover:text-primary cursor-pointer transition-colors">
+                <p>Classroom Management</p>
+                <p className="text-xs">49 Post(s)</p>
+              </div>
 
-    //         <div className="text-sm flex justify-between text-gray-600">
-    //           <p className="text-gray-600">Technology</p>
-    //           <p>{"49 Post(s)"}</p>
-    //         </div>
+              <div className="text-sm flex justify-between text-gray-600 hover:text-primary cursor-pointer transition-colors">
+                <p>Lesson Planning</p>
+                <p className="text-xs">38 Post(s)</p>
+              </div>
 
-    //         <div className="text-sm flex justify-between text-gray-600">
-    //           <p className="text-gray-600">Assessment</p>
-    //           <p>{"49 Post(s)"}</p>
-    //         </div>
+              <div className="text-sm flex justify-between text-gray-600 hover:text-primary cursor-pointer transition-colors">
+                <p>Technology</p>
+                <p className="text-xs">56 Post(s)</p>
+              </div>
 
-    //         <div className="text-sm flex justify-between text-gray-600">
-    //           <p className="text-gray-600">Development</p>
-    //           <p>{"49 Post(s)"}</p>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
+              <div className="text-sm flex justify-between text-gray-600 hover:text-primary cursor-pointer transition-colors">
+                <p>Assessment</p>
+                <p className="text-xs">42 Post(s)</p>
+              </div>
+
+              <div className="text-sm flex justify-between text-gray-600 hover:text-primary cursor-pointer transition-colors">
+                <p>Development</p>
+                <p className="text-xs">31 Post(s)</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
   );
 };
 
