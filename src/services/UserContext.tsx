@@ -1,16 +1,24 @@
 "use client";
 
-import axios from "@/services/axios-instance";
-
 import { createContext, useContext, useEffect, useState } from "react";
-import AuthInitializer from "./AuthInitializer";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
-interface User {
+export interface User {
   userId: string;
   fullName: string;
   email: string;
-  role: string;
-  avatarUrl: string;
+  phone: string;
+  gender: string;
+  country: string;
+  dob: string;
+  role?: string;
+  avatarUrl?: string;
+  isVerified: boolean;
+  schoolId?: string;
+  subscription?: any; // or null
+  currentTier?: string | null;
+  promoApplied?: string | null;
 }
 
 interface UserContextType {
@@ -18,7 +26,12 @@ interface UserContextType {
   setUser: (user: User | null) => void;
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  token: string | null;
+  setToken: (token: string | null) => void;
+  isInitialized: boolean;
+  isRefreshing: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,50 +39,232 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [token, setTokenState] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
   const logout = async () => {
-    setUserState(null);
-    setIsLoggedIn(false);
-    localStorage.removeItem("user");
-    localStorage.setItem("isLoggedIn", "false");
-
     try {
-      await axios.post("/auth/logout", {}, { withCredentials: true });
+      console.log("UserContext - Logging out user");
+      // await apiLogout();
+      clearUserData();
+      
+      // Redirect to login and replace history to prevent back button issues
+      router.replace("/auth/login");
+      
+      // Clear browser history for the current session (optional but recommended)
+      if (typeof window !== "undefined") {
+        window.history.replaceState(null, "", "/auth/login");
+      }
     } catch (err) {
       console.error("Logout error:", err);
+      // Always clear local state regardless of API call success
+      clearUserData();
+      router.replace("/auth/login");
     }
   };
 
+const refreshUser = async () => {
+    const currentToken = token || localStorage.getItem("token");
+    
+    if (!currentToken) {
+      console.log("UserContext - No token available for refresh");
+      return;
+    }
+
+    setIsRefreshing(true);
+    
+    try {
+      console.log("UserContext - Refreshing user data");
+      
+      // Remove the fetch-style configuration from axios
+      const response = await axios.get(`${baseUrl}/auth/me`, {
+        headers: {
+          "Authorization": `Bearer ${currentToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Axios throws on non-2xx status codes, but if you need to check:
+      if (response.status !== 200) {
+        throw new Error(`Failed to refresh user: ${response.statusText}`);
+      }
+
+      // Axios automatically parses JSON, so response.data contains the parsed data
+      const data = response.data;
+      
+      // Update user data
+      const updatedUser: User = {
+        userId: data.userId || data.id,
+        fullName: data.fullName || data.name,
+        email: data.email,
+        phone: data.phone,
+        gender: data.gender,
+        country: data.country,
+        dob: data.dob,
+        role: data.role,
+        avatarUrl: data.avatarUrl,
+        isVerified: data.isVerified,
+        schoolId: data.schoolId,
+        subscription: data.subscription,
+        currentTier: data.currentTier,
+        promoApplied: data.promoApplied,
+      };
+
+      setUserState(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      console.log("UserContext - User data refreshed successfully");
+    } catch (error) {
+      console.error("UserContext - Error refreshing user:", error);
+      
+      // Check if it's a 401 error and logout
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log("UserContext - Token invalid during refresh, logging out");
+        await logout();
+        return;
+      }
+      // Don't logout on network errors, only on auth errors
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const clearUserData = () => {
+    console.log("UserContext - Clearing user data");
+    setUserState(null);
+    setIsLoggedIn(false);
+    setTokenState(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+  };
+
+  // Check for token expiration
+  const checkTokenValidity = () => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      try {
+        // If you're using JWTs, you can decode and check expiration
+        // const decoded = jwt.decode(storedToken);
+        // if (decoded.exp * 1000 < Date.now()) {
+        //   clearUserData();
+        //   return false;
+        // }
+        return true;
+      } catch (error) {
+        console.error("Token validation error:", error);
+        clearUserData();
+        return false;
+      }
+    }
+    return false;
+  };
+
+  // Initialize from localStorage on mount
   useEffect(() => {
+    console.log("UserContext - Initializing from localStorage");
+    
     const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
     const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
 
-    if (storedUser) {
-      setUserState(JSON.parse(storedUser));
-    }
+    console.log("UserContext - Stored data:", {
+      hasUser: !!storedUser,
+      hasToken: !!storedToken,
+      isLoggedIn: storedIsLoggedIn
+    });
 
-    if (storedIsLoggedIn === "true") {
-      setIsLoggedIn(true);
+    if (storedUser && storedToken && checkTokenValidity()) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUserState(parsedUser);
+        setTokenState(storedToken);
+        setIsLoggedIn(storedIsLoggedIn === "true");
+        console.log("UserContext - User restored from localStorage:", parsedUser.email);
+      } catch (error) {
+        console.error("Error parsing stored user data:", error);
+        clearUserData();
+      }
+    } else {
+      console.log("UserContext - No valid stored data, clearing user data");
+      clearUserData();
     }
+    
+    setIsInitialized(true);
   }, []);
 
+  // Listen for storage changes (handles logout in other tabs)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      console.log("UserContext - Storage change detected:", e.key, e.newValue);
+      
+      if (e.key === "token" && !e.newValue) {
+        // Token was removed, user logged out in another tab
+        console.log("UserContext - Token removed in another tab, logging out");
+        setUserState(null);
+        setIsLoggedIn(false);
+        setTokenState(null);
+        router.replace("/auth/login");
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("storage", handleStorageChange);
+      return () => window.removeEventListener("storage", handleStorageChange);
+    }
+  }, [router]);
+
   const setUser = (user: User | null) => {
+    console.log("UserContext - Setting user:", user?.email || "null");
     setUserState(user);
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("isLoggedIn", "true");
     } else {
       localStorage.removeItem("user");
-      localStorage.setItem("isLoggedIn", "false");
     }
   };
 
+  const setToken = (token: string | null) => {
+    console.log("UserContext - Setting token:", !!token);
+    setTokenState(token);
+    if (token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("isLoggedIn", "true");
+      setIsLoggedIn(true);
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
+      setIsLoggedIn(false);
+    }
+  };
+
+  // Don't render children until context is initialized
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
     <UserContext.Provider
-      value={{ user, setUser, isLoggedIn, setIsLoggedIn, logout }}
+      value={{ 
+        user, 
+        setUser, 
+        isLoggedIn, 
+        setIsLoggedIn, 
+        logout, 
+        refreshUser,
+        token, 
+        setToken, 
+        isInitialized,
+        isRefreshing,
+      }}
     >
-      {/* 👇 this makes sure useAuth is called in a client-safe way */}
-      <AuthInitializer />
       {children}
     </UserContext.Provider>
   );

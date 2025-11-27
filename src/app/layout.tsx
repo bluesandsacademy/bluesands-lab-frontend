@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "react-toastify/dist/ReactToastify.css";
 import LoadingBar from "@/components/LoadingBar";
 import { UserProvider } from "@/services/UserContext";
 import { Suspense } from "react";
+import { ToastContainer } from "react-toastify";
+import AuthGuard from "@/services/AuthGuard";
 
 export const metadata: Metadata = {
   title: "Blue Sands Stem Labs",
@@ -17,11 +20,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://js.paystack.co/v1/inline.js"></script>
+      </head>
       <body className={` antialiased`}>
         <Suspense fallback={null}>
           <LoadingBar />
         </Suspense>
-        <UserProvider> {children} </UserProvider>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+        <UserProvider>
+          <AuthGuard> {children} </AuthGuard>
+        </UserProvider>
       </body>
     </html>
   );
