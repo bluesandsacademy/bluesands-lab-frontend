@@ -806,8 +806,7 @@ export const PhETSimulations = [
     simulationUrl:
       "https://phet.colorado.edu/sims/html/energy-forms-and-changes/latest/energy-forms-and-changes_en.html",
     title: "Energy Forms and Changes",
-    description:
-      "Learn how energy is transformed from one state to another",
+    description: "Learn how energy is transformed from one state to another",
     subject: "Physics",
     class: "ss1",
   },
@@ -878,8 +877,7 @@ export const PhETSimulations = [
     simulationUrl:
       "https://phet.colorado.edu/sims/html/isotopes-and-atomic-mass/latest/isotopes-and-atomic-mass_en.html",
     title: "Isotopes and Atomic Mass",
-    description:
-      "Learn about Isotoy and simulations of atomic mass",
+    description: "Learn about Isotoy and simulations of atomic mass",
     subject: "Chemistry",
     class: "ss2",
   },
@@ -905,8 +903,7 @@ export const PhETSimulations = [
     simulationUrl:
       "https://phet.colorado.edu/sims/html/bending-light/latest/bending-light_en.html",
     title: "Bending Light",
-    description:
-      "Learn about light's refraction, reflection and wavelength",
+    description: "Learn about light's refraction, reflection and wavelength",
     subject: "Physics",
     class: "ss3",
   },
@@ -928,15 +925,23 @@ export const PhETSimulations = [
     subject: "Chemistry",
     class: "ss3",
   },
-   {
+  {
     simulationUrl:
       "https://phet.colorado.edu/sims/html/sugar-and-salt-solutions/latest/sugar-and-salt-solutions_en.html",
     title: "Sugar and Salt Solutions",
-    description:
-      "Learn about the complexity of Sugars and Salts",
+    description: "Learn about the complexity of Sugars and Salts",
     subject: "Chemistry",
     class: "ss3",
   },
+  //  {
+  //   simulationUrl:
+  //     "",
+  //   title: "",
+  //   description:
+  //     "",
+  //   subject: "Biology",
+  //   class: "ss3",
+  // },
   //  {
   //   simulationUrl:
   //     "",
