@@ -214,6 +214,7 @@
 
 "use client";
 
+import apiClient from "@/services/axios-instance";
 import { useUser } from "@/services/UserContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -221,7 +222,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 const SchoolStudentPayment = () => {
-  const { user } = useUser();
+  const { user, token } = useUser();
   const router = useRouter();
   const [studentCount, setStudentCount] = useState(0);
   const VAT_RATE = 0.075; // 7.5%
@@ -248,9 +249,9 @@ const SchoolStudentPayment = () => {
   const subtotal = studentCount * pricePerStudent;
   const discountAmount = couponApplied ? subtotal * COUPON_DISCOUNT : 0;
   const subtotalAfterDiscount = subtotal - discountAmount;
-  const vatAmount = subtotalAfterDiscount * VAT_RATE;
-  const totalAmount = subtotalAfterDiscount + vatAmount;
-  const pricePerStudentWithVAT = pricePerStudent + (pricePerStudent * VAT_RATE);
+  // const vatAmount = subtotalAfterDiscount * VAT_RATE;
+  const totalAmount = subtotalAfterDiscount // + vatAmount;
+  // const pricePerStudentWithVAT = pricePerStudent + (pricePerStudent * VAT_RATE);
 
   // Handle coupon application
   const applyCoupon = () => {
@@ -335,11 +336,11 @@ const SchoolStudentPayment = () => {
             variable_name: "discount_amount",
             value: discountAmount,
           },
-          {
-            display_name: "VAT Amount",
-            variable_name: "vat_amount",
-            value: vatAmount,
-          },
+          // {
+          //   display_name: "VAT Amount",
+          //   variable_name: "vat_amount",
+          //   value: vatAmount,
+          // },
         ],
       },
       onClose: function () {
@@ -354,35 +355,76 @@ const SchoolStudentPayment = () => {
     handler.openIframe();
   };
 
-  const verifyPayment = async (reference: string) => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/payments/verify`,
-        {
-          params: {
-            reference,
-          },
-        }
-      );
+const verifyPayment = async (reference: string) => {
+    if (isProcessing) return;
 
-      if (res.data && res.data.ok) {
+    setIsProcessing(true);
+
+    try {
+      const res = await apiClient.get(`/api/payments/verify`, {
+        params: {
+          reference,
+        },
+      });
+
+      // Check if payment verification was successful (status 200)
+      if (res.status === 200) {
         toast.success("Payment successful!");
-        setStudentCount(0);
-        setCouponCode("");
-        setCouponApplied(false);
-        setIsProcessing(false);
-        // Redirect
-        router.push("/school/dashboard");
+
+      // Register the payment details
+        try {
+          await apiClient.post(
+            `/api/payments/register-payment`,
+            {
+              reference: reference,
+              userId: user?.userId,
+              studentCount: studentCount,
+              pricePerStudent: pricePerStudent,
+              subtotal: subtotal,
+              vatAmount: 0,
+              amount: totalAmount,
+              promoCode: couponCode,
+            },
+            {
+              headers: token
+                ? {
+                    Authorization: `Bearer ${token}`,
+                  }
+                : {},
+              withCredentials: true,
+            }
+          );
+
+          // Refresh user data to get updated subscription info
+          await refreshUser();
+
+          // Reset coupon state after successful registration
+          setCouponCode("");
+          setCouponApplied(false);
+
+          // Redirect to dashboard
+          router.push("/school/dashboard");
+        } catch (error) {
+          console.error("Failed to register payment:", error);
+          toast.error(
+            "Payment successful but failed to register. Please contact support."
+          );
+        // Still redirect even if registration fails since payment went through
+          setTimeout(() => router.push("/school/dashboard"), 2000);
+        }
       } else {
+        // Log the response for debugging
+        console.log("Verification response:", res.data);
         toast.error("Payment verification failed. Please contact support.");
-        setIsProcessing(false);
       }
     } catch (error) {
       console.error("Verification failed:", error);
       toast.error("An error occurred. Please contact support.");
+    } finally {
       setIsProcessing(false);
     }
   };
+
 
   // Format number to currency
   const formatCurrency = (amount: number) => {
@@ -501,10 +543,10 @@ const SchoolStudentPayment = () => {
             </div>
           )}
 
-          <div className="flex justify-between">
+          {/* <div className="flex justify-between">
             <p className="text-sm">VAT (7.5%):</p>
             <p className="text-sm">₦{formatCurrency(vatAmount)}</p>
-          </div>
+          </div> */}
 
           <div className="flex justify-between mt-4 border-t border-t-gray-200 pt-2">
             <p className="text-sm font-semibold">Total:</p>
@@ -545,3 +587,7 @@ const SchoolStudentPayment = () => {
 };
 
 export default SchoolStudentPayment;
+
+function refreshUser() {
+  throw new Error("Function not implemented.");
+}
