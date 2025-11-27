@@ -946,15 +946,6 @@ export const PhETSimulations = [
   //   subject: "Biology",
   //   class: "ss3",
   // },
-  //  {
-  //   simulationUrl:
-  //     "",
-  //   title: "",
-  //   description:
-  //     "",
-  //   subject: "Biology",
-  //   class: "ss3",
-  // },
 ];
 
 //end
