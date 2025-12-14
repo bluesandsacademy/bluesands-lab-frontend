@@ -121,8 +121,8 @@ const SchoolTable = () => {
               <div className="flex items-center gap-2">
                 {/* Previous Button */}
                 <button
-                  // onClick={() => handlePageChange(page - 1)}
-                  // disabled={page === 1}
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
                   className="p-2 rounded-md border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <FaChevronLeft />
