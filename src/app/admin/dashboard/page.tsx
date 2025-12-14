@@ -23,43 +23,47 @@ import {
 
 // Sample data for charts
 const lineChartData = [
-  { month: "Jan", users: 0, schools: 0 },
-  { month: "Feb", users: 0, schools: 0 },
-  { month: "Mar", users: 0, schools: 0 },
-  { month: "Apr", users: 0, schools: 0 },
-  { month: "May", users: 0, schools: 0 },
-  { month: "Jun", users: 0, schools: 0 },
+  // { month: "Jan", users: 0, schools: 0 },
+  // { month: "Feb", users: 0, schools: 0 },
+  // { month: "Mar", users: 0, schools: 0 },
+  // { month: "Apr", users: 0, schools: 0 },
+  // { month: "May", users: 0, schools: 0 },
+  { month: "Jun", users: 150, schools: 0 },
+  { month: "Jul", users: 350, schools: 15 },
+  { month: "Aug", users: 428, schools: 15 },
+  { month: "Sep", users: 125, schools: 14 },
+  { month: "Oct", users: 200, schools: 32 },
 ];
 
 const pieChartData = [
-  { name: "Male Students", value: 400 },
-  { name: "Female Students", value: 200 },
-  { name: "Others", value: 100 },
+  { name: "Male Students", value: 722 },
+  { name: "Female Students", value: 531 },
+  // { name: "Others", value: 100 },
 ];
 
 const barChartData = [
-  { month: "Jan", revenue: 0 },
-  { month: "Feb", revenue: 0 },
-  { month: "Mar", revenue: 0 },
-  { month: "Apr", revenue: 0 },
-  { month: "May", revenue: 0 },
-  { month: "Jun", revenue: 0 },
-  { month: "Jul", revenue: 0 },
-  { month: "Aug", revenue: 0 },
-  { month: "Sep", revenue: 0 },
-  { month: "Oct", revenue: 0 },
-  { month: "Nov", revenue: 0 },
-  { month: "Dec", revenue: 0 },
+  // { month: "Jan", revenue: 0 },
+  // { month: "Feb", revenue: 0 },
+  // { month: "Mar", revenue: 0 },
+  // { month: "Apr", revenue: 0 },
+  // { month: "May", revenue: 0 },
+  { month: "Jun", revenue: 2690000 },
+  { month: "Jul", revenue: 2950000 },
+  { month: "Aug", revenue: 3680000 },
+  { month: "Sep", revenue: 4440000 },
+  { month: "Oct", revenue: 5650000 },
+  // { month: "Nov", revenue: 0 },
+  // { month: "Dec", revenue: 0 },
 ];
 
-const userDemographics = [
-  { country: "Nigeria", population: 0 },
-  { country: "Ghana", population: 0 },
-  { country: "Camerooon", population: 0 },
-  { country: "Benin", population: 0 },
-  { country: "South Africa", population: 0 },
-  { country: "Uganda", population: 0 },
-];
+// const userDemographics = [
+//   { country: "Nigeria", population: 0 },
+//   { country: "Ghana", population: 0 },
+//   { country: "Camerooon", population: 0 },
+//   { country: "Benin", population: 0 },
+//   { country: "South Africa", population: 0 },
+//   { country: "Uganda", population: 0 },
+// ];
 
 const COLORS = ["#3b82f6", "#ec4899", "#f59e0b"];
 
@@ -162,10 +166,10 @@ const Page = () => {
         </div>
 
         {/* User Demographics */}
-        <div className="flex flex-col gap-3 p-4 bg-white rounded-lg shadow">
+       {/* <div className="flex flex-col gap-3 p-4 bg-white rounded-lg shadow">
           <p className="text-sm font-semibold">User Demographics</p>
           <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {userDemographics.map((demo, index) => (
+             {userDemographics.map((demo, index) => (
               <div
                 key={index}
                 className="bg-blue-400 rounded-md w-20 h-14 flex flex-col items-center justify-center text-xs"
@@ -173,9 +177,9 @@ const Page = () => {
                 <p className="text-blue-900 font-semibold">{demo.country}</p>
                 <p className="text-white">{demo.population}</p>
               </div>
-            ))}
-          </div>
-        </div>
+            ))} 
+          </div> 
+        </div> */}
       </div>
     </div>
   );
