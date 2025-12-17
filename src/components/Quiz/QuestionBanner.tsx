@@ -30,7 +30,7 @@ const QuestionBanner = ({
           {/* <h3 className="font-medium leading-tight md:leading-none my-0 text-lg md:text-2xl lg:text-3xl">
                 Welcome Back, {question}
                 </h3> */}
-          <p className="my-0 text-sm md:text-md leading-normal md:leading-none">
+          <p className="my-0 text-sm md:text-base font-semibold leading-normal">
             {question.question}
           </p>
         </div>
@@ -38,7 +38,7 @@ const QuestionBanner = ({
 
       {/* Answer Section */}
       <div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* {options.map((opt, index) => (
             <div
               key={index}
@@ -64,7 +64,7 @@ const QuestionBanner = ({
                 className={`block p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                   isSelected
                     ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-gray-200 hover:border-gray-300 bg-gray-100"
                 }`}
               >
                 <input
@@ -75,7 +75,7 @@ const QuestionBanner = ({
                   onChange={() => onAnswer(question.id, optionValue)}
                   className="sr-only"
                 />
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                   <span
                     className={`w-6 h-6 rounded-full border-2 mr-3 flex items-center justify-center text-sm font-medium ${
                       isSelected
