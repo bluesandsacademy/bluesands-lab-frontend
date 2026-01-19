@@ -5,6 +5,7 @@ import {
   addSchoolTeacher,
 } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
+import { error } from "console";
 import React, { useState } from "react";
 import { FaPlus, FaSpinner, FaTimes } from "react-icons/fa";
 import { FiUpload } from "react-icons/fi";
@@ -171,10 +172,10 @@ export const AddTeacherModal = ({ isOpen, onClose }: any) => {
       setIsLoading(false);
       onClose();
       toast.success("Teacher added successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding teacher:", error);
       setIsLoading(false);
-      toast.error("Failed to add teacher");
+      toast.error(<div><p className="font-semibold">Failed to add teacher</p><p>${error.message}</p></div>)
     }
   };
 
@@ -297,10 +298,10 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
       setIsLoading(false);
       onClose();
       toast.success("Student added successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding student:", error);
       setIsLoading(false);
-      toast.error("Failed to add student");
+      toast.error(<div><p className="font-semibold">Failed to add Student</p><p>${error.message}</p></div>)
     }
   };
 
@@ -409,10 +410,10 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
       setIsLoading(false);
       onClose();
       toast.success("Class added successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding Class:", error);
       setIsLoading(false);
-      toast.error("Failed to add Class");
+      toast.error(<div><p className="font-semibold">Failed to add Class</p><p>${error.message}</p></div>)
     }
     onClose();
   };

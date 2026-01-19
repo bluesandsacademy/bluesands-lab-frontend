@@ -29,7 +29,7 @@ const AdminReportPage = () => {
         <div className="flex">
           <StatCards stats={statsConfig} isLoading={isLoading} />
         </div>
-        
+
       </div>
 
       <div></div>

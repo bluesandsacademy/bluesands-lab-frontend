@@ -650,8 +650,7 @@ export default function RegisterSchoolAccount() {
           <div className="w-full flex flex-col gap-y-1 md:gap-y-3">
             <button
               type="submit"
-              //disabled={isSubmitting}
-              disabled
+              disabled={isSubmitting}
               className={`text-center text-sm md:text-base rounded-md py-2 md:py-3 lg:py-5 bg-bgBlue text-white w-full lg:text-lg`}
             >
               Sign Up

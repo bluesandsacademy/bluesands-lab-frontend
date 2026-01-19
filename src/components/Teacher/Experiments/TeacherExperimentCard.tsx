@@ -74,6 +74,7 @@ const TeacherExperimentCard = ({
         <AssignExperimentModal
           isOpen={isAddModalOpen}
           onClose={handleCloseModal}
+          experimentName = {title}
         />
       )}
     </>
