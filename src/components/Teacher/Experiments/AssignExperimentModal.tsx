@@ -5,16 +5,16 @@ import { useState } from "react";
 import { FaSpinner, FaPlus, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-export const AssignExperimentModal = ({ isOpen, onClose }: any) => {
+export const AssignExperimentModal = ({ isOpen, onClose, experimentName }: any) => {
   const { user, token } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
+    title: experimentName,
     classID: "",
     dueDate: "",
     resourceCode: "",
   });
-  const [classList, setClassList] = useState([])
+  const [classList, setClassList] = useState([]);
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,30 +24,26 @@ export const AssignExperimentModal = ({ isOpen, onClose }: any) => {
     // console.log("Assigning experiment:", formData);
 
     // Validation
-    if (
-      !formData.title ||
-      !formData.resourceCode ||
-      !formData.dueDate
-    ) {
+    if (!formData.title || !formData.resourceCode || !formData.dueDate) {
       toast.error("Please fill in all required fields");
       return;
     }
 
     try {
       setIsLoading(true);
-     // const res = await assignExperiment(formData, user?.schoolId, token);
-      // console.log(res);
+      const res = await assignExperiment(formData, user?.schoolId, token);
+      console.log(res);
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      //await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setIsLoading(false);
       onClose();
       toast.success("Experiment assigned successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error assigning experiment:", error);
       setIsLoading(false);
-      toast.error("Failed to assign experiment");
+      toast.error(<div><p className="font-semibold">Failed to assign experiment</p><p>${error.message}</p></div>)
     }
   };
 
@@ -66,6 +62,7 @@ export const AssignExperimentModal = ({ isOpen, onClose }: any) => {
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
               placeholder="Enter Experiment title"
+              disabled
             />
           </div>
 

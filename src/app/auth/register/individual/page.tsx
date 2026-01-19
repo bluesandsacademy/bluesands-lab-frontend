@@ -288,8 +288,7 @@ export default function RegisterIndividualAccount() {
           <div className="w-full flex flex-col gap-y-3">
             <button
               type="submit"
-              //disabled={isSubmitting}
-              disabled
+              disabled={isSubmitting}
               className={`text-center rounded-md py-1 md:py-3 lg:py-5 bg-bgBlue text-white w-full text-sm md:text-lg ${
                 isSubmitting
                   ? "opacity-50 cursor-not-allowed"
