@@ -1,0 +1,58 @@
+{
+  "id": "lesson-001",
+  "title": "Density & Floating",
+  "subtitle": "Exploring why things float and sink",
+  "steps": [
+    {
+      "id": "orientation",
+      "type": "orientation",
+      "label": "Orientation",
+      "stepNumber": 1,
+      "totalSteps": 6,
+      "guidingQuestion": "Why do some objects float while others sink?",
+      "mediaUrl": null,
+      "poll": {
+        "prompt": "What do you think?",
+        "subtext": "Share your initial thought before we explore",
+        "options": [
+          { "id": "size",     "label": "It depends on size" },
+          { "id": "material", "label": "It depends on material" },
+          { "id": "unsure",   "label": "I'm not sure yet" }
+        ],
+        "defaultSelected": "unsure"
+      }
+    },
+    {
+      "id": "hypothesis",
+      "type": "hypothesis",
+      "label": "Hypothesis",
+      "stepNumber": 2,
+      "totalSteps": 6,
+      "framingQuestion": "What will happen if we increase the density of an object placed in water?",
+      "inputPlaceholder": "I think that...",
+      "inputSubtext": "Write what you think will happen and why.",
+      "peers": [
+        { "id": "p1", "initials": "AM", "name": "Alex M.",   "avatarColor": "bg-violet-400", "text": "I think it will sink faster because the density pushes it down." },
+        { "id": "p2", "initials": "SK", "name": "Sam K.",    "avatarColor": "bg-rose-400",   "text": "No change will happen — temperature might matter more." },
+        { "id": "p3", "initials": "JP", "name": "Jordan P.", "avatarColor": "bg-teal-400",   "text": "If density increases beyond the liquid, it sinks." }
+      ]
+    },
+    {
+      "id": "experiment",
+      "type": "experiment",
+      "label": "Experiment",
+      "stepNumber": 3,
+      "totalSteps": 6,
+      "observationPrompt": "What did you notice when density increased?",
+      "observationPlaceholder": "I observed that...",
+      "controls": [
+        { "id": "density",     "label": "Density",     "min": 0.5, "max": 2.0, "step": 0.1, "default": 1.0, "unit": "g/cm" },
+        { "id": "volume",      "label": "Volume",      "min": 10,  "max": 100, "step": 5,   "default": 50,  "unit": "ml"   },
+        { "id": "temperature", "label": "Temperature", "min": 0,   "max": 100, "step": 5,   "default": 25,  "unit": "°C"   }
+      ]
+    },
+    { "id": "discussion", "type": "discussion", "label": "Discussion", "stepNumber": 4, "totalSteps": 6 },
+    { "id": "real-world",  "type": "real-world",  "label": "Real World",  "stepNumber": 5, "totalSteps": 6 },
+    { "id": "assessment",  "type": "assessment",  "label": "Assessment",  "stepNumber": 6, "totalSteps": 6 }
+  ]
+}

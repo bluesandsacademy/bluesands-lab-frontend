@@ -1,4 +1,9 @@
+"use client"
+
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
+import LearningSpace from "@/components/LearningSpace/LearningSpace";
+import { CreateLearningSpaceModal } from "@/components/Teacher/LearningSpaces/CreateLearningSpace";
+import { useState } from "react";
 import { CgNotes } from "react-icons/cg";
 import { FaPlus, FaRegEdit } from "react-icons/fa";
 import { IoCopyOutline } from "react-icons/io5";
@@ -40,7 +45,10 @@ const statsConfig: StatCardData[] = [
 ];
 
 const TeacherClassManagementPage = () => {
+  const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
+
   return (
+    <>
     <div className="flex flex-col gap-4 p-2 lg:p-4">
       <div className="flex justify-end">
         <button className="bg-[#303C48] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5">
@@ -65,12 +73,12 @@ const TeacherClassManagementPage = () => {
               PHY101 <IoCopyOutline />
             </p>
           </button>
-          <button className="bg-[#00B69B] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5">
+          <button onClick={()=> setIsCreateSpaceOpen(true)} className="bg-[#00B69B] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5">
             {" "}
-            <CgNotes /> Create Assignment
+            <CgNotes /> Create Learning Space
           </button>
           <button className="bg-[#006FCC] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5">
-            <FaRegEdit /> Edit Assignment
+            <FaRegEdit /> Edit Learning Space
           </button>
         </div>
       </div>
@@ -163,6 +171,13 @@ const TeacherClassManagementPage = () => {
         </div>
       </div>
     </div>
+
+{isCreateSpaceOpen && <CreateLearningSpaceModal
+  isOpen={isCreateSpaceOpen}
+  onClose={() => setIsCreateSpaceOpen(false)}
+  //onSuccess={() => refetchSpaces()}
+/>}
+    </>
   );
 };
 
