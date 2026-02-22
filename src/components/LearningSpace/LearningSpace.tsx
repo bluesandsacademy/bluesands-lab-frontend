@@ -10,28 +10,50 @@
 // import HypothesisStep from "./HypothesisStep";
 // import ExperimentStep from "./ExperimentStep";
 
-// // Map step type → component
-// const STEP_COMPONENTS = {
+// // ── Types ─────────────────────────────────────────────────────
+
+// type StepType = "orientation" | "hypothesis" | "experiment" | "discussion" | "real-world" | "assessment";
+
+// interface LessonStep {
+//   id: string;
+//   type: StepType;
+//   label: string;
+//   stepNumber: number;
+//   totalSteps: number;
+//   [key: string]: unknown; // allows extra fields per step type
+// }
+
+// interface Lesson {
+//   id: string;
+//   title: string;
+//   subtitle: string;
+//   steps: LessonStep[];
+// }
+
+// type StepComponentType = React.ComponentType<{ data: LessonStep & { title: string; subtitle: string }; onContinue: () => void }>;
+
+// // ── Step registry ─────────────────────────────────────────────
+
+// const STEP_COMPONENTS: Partial<Record<StepType, StepComponentType>> = {
 //   orientation: OrientationStep,
 //   hypothesis:  HypothesisStep,
 //   experiment:  ExperimentStep,
 // };
 
-// // Map step type → icon (for the progress bar)
-// const STEP_ICONS = {
-//   orientation: <MdOutlineExplore size={15} />,
-//   hypothesis:  <BsLightbulb      size={15} />,
-//   experiment:  <FaFlask          size={15} />,
-//   discussion:  <BsChatSquareText size={15} />,
-//   "real-world":<BsGlobe          size={15} />,
-//   assessment:  <BsTrophy         size={15} />,
+// const STEP_ICONS: Record<StepType, React.ReactNode> = {
+//   orientation:  <MdOutlineExplore size={15} />,
+//   hypothesis:   <BsLightbulb      size={15} />,
+//   experiment:   <FaFlask          size={15} />,
+//   discussion:   <BsChatSquareText size={15} />,
+//   "real-world": <BsGlobe          size={15} />,
+//   assessment:   <BsTrophy         size={15} />,
 // };
 
 // // ── Sub-components ────────────────────────────────────────────
 
-// function Header({ title, subtitle, onBack }: any) {
+// function Header({ title, subtitle, onBack }: { title: string; subtitle: string; onBack: () => void }) {
 //   return (
-//     <div className="flex items-center gap-3 border-b border-gray-100 bg-white px-5 py-4 sticky top-0 z-10">
+//     <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-100 bg-white px-5 py-4">
 //       <button onClick={onBack} className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100">
 //         <FiArrowLeft size={18} />
 //       </button>
@@ -43,7 +65,7 @@
 //   );
 // }
 
-// function StepBar({ steps, currentIndex }: any) {
+// function StepBar({ steps, currentIndex }: { steps: LessonStep[]; currentIndex: number }) {
 //   return (
 //     <div className="flex items-center gap-1 overflow-x-auto border-b border-gray-100 bg-white px-5 py-3">
 //       {steps.map((step, i) => {
@@ -77,13 +99,13 @@
 
 // // ── Main component ────────────────────────────────────────────
 
-// export default function LearningSpace({ lessonId }: any) {
-//   const [lesson, setLesson]       = useState(null);
+// export default function LearningSpace({ lessonId }: { lessonId?: string }) {
+//   const [lesson, setLesson] = useState<Lesson | null>(null);
 //   const [currentStep, setCurrentStep] = useState(0);
 
-//   // Simulate an API fetch — swap this for a real fetch()/SWR/React Query call
+//   // Simulate an API fetch — swap for a real fetch()/SWR/React Query call
 //   useEffect(() => {
-//     import("./lessonData.json").then((mod) => setLesson(mod.default));
+//     import("./lessonData.json").then((mod) => setLesson(mod.default as Lesson));
 //   }, [lessonId]);
 
 //   if (!lesson) {
@@ -94,20 +116,16 @@
 //     );
 //   }
 
-//   const steps      = lesson.steps;
-//   const stepData   = steps[currentStep];
-//   const StepView   = STEP_COMPONENTS[stepData.type];
+//   const steps    = lesson.steps;
+//   const stepData = steps[currentStep];
+//   const StepView = STEP_COMPONENTS[stepData.type];
 
 //   const handleContinue = () => setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
 //   const handleBack     = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
 //   return (
-//     <div className="mx-auto flex max-w-2xl flex-col bg-gray-50 min-h-screen">
-//       <Header
-//         title={lesson.title}
-//         subtitle={lesson.subtitle}
-//         onBack={handleBack}
-//       />
+//     <div className="mx-auto flex min-h-screen max-w-2xl flex-col bg-gray-50">
+//       <Header title={lesson.title} subtitle={lesson.subtitle} onBack={handleBack} />
 //       <StepBar steps={steps} currentIndex={currentStep} />
 
 //       {StepView ? (
@@ -127,7 +145,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiArrowLeft, FiCheckCircle } from "react-icons/fi";
+import { FiArrowLeft, FiCheckCircle, FiX } from "react-icons/fi";
 import { MdOutlineExplore } from "react-icons/md";
 import { BsLightbulb, BsChatSquareText, BsGlobe, BsTrophy } from "react-icons/bs";
 import { FaFlask } from "react-icons/fa";
@@ -146,7 +164,7 @@ interface LessonStep {
   label: string;
   stepNumber: number;
   totalSteps: number;
-  [key: string]: unknown; // allows extra fields per step type
+  [key: string]: unknown;
 }
 
 interface Lesson {
@@ -156,7 +174,10 @@ interface Lesson {
   steps: LessonStep[];
 }
 
-type StepComponentType = React.ComponentType<{ data: LessonStep & { title: string; subtitle: string }; onContinue: () => void }>;
+type StepComponentType = React.ComponentType<{
+  data: LessonStep & { title: string; subtitle: string };
+  onContinue: () => void;
+}>;
 
 // ── Step registry ─────────────────────────────────────────────
 
@@ -177,16 +198,31 @@ const STEP_ICONS: Record<StepType, React.ReactNode> = {
 
 // ── Sub-components ────────────────────────────────────────────
 
-function Header({ title, subtitle, onBack }: { title: string; subtitle: string; onBack: () => void }) {
+function Header({
+  title,
+  subtitle,
+  onBack,
+  onClose,
+}: {
+  title: string;
+  subtitle: string;
+  onBack: () => void;
+  onClose?: () => void;
+}) {
   return (
-    <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-100 bg-white px-5 py-4">
+    <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-100 bg-white px-5 py-4 w-full">
       <button onClick={onBack} className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100">
         <FiArrowLeft size={18} />
       </button>
-      <div>
+      <div className="flex-1">
         <p className="text-sm font-semibold text-gray-800">{title}</p>
         <p className="text-xs text-gray-400">{subtitle}</p>
       </div>
+      {onClose && (
+        <button onClick={onClose} className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100">
+          <FiX size={18} />
+        </button>
+      )}
     </div>
   );
 }
@@ -223,20 +259,19 @@ function StepBar({ steps, currentIndex }: { steps: LessonStep[]; currentIndex: n
   );
 }
 
-// ── Main component ────────────────────────────────────────────
+// ── Shared lesson content (used by both modes) ────────────────
 
-export default function LearningSpace({ lessonId }: { lessonId?: string }) {
+function LessonContent({ lessonId, onClose }: { lessonId?: string; onClose?: () => void }) {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Simulate an API fetch — swap for a real fetch()/SWR/React Query call
   useEffect(() => {
     import("./lessonData.json").then((mod) => setLesson(mod.default as Lesson));
   }, [lessonId]);
 
   if (!lesson) {
     return (
-      <div className="flex h-screen items-center justify-center text-sm text-gray-400">
+      <div className="flex h-64 items-center justify-center text-sm text-gray-400">
         Loading lesson...
       </div>
     );
@@ -250,20 +285,74 @@ export default function LearningSpace({ lessonId }: { lessonId?: string }) {
   const handleBack     = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col bg-gray-50">
-      <Header title={lesson.title} subtitle={lesson.subtitle} onBack={handleBack} />
+    <div className="flex h-full flex-col bg-gray-50">
+      <Header
+        title={lesson.title}
+        subtitle={lesson.subtitle}
+        onBack={handleBack}
+        onClose={onClose}
+      />
       <StepBar steps={steps} currentIndex={currentStep} />
+      <div className="flex-1 overflow-y-auto">
+        {StepView ? (
+          <StepView
+            data={{ ...stepData, title: lesson.title, subtitle: lesson.subtitle }}
+            onContinue={handleContinue}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center p-10 text-sm text-gray-400">
+            This step is coming soon.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-      {StepView ? (
-        <StepView
-          data={{ ...stepData, title: lesson.title, subtitle: lesson.subtitle }}
-          onContinue={handleContinue}
-        />
-      ) : (
-        <div className="flex flex-1 items-center justify-center p-10 text-sm text-gray-400">
-          This step is coming soon.
-        </div>
-      )}
+// ── Popup wrapper ─────────────────────────────────────────────
+
+function LearningSpacePopup({ lessonId, onClose }: { lessonId?: string; onClose: () => void }) {
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="relative flex h-[90vh] w-full max-w-2xl lg:max-w-6xl flex-col overflow-hidden rounded-2xl shadow-2xl">
+        <LessonContent lessonId={lessonId} onClose={onClose} />
+      </div>
+    </div>
+  );
+}
+
+// ── Main export — `popup` prop switches the mode ──────────────
+//
+//  Full page:  <LearningSpace lessonId="lesson-001" />
+//  Popup:      <LearningSpace lessonId="lesson-001" popup onClose={() => setOpen(false)} />
+
+export default function LearningSpace({
+  lessonId,
+  popup = false,
+  onClose,
+}: {
+  lessonId?: string;
+  popup?: boolean;
+  onClose?: () => void;
+}) {
+  if (popup) {
+    if (!onClose) throw new Error("LearningSpace: `onClose` is required when using `popup` mode.");
+    return <LearningSpacePopup lessonId={lessonId} onClose={onClose} />;
+  }
+
+  return (
+    <div className="mx-auto flex min-h-screen max-w-2xl flex-col">
+      <LessonContent lessonId={lessonId} />
     </div>
   );
 }
