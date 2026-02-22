@@ -226,9 +226,9 @@ export const sidebarLinks: SidebarLinks[] = [
     icon: "/images/icon/home.svg",
   },
   {
-    title: "Experiments",
-    url: "/dashboard/experiments",
-    icon: "/images/icon/beaker.svg",
+    title: "Learning Space",
+    url: "/dashboard/stem-courses",
+    icon: "/images/icon/notepad.svg",
   },
   // {
   //   title: "VR Studio",
@@ -240,13 +240,13 @@ export const sidebarLinks: SidebarLinks[] = [
   //   url: "/dashboard/vr-experience",
   //   icon: "/images/icon/game_vr_headset.svg",
   // },
-  {
-    title: "STEM Courses",
-    url: "/dashboard/stem-courses",
-    icon: "/images/icon/notepad.svg",
+   {
+    title: "Experiments",
+    url: "/dashboard/experiments",
+    icon: "/images/icon/beaker.svg",
   },
   {
-    title: "STEM Quiz",
+    title: "Assessment",
     url: "/dashboard/stem-quizzes",
     icon: "/images/icon/quiz.svg",
   },
