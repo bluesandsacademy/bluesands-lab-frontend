@@ -3,6 +3,8 @@ import ExperimentCard from "@/components/Dashboard/Experiments/ExperimentCards";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import LearningSpace from "@/components/LearningSpace/LearningSpace";
+import SpaceCard from "@/components/LearningSpace/SpaceCard";
+import { getLearningSpaces } from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -10,7 +12,6 @@ import { BiSolidEraser } from "react-icons/bi";
 import { FaChevronRight } from "react-icons/fa";
 import { IoMdStar } from "react-icons/io";
 import { LuNotebookPen } from "react-icons/lu";
-
 
 interface Lesson {
   id: string;
@@ -60,12 +61,33 @@ const DashboardStemCoursesPage = () => {
       timeFrame: "from last month",
     },
   ];
- 
-  const [isShowingPop, setIsShowingPop] = useState<boolean>(false);  
-const [lesson, setLesson] = useState<Lesson | null>();
-useEffect(() => {
-   import("../../../components/LearningSpace/lessonData.json").then((mod) => setLesson(mod.default as Lesson));
+
+  const { token } = useUser();
+  const [isShowingPop, setIsShowingPop] = useState<boolean>(false);
+  const [lesson, setLesson] = useState<Lesson | null>();
+  const [loading, setLoading] = useState(false);
+
+  const [learningSpacesData, setLearningSpacesData] = useState<Lesson[]>();
+  useEffect(() => {
+    import("../../../components/LearningSpace/lessonData.json").then((mod) =>
+      setLesson(mod.default as Lesson),
+    );
   }, []);
+
+  // useEffect(() => {
+  //   async function fetchSpaces() {
+  //     setLoading(true);
+  //     try {
+  //       const data = await getLearningSpaces(token);
+  //       setLearningSpacesData(data.items || []);
+  //     } catch (err) {
+  //       console.error("Error fetching experiments:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  //   fetchSpaces();
+  // }, [token]);
 
   if (!lesson) {
     return (
@@ -75,63 +97,22 @@ useEffect(() => {
     );
   }
 
-
-
   const showSpacePopUp = () => {
-    setIsShowingPop(true)
-  }
+    setIsShowingPop(true);
+  };
 
   return (
     <div className="m-1">
       <WelcomeBanner firstName={firstName ? firstName : ""} />
       <StatCards stats={courseStats} />
-      <div className="m-4 mt-6 lg:mt-12 flex flex-col md:flex-row flex-wrap gap-5">
-        {/* <p className="text-sm lg:text-base font-semibold lg:ml-4">STEM Courses Coming Soon...</p>
-        <div className="rounded-md overflow-hidden flex flex-col w-56 bg-white">
-          <div className=" bg-blue-300 text-slate-700 py-16 w-full rounded-md flex items-center justify-center">
-            {" "}
-            Example Course
-          </div>
-          <div className="p-2 flex flex-col gap-3">
-            <div className="flex justify-between text-xs items-center">
-              <p className="p-0.5 px-1 bg-blue-200 rounded text-blue-600">
-                Dummy Course
-              </p>
-              <strong className="text-blue-600">Price</strong>
-            </div>
-            <p className=" text-xs">
-              {description.length < 16 ? description : truncatedDesc}
-            </p>
-            <div className="flex justify-between text-xs md:text-sm">
-              <strong className="flex items-center">
-                <IoMdStar className="text-bgBlue" />
-                5.0
-              </strong>
-              <p>
-                <strong>500k+ </strong>Students
-              </p>
-            </div>
-            <div className="flex justify-between text-xs">
-              <Link href="/dashboard/stem-courses/overview">
-                <button className="p-1 px-3 rounded-md bg-bgBlue text-white flex gap-1">
-                  <LuNotebookPen />
-                  Enroll
-                </button>
-              </Link>
+      <div className="m-4 mt-6 lg:mt-12 flex flex-col gap-5">
+        <p className="font-semibold lg:text-lg">Available Learning Spaces</p>
 
-              <button className="p-1 px-3 rounded-md flex bg-blue-50 text-blue-600 hover:bg-blue-100 gap-1">
-                <BiSolidEraser /> UnEnroll
-              </button>
-            </div>
-          </div>
-        </div> */}
-        
-         {/* // availableSpaces < 1 ? <p>No spaces available<p/> : <p>Available Spaces</p> */}
-         <p className="font-semibold lg:text-lg">Available Learning Spaces</p>
-        
+        <div className=" flex flex-row flex-wrap gap-5">
+          {/* // availableSpaces < 1 ? <p>No spaces available<p/> : <p>Available Spaces</p> */}
 
-         {/* Experiments Grid */}
-      {/* {!loading && lesson.length > 0 && (
+          {/* Learning Space Grid */}
+          {/* {!loading && lesson.length > 0 && (
         <>
           <div className="flex flex-wrap gap-4 m-4">
             {lesson.map((lab) => (
@@ -146,20 +127,31 @@ useEffect(() => {
             ))}
           </div> */}
 
-              <ExperimentCard
-                key={lesson.id}
-                lab={{
-                  title: lesson.title,
-                  url: "",
-                  description: lesson.subtitle,
-                }}
-              />
+          <SpaceCard
+            key={lesson.id}
+            lesson={{
+              id: lesson.id,
+              title: lesson.title,
+              url: lesson.subtitle,
+              description: lesson.subtitle,
+            }}
+            onOpenSpace={showSpacePopUp}
+          />
 
-              <button className="p-2 bg-slate-800 text-white rounded-md" onClick={showSpacePopUp}>Start Space</button>
+          {/* <button
+            className="p-2 bg-slate-800 text-white rounded-md"
+            onClick={showSpacePopUp}
+          >
+            Start Space
+          </button> */}
 
-          {
-            isShowingPop && <LearningSpace lessonId="lesson-001" popup onClose={() => setIsShowingPop(false)} />
-          }
+          {isShowingPop && (
+            <LearningSpace
+              lessonId="lesson-001"
+              popup
+              onClose={() => setIsShowingPop(false)}
+            />
+          )}
 
           {/* Pagination Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 mt-6">
@@ -187,7 +179,7 @@ useEffect(() => {
             </div> */}
 
             {/* Page Navigation */}
-             <div className="flex items-center gap-2"> 
+            <div className="flex items-center gap-2">
               {/* Previous Button */}
               {/* <button
                 onClick={() => handlePageChange(page - 1)}
@@ -248,19 +240,19 @@ useEffect(() => {
               </button> */}
             </div>
           </div>
-        {/* </> */}
-      {/* )} */}
+          {/* </> */}
+          {/* )} */}
 
-      {/* Empty State */}
-      {/* {!loading && experimentData.length === 0 && (
+          {/* Empty State */}
+          {/* {!loading && experimentData.length === 0 && (
         <div className="flex flex-col items-center justify-center p-12 text-gray-500">
           <p className="text-lg font-medium">No experiments found</p>
           <p className="text-sm mt-2">Try adjusting your filters</p>
         </div>
       )} */}
+        </div>
       </div>
     </div>
-
   );
 };
 

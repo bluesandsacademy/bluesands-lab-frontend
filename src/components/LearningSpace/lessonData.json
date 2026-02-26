@@ -4,20 +4,100 @@
   "subtitle": "Exploring why things float and sink",
   "steps": [
     {
+      "id": "pre-quiz",
+      "type": "pre-quiz",
+      "label": "Pre-Quiz",
+      "optional": true,
+      "enabled": true,
+      "quiz": {
+        "title": "Density & Floating \u2014 Pre-Quiz",
+        "duration": 5,
+        "questions": [
+          {
+            "id": "q1",
+            "question": "What does density measure?",
+            "options": [
+              "The size of an object",
+              "The mass per unit volume of a substance",
+              "The weight of an object in water",
+              "The temperature of a liquid"
+            ],
+            "correctAnswer": "The mass per unit volume of a substance",
+            "explanation": "Density is defined as mass divided by volume (D = m/v). It tells us how much matter is packed into a given space."
+          },
+          {
+            "id": "q2",
+            "question": "An object will float in water if its density is:",
+            "options": [
+              "Greater than 1.0 g/cm\u00b3",
+              "Equal to 1.0 g/cm\u00b3",
+              "Less than 1.0 g/cm\u00b3",
+              "Less than 0.5 g/cm\u00b3 only"
+            ],
+            "correctAnswer": "Less than 1.0 g/cm\u00b3",
+            "explanation": "Water has a density of 1.0 g/cm\u00b3. Any object with a lower density will float; any object with a higher density will sink."
+          },
+          {
+            "id": "q3",
+            "question": "Which of the following objects would sink in water?",
+            "options": [
+              "A wooden log",
+              "An inflated balloon",
+              "A solid iron ball",
+              "A plastic bottle cap"
+            ],
+            "correctAnswer": "A solid iron ball",
+            "explanation": "Iron has a density of about 7.87 g/cm\u00b3, which is much greater than water's 1.0 g/cm\u00b3, so it sinks."
+          },
+          {
+            "id": "q4",
+            "question": "Why does a large steel ship float even though steel is denser than water?",
+            "options": [
+              "Steel becomes less dense in salt water",
+              "The ship's hollow hull lowers its overall density below water",
+              "Ships use special anti-gravity technology",
+              "The weight of the water pushes the ship up"
+            ],
+            "correctAnswer": "The ship's hollow hull lowers its overall density below water",
+            "explanation": "The hollow hull means the ship displaces a large volume of water. Its total mass divided by total volume gives an overall density less than 1.0 g/cm\u00b3."
+          },
+          {
+            "id": "q5",
+            "question": "If you compress a floating object to half its volume without changing its mass, what happens?",
+            "options": [
+              "It still floats \u2014 mass didn't change",
+              "It sinks \u2014 its density has doubled",
+              "It floats higher \u2014 it's smaller now",
+              "Nothing changes"
+            ],
+            "correctAnswer": "It sinks \u2014 its density has doubled",
+            "explanation": "Density = mass / volume. Halving the volume while keeping mass the same doubles the density, which may push it above 1.0 g/cm\u00b3 and cause it to sink."
+          }
+        ]
+      }
+    },
+    {
       "id": "orientation",
       "type": "orientation",
       "label": "Orientation",
-      "stepNumber": 1,
-      "totalSteps": 6,
       "guidingQuestion": "Why do some objects float while others sink?",
       "mediaUrl": null,
       "poll": {
         "prompt": "What do you think?",
         "subtext": "Share your initial thought before we explore",
         "options": [
-          { "id": "size",     "label": "It depends on size" },
-          { "id": "material", "label": "It depends on material" },
-          { "id": "unsure",   "label": "I'm not sure yet" }
+          {
+            "id": "size",
+            "label": "It depends on size"
+          },
+          {
+            "id": "material",
+            "label": "It depends on material"
+          },
+          {
+            "id": "unsure",
+            "label": "I'm not sure yet"
+          }
         ],
         "defaultSelected": "unsure"
       }
@@ -26,33 +106,184 @@
       "id": "hypothesis",
       "type": "hypothesis",
       "label": "Hypothesis",
-      "stepNumber": 2,
-      "totalSteps": 6,
       "framingQuestion": "What will happen if we increase the density of an object placed in water?",
       "inputPlaceholder": "I think that...",
       "inputSubtext": "Write what you think will happen and why.",
       "peers": [
-        { "id": "p1", "initials": "AM", "name": "Alex M.",   "avatarColor": "bg-violet-400", "text": "I think it will sink faster because the density pushes it down." },
-        { "id": "p2", "initials": "SK", "name": "Sam K.",    "avatarColor": "bg-rose-400",   "text": "No change will happen — temperature might matter more." },
-        { "id": "p3", "initials": "JP", "name": "Jordan P.", "avatarColor": "bg-teal-400",   "text": "If density increases beyond the liquid, it sinks." }
+        {
+          "id": "p1",
+          "initials": "AM",
+          "name": "Alex M.",
+          "avatarColor": "bg-violet-400",
+          "text": "I think it will sink faster because the density pushes it down."
+        },
+        {
+          "id": "p2",
+          "initials": "SK",
+          "name": "Sam K.",
+          "avatarColor": "bg-rose-400",
+          "text": "No change will happen \u2014 temperature might matter more."
+        },
+        {
+          "id": "p3",
+          "initials": "JP",
+          "name": "Jordan P.",
+          "avatarColor": "bg-teal-400",
+          "text": "If density increases beyond the liquid, it sinks."
+        }
       ]
     },
     {
       "id": "experiment",
       "type": "experiment",
       "label": "Experiment",
-      "stepNumber": 3,
-      "totalSteps": 6,
+      "phetUrl": "https://phet.colorado.edu/sims/html/density/latest/density_en.html",
+      "objectives": [
+        "Observe how changing an object's mass affects whether it floats or sinks.",
+        "Compare the density of different materials to water (1.0 g/cm\u00b3).",
+        "Record what happens when density goes above and below 1.0 g/cm\u00b3."
+      ],
       "observationPrompt": "What did you notice when density increased?",
       "observationPlaceholder": "I observed that...",
-      "controls": [
-        { "id": "density",     "label": "Density",     "min": 0.5, "max": 2.0, "step": 0.1, "default": 1.0, "unit": "g/cm" },
-        { "id": "volume",      "label": "Volume",      "min": 10,  "max": 100, "step": 5,   "default": 50,  "unit": "ml"   },
-        { "id": "temperature", "label": "Temperature", "min": 0,   "max": 100, "step": 5,   "default": 25,  "unit": "°C"   }
+      "postSimQuiz": [
+        {
+          "id": "psq-1",
+          "question": "What happens to an object when its density is greater than water (1.0 g/cm\u00b3)?",
+          "options": [
+            "It floats",
+            "It sinks",
+            "It dissolves",
+            "Nothing changes"
+          ],
+          "correctAnswer": "It sinks"
+        },
+        {
+          "id": "psq-2",
+          "question": "Which variable most directly determines if an object floats?",
+          "options": [
+            "Size",
+            "Color",
+            "Density relative to the liquid",
+            "Temperature"
+          ],
+          "correctAnswer": "Density relative to the liquid"
+        },
+        {
+          "id": "psq-3",
+          "question": "A hollow steel ship floats because its overall density is:",
+          "options": [
+            "Greater than water",
+            "Equal to steel",
+            "Less than water",
+            "Equal to air"
+          ],
+          "correctAnswer": "Less than water"
+        }
       ]
     },
-    { "id": "discussion", "type": "discussion", "label": "Discussion", "stepNumber": 4, "totalSteps": 6 },
-    { "id": "real-world",  "type": "real-world",  "label": "Real World",  "stepNumber": 5, "totalSteps": 6 },
-    { "id": "assessment",  "type": "assessment",  "label": "Assessment",  "stepNumber": 6, "totalSteps": 6 }
+    {
+      "id": "discussion",
+      "type": "discussion",
+      "label": "Discussion",
+      "reflectionPrompt": "Did your results match your hypothesis? Why or why not?",
+      "reflectionPlaceholder": "Post My Reflection...",
+      "classDiscussion": [
+        {
+          "id": "d1",
+          "initials": "MI",
+          "name": "Mfariso Ibokette",
+          "role": "Learner",
+          "time": "just now",
+          "avatarColor": "bg-orange-400",
+          "text": "I hope to learn how to secure my local area network."
+        },
+        {
+          "id": "d2",
+          "initials": "MJ",
+          "name": "Mr Okon James",
+          "role": "Learner",
+          "time": "just now",
+          "avatarColor": "bg-teal-500",
+          "text": "My name is Mfariso Ibokette, a passionate UI/UX Designer dedicated to building intuitive digital experiences."
+        },
+        {
+          "id": "d3",
+          "initials": "RV",
+          "name": "Rames Vadakki",
+          "role": "Learner",
+          "time": "just now",
+          "avatarColor": "bg-rose-400",
+          "text": "I noticed the object sank immediately once the density slider passed 1.0."
+        },
+        {
+          "id": "d4",
+          "initials": "CM",
+          "name": "Charity Musare",
+          "role": "Learner",
+          "time": "just now",
+          "avatarColor": "bg-violet-400",
+          "text": "With experience across STEM education platforms, I design with clarity and measurable impact."
+        }
+      ]
+    },
+    {
+      "id": "real-world",
+      "type": "real-world",
+      "label": "Real World",
+      "examples": [
+        {
+          "id": "e1",
+          "title": "Ships Floating on Water",
+          "imageUrl": null,
+          "description": "Despite being made of heavy steel, ships are designed with hollow hulls to reduce overall density below that of water."
+        },
+        {
+          "id": "e2",
+          "title": "Hot Air Balloons",
+          "imageUrl": null,
+          "description": "Heating air inside the balloon reduces its density, making it lighter than the surrounding cooler air."
+        },
+        {
+          "id": "e3",
+          "title": "Oil & Water Separation",
+          "imageUrl": null,
+          "description": "Oil floats on water because it has a lower density. This principle is used in environmental cleanup."
+        }
+      ],
+      "optionalTask": {
+        "prompt": "Find one real-world example near you where density plays a role. Describe it below or upload a photo!",
+        "placeholder": "I noticed that..."
+      }
+    },
+    {
+      "id": "assessment",
+      "type": "assessment",
+      "label": "Assessment",
+      "score": 3,
+      "maxScore": 10,
+      "teacherFeedbackPending": true,
+      "completionItems": [
+        {
+          "id": "c1",
+          "label": "Pre-Quiz Completed"
+        },
+        {
+          "id": "c2",
+          "label": "Hypothesis Submitted"
+        },
+        {
+          "id": "c3",
+          "label": "Experiment Completed"
+        },
+        {
+          "id": "c4",
+          "label": "Reflection Posted"
+        },
+        {
+          "id": "c5",
+          "label": "Assessment Submitted"
+        }
+      ]
+    }
   ]
 }
