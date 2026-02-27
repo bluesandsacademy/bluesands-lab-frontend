@@ -579,6 +579,9 @@ export const CreateLearningSpaceModal = ({
     setCurrentStep((s) => Math.min(s + 1, 2));
   };
 
+//correct here
+const myvar = ""
+
   const handleBack = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
   // ── Submit ────────────────────────────────────────────────────────────────
