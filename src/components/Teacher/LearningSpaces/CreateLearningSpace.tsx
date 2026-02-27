@@ -15,6 +15,8 @@ import {
   FaSave,
   FaTrash,
   FaChevronRight,
+  FaToggleOn,
+  FaToggleOff,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 
@@ -398,18 +400,22 @@ export const CreateLearningSpaceModal = ({
 }: CreateLearningSpaceModalProps) => {
   const { user, token } = useUser();
 
-  // Step: 0 = Setup, 1 = Pre-Quiz, 2 = Post-Quiz
+  // Step: 0 = Setup, 1 = Pre-Quiz, 2 = Orientation, 3 = Post-Quiz
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+
+  // ── FIX: separate tag inputs so Enter only adds to the correct array ──
   const [tagInput, setTagInput] = useState("");
-  const [realWorldInput, setRealWorldInput] = useState("")
-  const [careersInput, setCareersInput] = useState("")
+  const [realWorldInput, setRealWorldInput] = useState("");
+  const [careersInput, setCareersInput] = useState("");
+
+  // ── Pre-quiz optional toggle ──────────────────────────────────────────
+  const [includePreQuiz, setIncludePreQuiz] = useState(true);
+
   const [loading, setLoading] = useState(false);
   const [activeSubject, setActiveSubject] = useState<string>("");
-  const [experimentData, setExperimentData] = useState<ExperimentResponse[]>(
-    [],
-  );
+  const [experimentData, setExperimentData] = useState<ExperimentResponse[]>([]);
   const [fetchFilters, setFetchFilters] = useState({
     physics: "",
     chemistry: "",
@@ -473,6 +479,8 @@ export const CreateLearningSpaceModal = ({
     });
   };
 
+  // ── Tags ──────────────────────────────────────────────────────────────────
+
   const handleTagKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim()) {
       e.preventDefault();
@@ -494,29 +502,61 @@ export const CreateLearningSpaceModal = ({
   const handleRemoveTag = (tag: string) =>
     setFormData({ ...formData, tags: formData.tags.filter((t) => t !== tag) });
 
+  // ── Real-World Applications ───────────────────────────────────────────────
+
+  // FIX: dedicated Enter handler for the real-world input
+  const handleRwaKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && realWorldInput.trim()) {
+      e.preventDefault();
+      handleAddRwa();
+    }
+  };
+
   const handleAddRwa = () => {
     const newRwa = realWorldInput.trim();
     if (newRwa && !formData.realWorldApplications.includes(newRwa)) {
-      setFormData({ ...formData, realWorldApplications: [...formData.realWorldApplications, newRwa] });
+      setFormData({
+        ...formData,
+        realWorldApplications: [...formData.realWorldApplications, newRwa],
+      });
       setRealWorldInput("");
     }
   };
 
   const handleRemoveRwa = (rwa: string) =>
-    setFormData({ ...formData, realWorldApplications: formData.realWorldApplications.filter((r) => r !== rwa) });
+    setFormData({
+      ...formData,
+      realWorldApplications: formData.realWorldApplications.filter(
+        (r) => r !== rwa,
+      ),
+    });
 
+  // ── Related Careers ───────────────────────────────────────────────────────
+
+  // FIX: dedicated Enter handler for the careers input
+  const handleCareerKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && careersInput.trim()) {
+      e.preventDefault();
+      handleAddCareer();
+    }
+  };
 
   const handleAddCareer = () => {
     const newCareer = careersInput.trim();
     if (newCareer && !formData.relatedCareers.includes(newCareer)) {
-      setFormData({ ...formData, relatedCareers: [...formData.relatedCareers, newCareer] });
+      setFormData({
+        ...formData,
+        relatedCareers: [...formData.relatedCareers, newCareer],
+      });
       setCareersInput("");
     }
   };
 
   const handleRemoveCareer = (career: string) =>
-    setFormData({ ...formData, relatedCareers: formData.relatedCareers.filter((c) => c !== career) });
-
+    setFormData({
+      ...formData,
+      relatedCareers: formData.relatedCareers.filter((c) => c !== career),
+    });
 
   // ── Validation ────────────────────────────────────────────────────────────
 
@@ -529,10 +569,10 @@ export const CreateLearningSpaceModal = ({
       toast.error("Please enter a learning objective");
       return false;
     }
-    if (!formData.score) {
-      toast.error("Please select a score");
-      return false;
-    }
+    // if (!formData.score) {
+    //   toast.error("Please select a score");
+    //   return false;
+    // }
     if (!formData.duration) {
       toast.error("Please select a duration");
       return false;
@@ -570,17 +610,19 @@ export const CreateLearningSpaceModal = ({
   // ── Navigation ────────────────────────────────────────────────────────────
 
   const handleNext = () => {
+    // Step 0 → validate setup
     if (currentStep === 0 && !validateSetup()) return;
+
+    // Step 1 → validate pre-quiz only if teacher chose to include it
     if (
       currentStep === 1 &&
+      includePreQuiz &&
       !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")
     )
       return;
-    setCurrentStep((s) => Math.min(s + 1, 2));
-  };
 
-//correct here
-const myvar = ""
+    setCurrentStep((s) => Math.min(s + 1, STEPS.length - 1));
+  };
 
   const handleBack = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
@@ -604,7 +646,8 @@ const myvar = ""
 
   const handlePublish = async () => {
     if (!validateSetup()) return;
-    if (!validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")) return;
+    // FIX: only validate pre-quiz if it is included
+    if (includePreQuiz && !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")) return;
     if (!validateQuiz(formData.postSimAssessment, "Post-Sim Quiz")) return;
     try {
       setIsLoading(true);
@@ -687,12 +730,12 @@ const myvar = ""
 
             <Section
               icon={<GradeIcon />}
-              title="Score & Duration"
-              subtitle="Set the appropriate score and time allocation"
+              title="Duration"
+              subtitle="Set time allocation"
               color="green"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 gap-4">
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Score
                   </label>
@@ -709,7 +752,7 @@ const myvar = ""
                       </option>
                     ))}
                   </select>
-                </div>
+                </div> */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Duration
@@ -845,29 +888,70 @@ const myvar = ""
             subtitle="Test prior knowledge before students begin the simulation"
             color="orange"
           >
-            <QuizEditor
-              label="Pre-Simulation Quiz"
-              data={formData.preSimAssessment}
-              onChange={(updated) =>
-                setFormData({ ...formData, preSimAssessment: updated })
-              }
-            />
+            {/* Toggle */}
+            <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-gray-800">
+                  Include Pre-Simulation Quiz
+                </p>
+                <p className="text-xs text-gray-500">
+                  Turn off to skip this assessment
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIncludePreQuiz((v) => !v)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors
+                  ${includePreQuiz ? "bg-blue-950 text-white" : "bg-gray-200 text-gray-600"}`}
+              >
+                {includePreQuiz ? (
+                  <>
+                    <FaToggleOn className="w-4 h-4" /> Enabled
+                  </>
+                ) : (
+                  <>
+                    <FaToggleOff className="w-4 h-4" /> Disabled
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Quiz form — only shown when toggled on */}
+            {includePreQuiz && (
+              <QuizEditor
+                label="Pre-Simulation Quiz"
+                data={formData.preSimAssessment}
+                onChange={(updated) =>
+                  setFormData({ ...formData, preSimAssessment: updated })
+                }
+              />
+            )}
+
+            {/* Skipped state */}
+            {!includePreQuiz && (
+              <div className="flex flex-col items-center justify-center py-10 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-lg mt-2">
+                <FaToggleOff className="w-8 h-8 mb-2 text-gray-300" />
+                <p className="text-sm font-medium text-gray-500">
+                  Pre-simulation quiz is disabled
+                </p>
+                <p className="text-xs mt-1">
+                  Students will go directly to the simulation.
+                </p>
+              </div>
+            )}
           </Section>
         )}
 
-
+        {/* ── Step 2: Orientation ── */}
         {currentStep === 2 && (
           <>
-          <Section
-              icon={<TargetIcon />}
+            <Section
+              icon={<BookIcon />}
               title="Teacher Introduction Message"
               subtitle="Message from the teacher"
               color="orange"
             >
               <div>
-                {/* <label className="block text-sm font-medium text-gray-700 mb-1">
-                  
-                </label> */}
                 <textarea
                   name="introductionMessage"
                   value={formData.introductionMessage}
@@ -886,37 +970,31 @@ const myvar = ""
               color="blue"
             >
               <div>
-                {/* <label className="block text-sm font-medium text-gray-700 mb-1">
-                  
-                </label> */}
                 <input
                   type="text"
                   name="engagementQuestion"
                   value={formData.engagementQuestion}
                   onChange={handleChange}
                   placeholder="e.g Why do some things float or sink?"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                 />
               </div>
             </Section>
 
             <Section
-              icon={<TargetIcon />}
+              icon={<LabIcon />}
               title="Discussion Prompt"
               subtitle="A question or debate topic for after the experiment."
               color="green"
             >
               <div>
-                {/* <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Question to spark curiosity before the experiment
-                </label> */}
                 <input
                   type="text"
                   name="discussionPrompt"
                   value={formData.discussionPrompt}
                   onChange={handleChange}
                   placeholder="e.g Was your hypothesis correct? What would you do differently?"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                 />
               </div>
             </Section>
@@ -925,7 +1003,7 @@ const myvar = ""
               icon={<TargetIcon />}
               title="Real-World Applications"
               subtitle=""
-              color="blue"
+              color="orange"
             >
               <div>
                 <div className="flex gap-2">
@@ -933,8 +1011,9 @@ const myvar = ""
                     type="text"
                     value={realWorldInput}
                     onChange={(e) => setRealWorldInput(e.target.value)}
-                    onKeyDown={handleTagKeyDown}
-                    placeholder="e.g Ships Floating in water use Archimedes principle..."
+                    // FIX: use dedicated handler so Enter adds to realWorldApplications
+                    onKeyDown={handleRwaKeyDown}
+                    placeholder="e.g Ships floating in water use Archimedes principle..."
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                   />
                   <button
@@ -968,7 +1047,7 @@ const myvar = ""
             </Section>
 
             <Section
-              icon={<TagIcon />}
+              icon={<GradeIcon />}
               title="Related Occupations / Careers"
               subtitle=""
               color="red"
@@ -979,8 +1058,9 @@ const myvar = ""
                     type="text"
                     value={careersInput}
                     onChange={(e) => setCareersInput(e.target.value)}
-                    onKeyDown={handleTagKeyDown}
-                    placeholder="Type a tag and press Enter..."
+                    // FIX: use dedicated handler so Enter adds to relatedCareers
+                    onKeyDown={handleCareerKeyDown}
+                    placeholder="Type a career and press Enter..."
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                   />
                   <button
@@ -1017,23 +1097,20 @@ const myvar = ""
               icon={<TargetIcon />}
               title="Student Real-World Task"
               subtitle="A prompt asking students to find an example in their own life."
-              color="blue"
+              color="purple"
             >
               <div>
-                {/* <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Question to spark curiosity before the experiment
-                </label> */}
                 <input
                   type="text"
                   name="realWorldTask"
                   value={formData.realWorldTask}
                   onChange={handleChange}
                   placeholder="e.g Find one real world example near you and describe the connection"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                 />
               </div>
             </Section>
-            </>
+          </>
         )}
 
         {/* ── Step 3: Post-Sim Quiz ── */}
@@ -1080,8 +1157,8 @@ const myvar = ""
             {currentStep === 0 ? "Cancel" : "Back"}
           </button>
 
-          {/* Next — visible on steps 0 and 1 */}
-          {currentStep < 3 && (
+          {/* Next — visible on steps 0–2 */}
+          {currentStep < STEPS.length - 1 && (
             <button
               onClick={handleNext}
               className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
@@ -1092,7 +1169,7 @@ const myvar = ""
           )}
 
           {/* Publish — only on last step */}
-          {currentStep === 3 && (
+          {currentStep === STEPS.length - 1 && (
             <button
               onClick={handlePublish}
               disabled={isLoading || isSavingDraft}
