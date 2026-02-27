@@ -1,67 +1,73 @@
-import React from "react";
-import { BsBook } from "react-icons/bs";
-import { CgNotes } from "react-icons/cg";
-import { FaClock, FaPlus } from "react-icons/fa";
+"use client"
 
-const spaces = [
-  {
-    title: "Newton first law",
-    preSim: false,
-    postSim: true,
-    draft: true,
-    published:true,
-    points: 100,
-    time: "30 minutes",
-  },
-  {
-    title: "Newton first law",
-    preSim: true,
-    postSim: true,
-    draft: true,
-    published:false,
-    points: 100,
-    time: "30 minutes",
-  },
-  {
-    title: "Newton first law",
-    preSim: true,
-    postSim: true,
-    draft: true,
-    published:false,
-    points: 100,
-    time: "30 minutes",
-  },
-  {
-    title: "Newton first law",
-    preSim: false,
-    postSim: true,
-    draft: true,
-    published: true,
-    points: 100,
-    time: "30 minutes",
-  },
-  {
-    title: "Newton first law",
-    preSim: false,
-    postSim: true,
-    draft: true,
-    published:false,
-    points: 100,
-    time: "30 minutes",
-  },
-  {
-    title: "Newton first law",
-    preSim: true,
-    postSim: true,
-    draft: true,
-    published:false,
-    points: 100,
-    time: "30 minutes",
-  },
+import { CreateLearningSpaceModal } from "@/components/Teacher/LearningSpaces/CreateLearningSpace";
+import React, { useState } from "react";
+import { BsBook } from "react-icons/bs";
+//import { CgNotes } from "react-icons/cg";
+import { FaPlus } from "react-icons/fa";
+import { LuClock3 } from "react-icons/lu";
+import { SlOptionsVertical } from "react-icons/sl";
+
+const spaces: any[] = [
+  // {
+  //   title: "Newton first law",
+  //   preSim: false,
+  //   postSim: true,
+  //   draft: true,
+  //   published: true,
+  //   points: 100,
+  //   time: "30 minutes",
+  // },
+  // {
+  //   title: "Newton first law",
+  //   preSim: true,
+  //   postSim: true,
+  //   draft: true,
+  //   published: false,
+  //   points: 100,
+  //   time: "30 minutes",
+  // },
+  // {
+  //   title: "Newton first law",
+  //   preSim: true,
+  //   postSim: true,
+  //   draft: true,
+  //   published: false,
+  //   points: 100,
+  //   time: "30 minutes",
+  // },
+  // {
+  //   title: "Newton first law",
+  //   preSim: false,
+  //   postSim: true,
+  //   draft: true,
+  //   published: true,
+  //   points: 100,
+  //   time: "30 minutes",
+  // },
+  // {
+  //   title: "Newton first law",
+  //   preSim: false,
+  //   postSim: true,
+  //   draft: true,
+  //   published: false,
+  //   points: 100,
+  //   time: "30 minutes",
+  // },
+  // {
+  //   title: "Newton first law",
+  //   preSim: true,
+  //   postSim: true,
+  //   draft: true,
+  //   published: false,
+  //   points: 100,
+  //   time: "30 minutes",
+  // },
 ];
 
-
 const TeacherLearningSpacePage = () => {
+  const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
+
   return (
     <div className="flex flex-col gap-4 lg:gap-12 p-2 md:p-4 lg:p-8">
       {/* Section */}
@@ -74,7 +80,7 @@ const TeacherLearningSpacePage = () => {
         </div>
 
         <button
-          // onClick={() => setIsCreateSpaceOpen(true)}
+          onClick={() => setIsCreateSpaceOpen(true)}
           className="bg-blue-800 text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
         >
           {" "}
@@ -84,7 +90,13 @@ const TeacherLearningSpacePage = () => {
 
       {/* Section */}
       <div>
-        <input type="search" name="" id="" />
+        <input
+          type="search"
+          name=""
+          id=""
+          placeholder="Search learning spaces"
+          className="p-2 rounded-md border border-gray-200"
+        />
       </div>
 
       {/* Section */}
@@ -107,7 +119,7 @@ const TeacherLearningSpacePage = () => {
               based teaching.
             </p>
             <button
-              // onClick={() => setIsCreateSpaceOpen(true)}
+              onClick={() => setIsCreateSpaceOpen(true)}
               className="bg-blue-800 text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
             >
               {" "}
@@ -117,29 +129,45 @@ const TeacherLearningSpacePage = () => {
         )}
         {spaces.map((space, index) => (
           // Card
-          <div className="flex flex-col gap-2 bg-white rounded-md border border-gray-200 p-4">
+          <div className="flex flex-col gap-2 lg:gap-4 bg-white rounded-md border border-gray-200 p-4">
             <div className="flex justify-between">
-              <div className="flex gap-2">
-                <p>icon</p>
-                <p>{space.title}</p>
+              <div className="flex gap-2 items-center">
+                <div className="flex items-center justify-center rounded-full bg-indigo-200 p-2">
+                  <BsBook className="text-2xl text-indigo-700" />
+                </div>
+                <p className="lg:text-lg font-semibold">{space.title}</p>
               </div>
               <div>
-                <p>opt</p>
+                <button>
+                  <SlOptionsVertical />
+                </button>
               </div>
             </div>
             <div className="flex flex-row gap-4">
-              <p>{space.points} Points</p>
+              <p className="p-0.5 px-1 rounded bg-gray-200">
+                {space.points} Points
+              </p>
               <p className="flex gap-2 items-center">
-                <FaClock /> {space.time}
+                <LuClock3 /> {space.time}
               </p>
             </div>
             <div>
-              {space.preSim && <p>Pre-sim quiz available</p>}
-              {space.postSim && <p>Post-sim quiz available</p>}
+              {space.preSim && (
+                <p className="text-gray-400">Pre-sim quiz available</p>
+              )}
+              {/* {space.postSim && <p>Post-sim quiz available</p>} */}
             </div>
           </div>
         ))}
       </div>
+
+      {isCreateSpaceOpen && (
+        <CreateLearningSpaceModal
+          isOpen={isCreateSpaceOpen}
+          onClose={() => setIsCreateSpaceOpen(false)}
+          //onSuccess={() => refetchSpaces()}
+        />
+      )}
     </div>
   );
 };
