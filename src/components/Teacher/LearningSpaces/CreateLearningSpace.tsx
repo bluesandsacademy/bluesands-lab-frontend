@@ -1,5 +1,6 @@
 import { Modal } from "@/components/School/Dashboard/UserMgt/SchoolUserManagementModals";
 import { getPhetSimulations } from "@/services/dashboard-service";
+import { addLearningSpace, publishLearningSpace } from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
 import { useState, KeyboardEvent, useEffect } from "react";
 import {
@@ -53,7 +54,8 @@ type FormData = {
   tags: string[];
   introductionMessage: string;
   engagementQuestion: string;
-  experimentProcedures: string;
+  hypothesisQuestion: string;
+  experimentProcedures: string[];
   discussionPrompt: string;
   realWorldApplications: string[];
   relatedCareers: string[];
@@ -113,7 +115,7 @@ const SIMULATION_SUBJECT: SimulationTool[] = [
   },
 ];
 
-const SCORES = ["10", "20", "50", "100"];
+//const SCORES = ["10", "20", "50", "100"];
 
 const DURATION_OPTIONS = [
   "15 minutes",
@@ -405,17 +407,20 @@ export const CreateLearningSpaceModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
 
-  // ── FIX: separate tag inputs so Enter only adds to the correct array ──
+  // ── Form array input states  ──────────────────────────────────────────
   const [tagInput, setTagInput] = useState("");
   const [realWorldInput, setRealWorldInput] = useState("");
   const [careersInput, setCareersInput] = useState("");
+  const [proceduresInput, setProceduresInput] = useState("");
 
   // ── Pre-quiz optional toggle ──────────────────────────────────────────
   const [includePreQuiz, setIncludePreQuiz] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [activeSubject, setActiveSubject] = useState<string>("");
-  const [experimentData, setExperimentData] = useState<ExperimentResponse[]>([]);
+  const [experimentData, setExperimentData] = useState<ExperimentResponse[]>(
+    [],
+  );
   const [fetchFilters, setFetchFilters] = useState({
     physics: "",
     chemistry: "",
@@ -437,7 +442,8 @@ export const CreateLearningSpaceModal = ({
     tags: [],
     introductionMessage: "",
     engagementQuestion: "",
-    experimentProcedures: "",
+    hypothesisQuestion: "",
+    experimentProcedures: [],
     discussionPrompt: "",
     realWorldApplications: [],
     relatedCareers: [],
@@ -533,7 +539,6 @@ export const CreateLearningSpaceModal = ({
 
   // ── Related Careers ───────────────────────────────────────────────────────
 
-  // FIX: dedicated Enter handler for the careers input
   const handleCareerKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && careersInput.trim()) {
       e.preventDefault();
@@ -556,6 +561,32 @@ export const CreateLearningSpaceModal = ({
     setFormData({
       ...formData,
       relatedCareers: formData.relatedCareers.filter((c) => c !== career),
+    });
+
+    // ── Experiment Procedures ───────────────────────────────────────────────────────
+
+  const handleProceduresKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && proceduresInput.trim()) {
+      e.preventDefault();
+      handleAddProcedure();
+    }
+  };
+
+  const handleAddProcedure = () => {
+    const newProcedure = proceduresInput.trim();
+    if (newProcedure && !formData.experimentProcedures.includes(newProcedure)) {
+      setFormData({
+        ...formData,
+        experimentProcedures: [...formData.experimentProcedures, newProcedure],
+      });
+      setProceduresInput("");
+    }
+  };
+
+  const handleRemoveProcedure = (procedure: string) =>
+    setFormData({
+      ...formData,
+      experimentProcedures: formData.experimentProcedures.filter((p) => p !== procedure),
     });
 
   // ── Validation ────────────────────────────────────────────────────────────
@@ -635,7 +666,10 @@ export const CreateLearningSpaceModal = ({
     }
     try {
       setIsSavingDraft(true);
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      //await new Promise((resolve) => setTimeout(resolve, 800));
+      // const res = await addLearningSpace(formData);
+      // console.log(res)
+      await addLearningSpace(formData);
       toast.success("Draft saved successfully");
     } catch {
       toast.error("Failed to save draft");
@@ -647,11 +681,19 @@ export const CreateLearningSpaceModal = ({
   const handlePublish = async () => {
     if (!validateSetup()) return;
     // FIX: only validate pre-quiz if it is included
-    if (includePreQuiz && !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")) return;
+    if (
+      includePreQuiz &&
+      !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")
+    )
+      return;
     if (!validateQuiz(formData.postSimAssessment, "Post-Sim Quiz")) return;
     try {
       setIsLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      //I M P O R T A N T   T O   D O
+     // await publishLearningSpace(saveAsDraft then fetch id then publish)
+
       toast.success("Learning space published successfully");
       onSuccess?.();
       onClose();
@@ -982,7 +1024,90 @@ export const CreateLearningSpaceModal = ({
             </Section>
 
             <Section
+              icon={<BookIcon />}
+              title="Hypothesis Question"
+              subtitle="Ask a question to spark curiosity"
+              color="red"
+            >
+              <div>
+                <input
+                  type="text"
+                  name="hypothesisQuestion"
+                  value={formData.hypothesisQuestion}
+                  onChange={handleChange}
+                  placeholder="e.g What will happen if we increase the density of an object in water?"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                />
+              </div>
+            </Section>
+
+            {/* <Section
               icon={<LabIcon />}
+              title="Experiment Procedures"
+              subtitle="Step-by-step procedures to guide the student in carrying out the experiment"
+              color="orange"
+            >
+              <div>
+                <textarea
+                  name="experimentProcedures"
+                  value={formData.experimentProcedures}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder=""
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 resize-none"
+                />
+              </div>
+            </Section> */}
+
+            <Section
+              icon={<LabIcon />}
+              title="Experiment Procedures"
+              subtitle="Step-by-step procedures to guide the student in carrying out the experiment"
+              color="orange"
+            >
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={proceduresInput}
+                    onChange={(e) => setProceduresInput(e.target.value)}
+                    onKeyDown={handleProceduresKeyDown}
+                    placeholder="Type in a procedure and press Enter..."
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddProcedure}
+                    className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-600"
+                  >
+                    <FaPlus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {formData.experimentProcedures.length > 0 && (
+                  <div className="flex flex-col gap-2 mt-3">
+                    {formData.experimentProcedures.map((procedure) => (
+                      <span
+                        key={procedure}
+                        className="flex items-center justify-between gap-1 px-2.5 py-1 bg-blue-50 text-blue-900 text-xs rounded-full border border-blue-200"
+                      >
+                        {procedure}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveProcedure(procedure)}
+                          className="hover:text-red-500 transition-colors"
+                        >
+                          <FaTimes className="w-2.5 h-2.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Section>
+
+
+            <Section
+              icon={<TagIcon />}
               title="Discussion Prompt"
               subtitle="A question or debate topic for after the experiment."
               color="green"
@@ -1058,7 +1183,6 @@ export const CreateLearningSpaceModal = ({
                     type="text"
                     value={careersInput}
                     onChange={(e) => setCareersInput(e.target.value)}
-                    // FIX: use dedicated handler so Enter adds to relatedCareers
                     onKeyDown={handleCareerKeyDown}
                     placeholder="Type a career and press Enter..."
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
