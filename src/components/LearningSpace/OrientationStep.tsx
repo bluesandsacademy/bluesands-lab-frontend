@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FiPlay, FiArrowRight } from "react-icons/fi";
+import { FiPlay, FiArrowRight, FiMic, FiCheckCircle } from "react-icons/fi";
 
 export default function OrientationStep({ data, onContinue }: any) {
   const [selected, setSelected] = useState(data.poll.defaultSelected);
+  const [text, setText] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -40,7 +42,7 @@ export default function OrientationStep({ data, onContinue }: any) {
       </div> */}
 
       {/* Poll */}
-      <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+      {/* <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <p className="text-xs font-bold uppercase tracking-widest text-gray-700">{data.poll.prompt}</p>
         <p className="mb-4 mt-1 text-sm text-gray-400">{data.poll.subtext}</p>
         <div className="flex flex-col gap-3">
@@ -63,7 +65,42 @@ export default function OrientationStep({ data, onContinue }: any) {
             </label>
           ))}
         </div>
-      </div>
+      </div> */}
+
+      {/* Orientation answer input */}
+            <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+              <div className="mb-3 flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">What do you think?</p>
+                  <p className="text-xs text-gray-400">{data.poll.subtext}</p>
+                </div>
+                <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 transition hover:border-indigo-300 hover:text-indigo-500">
+                  <FiMic size={12} /> Voice
+                </button>
+              </div>
+      
+              <textarea
+                rows={3}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder={data.inputPlaceholder}
+                className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-indigo-400 focus:bg-white"
+              />
+      
+              {submitted ? (
+                <div className="mt-3 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-600">
+                  <FiCheckCircle /> Your answer is submitted!
+                </div>
+              ) : (
+                <button
+                  disabled={!text.trim()}
+                  onClick={() => setSubmitted(true)}
+                  className="mt-3 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Submit Answer
+                </button>
+              )}
+            </div>
 
       <div className="flex justify-end">
         <button
