@@ -1,6 +1,9 @@
 import { Modal } from "@/components/School/Dashboard/UserMgt/SchoolUserManagementModals";
 import { getPhetSimulations } from "@/services/dashboard-service";
-import { addLearningSpace, publishLearningSpace } from "@/services/learningSpaceService";
+import {
+  addLearningSpace,
+  publishLearningSpace,
+} from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
 import { useState, KeyboardEvent, useEffect } from "react";
 import {
@@ -563,7 +566,7 @@ export const CreateLearningSpaceModal = ({
       relatedCareers: formData.relatedCareers.filter((c) => c !== career),
     });
 
-    // ── Experiment Procedures ───────────────────────────────────────────────────────
+  // ── Experiment Procedures ───────────────────────────────────────────────────────
 
   const handleProceduresKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && proceduresInput.trim()) {
@@ -586,7 +589,9 @@ export const CreateLearningSpaceModal = ({
   const handleRemoveProcedure = (procedure: string) =>
     setFormData({
       ...formData,
-      experimentProcedures: formData.experimentProcedures.filter((p) => p !== procedure),
+      experimentProcedures: formData.experimentProcedures.filter(
+        (p) => p !== procedure,
+      ),
     });
 
   // ── Validation ────────────────────────────────────────────────────────────
@@ -692,7 +697,7 @@ export const CreateLearningSpaceModal = ({
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       //I M P O R T A N T   T O   D O
-     // await publishLearningSpace(saveAsDraft then fetch id then publish)
+      // await publishLearningSpace(saveAsDraft then fetch id then publish)
 
       toast.success("Learning space published successfully");
       onSuccess?.();
@@ -1104,7 +1109,6 @@ export const CreateLearningSpaceModal = ({
                 )}
               </div>
             </Section>
-
 
             <Section
               icon={<TagIcon />}
