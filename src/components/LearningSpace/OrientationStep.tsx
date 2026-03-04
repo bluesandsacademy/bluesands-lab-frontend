@@ -28,7 +28,7 @@ export default function OrientationStep({ data, onContinue }: any) {
       </div>
 
       {/* Media */}
-      <div className="flex min-h-40 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50">
+      {/* <div className="flex min-h-40 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50">
         {data.mediaUrl ? (
           <video src={data.mediaUrl} controls className="w-full rounded-xl" />
         ) : (
@@ -37,7 +37,7 @@ export default function OrientationStep({ data, onContinue }: any) {
             <p className="text-sm">Media content will appear here</p>
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Poll */}
       <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">

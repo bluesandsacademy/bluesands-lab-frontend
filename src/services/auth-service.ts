@@ -1,4 +1,3 @@
-
 import apiClient from "./axios-instance";
 import { User } from "./UserContext";
 
@@ -79,13 +78,13 @@ export async function registerNewSchool(newSchool: SchoolObject) {
 
 export async function login(
   email: string,
-  password: string
+  password: string,
 ): Promise<{ user: User; token: string; isVerified: boolean }> {
   try {
     const res = await apiClient.post(
       "/api/auth/login",
       { email, password },
-      { withCredentials: true }
+      { withCredentials: true },
     );
 
     const loginResponse: LoginResponse = res.data;
@@ -133,9 +132,64 @@ export async function resendVerification(email: string) {
     await apiClient.post(
       "/api/auth/resend-verification",
       { email },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   } catch (error) {
     console.error("request failed", error);
+  }
+}
+
+export async function changePassword(
+  data: {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  },
+  token?: string | null,
+) {
+  try {
+    const res = await apiClient.post("/api/Auth/change-password", data, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Failed to change password:", error);
+    throw error;
+  }
+}
+
+export async function forgotPassword(
+  data: {
+    email: string;
+  },
+  token?: string | null,
+) {
+  try {
+    const res = await apiClient.post("/api/Auth/forgot-password", data, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Failed to make request:", error);
+    throw error;
+  }
+}
+
+export async function resetPassword(
+  data: {
+    token: string;
+    newPassword: string;
+    confirmPassword: string;
+  },
+  token?: string | null,
+) {
+  try {
+    const res = await apiClient.post("/api/Auth/reset-password", data, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Failed to reset password:", error);
+    throw error;
   }
 }
