@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-// import Link from "next/link";
 import { resetPassword } from "@/services/auth-service";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import router from "next/router";
+import { useSearchParams } from "next/navigation";
 
 export default function ForgotPassword() {
   const [formData, setFormData] = useState({
@@ -13,6 +13,11 @@ export default function ForgotPassword() {
   });
   const [passwordMatch, setPasswordMatch] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const params = useSearchParams();
+  const tokenParam = params.get("token");
+  if (!tokenParam) {
+    throw new Error("Token is missing");
+  }
 
   useEffect(() => {
     setPasswordMatch(
@@ -32,15 +37,11 @@ export default function ForgotPassword() {
     try {
       setIsLoading(true);
 
-      await resetPassword(
-        {
-          newPassword: formData.newPassword,
-          confirmPassword: formData.confirmPassword,
-          //   remember to handle this token when backend updates the server it should come as response from forgotpassword then pass here as token not as parameter
-          token: "",
-        },
-        // token
-      );
+      await resetPassword({
+        newPassword: formData.newPassword,
+        confirmPassword: formData.confirmPassword,
+        token: tokenParam,
+      });
 
       toast.success("Password changed successfully, proceed to login");
 
