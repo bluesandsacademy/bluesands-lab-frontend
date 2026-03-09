@@ -101,3 +101,28 @@ export async function publishLearningSpace(
     throw error;
   }
 }
+
+
+export async function assignLearningSpace(
+  spaceData: {
+    classID: string,
+    type: string
+  },
+  schoolId?: string | null,
+  token?: string | null
+) {
+  try {
+    const res = await apiClient.post(
+      "/api/assignments",
+      spaceData,
+      {
+        params: { schoolId },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Failed to assign learning space:", error);
+    throw error;
+  }
+}

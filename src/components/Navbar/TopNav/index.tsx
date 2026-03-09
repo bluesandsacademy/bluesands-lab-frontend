@@ -17,7 +17,8 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
     const [openLanguageDropdown, setOpenLanguageDropdown] = useState<boolean>(false);
     const [openSearchDropdown, setOpenSearchDropdown] = useState<boolean>(false);
     const pathname = usePathname();
-    const breadcrumb = pathname.split("/").filter((val) => val !== "")
+    // const breadcrumb = pathname.split("/").filter((val) => val !== "")
+    const breadcrumb = pathname .split("/") .filter((val) => val !== "") .slice(0, 2);
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
