@@ -694,10 +694,9 @@ export const CreateLearningSpaceModal = ({
     if (!validateQuiz(formData.postSimAssessment, "Post-Sim Quiz")) return;
     try {
       setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      //I M P O R T A N T   T O   D O
-      // await publishLearningSpace(saveAsDraft then fetch id then publish)
+      const res = await addLearningSpace(formData);
+      const savedId = res.data.id
+      await publishLearningSpace(savedId)
 
       toast.success("Learning space published successfully");
       onSuccess?.();
