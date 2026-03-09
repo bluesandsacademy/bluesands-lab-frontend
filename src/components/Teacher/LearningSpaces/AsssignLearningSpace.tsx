@@ -7,11 +7,21 @@ import { FaSpinner, FaPlus, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 interface ClassResponse {
-    id:string;
-    name: string
+  id: string;
+  name: string;
+  subject: string;
+  myRole: string;
+  students: number;
+  createdAt: string;
+  inviteCode: string;
+  inviteCodeExpiresAt: string;
 }
 
-export const AssignLearningSpaceModal = ({ isOpen, onClose, experimentName }: any) => {
+export const AssignLearningSpaceModal = ({
+  isOpen,
+  onClose,
+  experimentName,
+}: any) => {
   const { user, token } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [isClassLoading, setIsClassLoading] = useState(false);
@@ -22,19 +32,19 @@ export const AssignLearningSpaceModal = ({ isOpen, onClose, experimentName }: an
   const [classList, setClassList] = useState<ClassResponse[]>([]);
 
   useEffect(() => {
-      async function fetchClasses() {
-        setIsClassLoading(true);
-        try {
-          const data = await getClasses(token);
-          setClassList(data.items || []);
-        } catch (err) {
-          console.error("Error fetching classes:", err);
-        } finally {
-          setIsClassLoading(false);
-        }
+    async function fetchClasses() {
+      setIsClassLoading(true);
+      try {
+        const data = await getClasses(token);
+        setClassList(data.items || []);
+      } catch (err) {
+        console.error("Error fetching classes:", err);
+      } finally {
+        setIsClassLoading(false);
       }
-      fetchClasses();
-    }, [token]);
+    }
+    fetchClasses();
+  }, [token]);
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -63,7 +73,12 @@ export const AssignLearningSpaceModal = ({ isOpen, onClose, experimentName }: an
     } catch (error: any) {
       console.error("Error assigning space:", error);
       setIsLoading(false);
-      toast.error(<div><p className="font-semibold">Failed to assign Learning Space</p><p>${error.message}</p></div>)
+      toast.error(
+        <div>
+          <p className="font-semibold">Failed to assign Learning Space</p>
+          <p>${error.message}</p>
+        </div>,
+      );
     }
   };
 
@@ -87,41 +102,41 @@ export const AssignLearningSpaceModal = ({ isOpen, onClose, experimentName }: an
           </div> */}
 
           <div className="mt-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Assign To
-                </label>
-                <select
-                  name="classId"
-                  value={formData.classID}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
-                >
-                  <option value="">Select a class</option>
-                  {classList.map((cls) => (
-                    <option key={cls.id} value={cls.id}>
-                      {cls.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Assign To
+            </label>
+            <select
+              name="classId"
+              value={formData.classID}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
+            >
+              <option value="">Select a class</option>
+              {classList.map((cls) => (
+                <option key={cls.id} value={cls.id}>
+                  {cls.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-               <div className="mt-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Set As
-                </label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
-                >
-                  <option value="">Select Activity</option>
-                  <option value="classWork">Class work</option>
-                  <option value="assignment">Assignment</option>
-                  <option value="test">Test</option>
-                  <option value="exam">Exam</option>
-                </select>
-              </div>
+          <div className="mt-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Set As
+            </label>
+            <select
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
+            >
+              <option value="">Select Activity</option>
+              <option value="classWork">Class work</option>
+              <option value="assignment">Assignment</option>
+              <option value="test">Test</option>
+              <option value="exam">Exam</option>
+            </select>
+          </div>
 
           {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
