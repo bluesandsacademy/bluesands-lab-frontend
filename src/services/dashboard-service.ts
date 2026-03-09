@@ -325,11 +325,11 @@ export async function assignExperiment(
   }
 }
 
-// export async function getClasses(token?: string | null) {
-//   const config = {
-//     withCredentials: true,
-//     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
-//   };
-//   const res = await apiClient.get("", config);
-//   return res.data;
-// }
+export async function getClasses(token?: string | null) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/classes/school", config);
+  return res.data;
+}
