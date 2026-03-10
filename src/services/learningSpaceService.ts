@@ -108,15 +108,15 @@ export async function assignLearningSpace(
     classID: string,
     type: string
   },
-  schoolId?: string | null,
+  id?: string | null,
   token?: string | null
 ) {
   try {
     const res = await apiClient.post(
-      "/api/assignments",
+      `/api/ils/${id}/assign`,
       spaceData,
       {
-        params: { schoolId },
+        params: { id },
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       }
     );
