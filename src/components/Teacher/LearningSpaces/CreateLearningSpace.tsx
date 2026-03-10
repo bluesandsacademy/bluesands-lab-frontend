@@ -695,7 +695,7 @@ export const CreateLearningSpaceModal = ({
     try {
       setIsLoading(true);
       const res = await addLearningSpace(formData);
-      const savedId = res.data.id
+      const savedId = res.id
       await publishLearningSpace(savedId)
 
       toast.success("Learning space published successfully");
