@@ -3,7 +3,7 @@ import ExperimentCard from "@/components/Dashboard/Experiments/ExperimentCards";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import LearningSpace from "@/components/LearningSpace/LearningSpace";
-import SpaceCard from "@/components/LearningSpace/SpaceCard";
+import SpaceCard, { SpaceData } from "@/components/LearningSpace/SpaceCard";
 import {
   getLearningSpaces,
   getLearningSpacesByClassId,
@@ -16,11 +16,40 @@ import { FaChevronRight } from "react-icons/fa";
 import { IoMdStar } from "react-icons/io";
 import { LuNotebookPen } from "react-icons/lu";
 
+type QuizQuestion = {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+};
+
+type QuizData = {
+  quizTitle: string;
+  description: string;
+  points: string;
+  questions: QuizQuestion[];
+};
+
 interface Lesson {
   id: string;
   title: string;
-  subtitle: string;
-  steps: [];
+  subtitle?: string;
+  objective?: string;
+  score?: string;
+  duration?: string;
+  simulationId?: string;
+  preSimAssessment?: QuizData;
+  postSimAssessment?: QuizData;
+  tags?: string[];
+  introductionMessage?: string;
+  engagementQuestion?: string;
+  hypothesisQuestion?: string;
+  experimentProcedures?: string[];
+  discussionPrompt?: string;
+  realWorldApplications?: string[];
+  relatedCareers?: string[];
+  realWorldTask?: string;
+  steps?: unknown[];
+  [key: string]: unknown; // allow extra fields from JSON/API
 }
 
 const DashboardStemCoursesPage = () => {
@@ -71,7 +100,7 @@ const DashboardStemCoursesPage = () => {
   const [loading, setLoading] = useState(false);
   const [activeSpaceId, setActiveSpaceId] = useState<string | null>(null);
 
-  const [learningSpacesData, setLearningSpacesData] = useState<Lesson[]>([]);
+  const [learningSpacesData, setLearningSpacesData] = useState<SpaceData[]>([]);
   useEffect(() => {
     import("../../../components/LearningSpace/lessonData.json").then((mod) =>
       setLesson(mod.default as Lesson),
@@ -107,7 +136,7 @@ const DashboardStemCoursesPage = () => {
       setLoading(true);
       try {
         const data = await getLearningSpaces(token);
-        setLearningSpacesData(data.items || []);
+        setLearningSpacesData(data || []);
       } catch (err) {
         console.error("Error fetching experiments:", err);
       } finally {
@@ -136,7 +165,7 @@ const DashboardStemCoursesPage = () => {
       <StatCards stats={courseStats} />
       <div className="m-4 mt-6 lg:mt-12 flex flex-col gap-5">
         <p className="font-semibold lg:text-lg">Available Learning Spaces</p>
-
+{/* <button onClick={()=> console.log(learningSpacesData)}> show data</button> */}
         <div className=" flex flex-row flex-wrap gap-5">
           {learningSpacesData?.length < 1 ? (
             <p>No spaces available</p>
@@ -151,12 +180,7 @@ const DashboardStemCoursesPage = () => {
                 {learningSpacesData.map((lab) => (
                   <SpaceCard
                     key={lab.id}
-                    lesson={{
-                      id: lab.id,
-                      title: lab.title,
-                      url: lab.subtitle,
-                      description: lab.subtitle,
-                    }}
+                    lesson={lab}
                     onOpenSpace={showSpacePopUp}
                   />
                 ))}
