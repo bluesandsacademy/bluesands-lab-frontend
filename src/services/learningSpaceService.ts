@@ -105,7 +105,7 @@ export async function publishLearningSpace(
 
 export async function assignLearningSpace(
   spaceData: {
-    classID: string,
+    classroomId: string,
     type: string
   },
   id?: string | null,

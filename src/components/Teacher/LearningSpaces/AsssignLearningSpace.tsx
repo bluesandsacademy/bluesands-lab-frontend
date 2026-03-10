@@ -26,7 +26,7 @@ export const AssignLearningSpaceModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isClassLoading, setIsClassLoading] = useState(false);
   const [formData, setFormData] = useState({
-  classroomId: "",   // ✅ was classroomId
+  classroomId: "",  
   type: "",
 });
   const [classList, setClassList] = useState<ClassResponse[]>([]);
