@@ -83,6 +83,27 @@ export async function addLearningSpace(
   }
 }
 
+export async function updateLearningSpace(
+  learningSpaceData: LearningSpaceObject,
+  id: string | null,
+  token?: string | null
+) {
+  try {
+    const res = await apiClient.put(
+      `/api/ils/${id}`,
+      learningSpaceData,
+      {
+        // params: { schoolId },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Failed to update learning space:", error);
+    throw error;
+  }
+}
+
 export async function publishLearningSpace(
   id: string,
   token?: string | null
