@@ -65,7 +65,7 @@ const TeacherLearningSpacePage = () => {
     toast.success(id);
   };
   //----------- REMEMBER TO IMPLEMENT THESE ONES LATER ------------//
-  const handleeditIls = () => {};
+  const handleeditIls = () => { console.log("nnn")};
   const handleAssignIls = () => {};
   const handlePublish = async (id: string) => {
     // ✅ accept id as param
