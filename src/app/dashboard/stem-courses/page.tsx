@@ -4,7 +4,10 @@ import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import LearningSpace from "@/components/LearningSpace/LearningSpace";
 import SpaceCard from "@/components/LearningSpace/SpaceCard";
-import { getLearningSpaces } from "@/services/learningSpaceService";
+import {
+  getLearningSpaces,
+  getLearningSpacesByClassId,
+} from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -66,28 +69,53 @@ const DashboardStemCoursesPage = () => {
   const [isShowingPop, setIsShowingPop] = useState<boolean>(false);
   const [lesson, setLesson] = useState<Lesson | null>();
   const [loading, setLoading] = useState(false);
+  const [activeSpaceId, setActiveSpaceId] = useState<string | null>(null);
 
-  const [learningSpacesData, setLearningSpacesData] = useState<Lesson[]>();
+  const [learningSpacesData, setLearningSpacesData] = useState<Lesson[]>([]);
   useEffect(() => {
     import("../../../components/LearningSpace/lessonData.json").then((mod) =>
       setLesson(mod.default as Lesson),
     );
   }, []);
 
-  // useEffect(() => {
-  //   async function fetchSpaces() {
-  //     setLoading(true);
+  //   useEffect(() => {
+  //   if (!activeSpaceId) {
+  //     // fallback to local JSON for development/testing
+  //     import("../../../components/LearningSpace/lessonData.json").then((mod) => setLesson(mod.default as Lesson));
+  //     return;
+  //   }
+
+  //   // Fetch from API using the real lessonId
+  //   async function fetchLesson() {
   //     try {
-  //       const data = await getLearningSpaces(token);
-  //       setLearningSpacesData(data.items || []);
+  //       const res = await getLearningSpacesByClassId(activeSpaceId);
+  //       if (!res.ok) throw new Error("Failed to fetch lesson");
+  //       const data = await res.json();
+  //       setLesson(data);
   //     } catch (err) {
-  //       console.error("Error fetching experiments:", err);
-  //     } finally {
-  //       setLoading(false);
+  //       console.error("Error fetching lesson:", err);
+  //       // optionally fall back to local JSON
+  //       import("./lessonData.json").then((mod) => setLesson(mod.default as Lesson));
   //     }
   //   }
-  //   fetchSpaces();
-  // }, [token]);
+
+  //   fetchLesson();
+  // }, [lessonId]);
+
+  useEffect(() => {
+    async function fetchSpaces() {
+      setLoading(true);
+      try {
+        const data = await getLearningSpaces(token);
+        setLearningSpacesData(data.items || []);
+      } catch (err) {
+        console.error("Error fetching experiments:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSpaces();
+  }, [token]);
 
   if (!lesson) {
     return (
@@ -97,7 +125,8 @@ const DashboardStemCoursesPage = () => {
     );
   }
 
-  const showSpacePopUp = () => {
+  const showSpacePopUp = (spaceId: string) => {
+    setActiveSpaceId(spaceId);
     setIsShowingPop(true);
   };
 
@@ -109,59 +138,52 @@ const DashboardStemCoursesPage = () => {
         <p className="font-semibold lg:text-lg">Available Learning Spaces</p>
 
         <div className=" flex flex-row flex-wrap gap-5">
-          {/* // availableSpaces < 1 ? <p>No spaces available<p/> : <p>Available Spaces</p> */}
+          {learningSpacesData?.length < 1 ? (
+            <p>No spaces available</p>
+          ) : (
+            <p>Available Spaces</p>
+          )}
 
           {/* Learning Space Grid */}
-          {/* {!loading && lesson.length > 0 && (
-        <>
-          <div className="flex flex-wrap gap-4 m-4">
-            {lesson.map((lab) => (
-              <ExperimentCard
-                key={lab.id}
-                lab={{
-                  title: lab.title,
-                  url: lab.runnableResource,
-                  description: lab.description,
-                }}
-              />
-            ))}
-          </div> */}
+          {!loading && learningSpacesData.length > 0 && (
+            <>
+              <div className="flex flex-wrap gap-4 m-4">
+                {learningSpacesData.map((lab) => (
+                  <SpaceCard
+                    key={lab.id}
+                    lesson={{
+                      id: lab.id,
+                      title: lab.title,
+                      url: lab.subtitle,
+                      description: lab.subtitle,
+                    }}
+                    onOpenSpace={showSpacePopUp}
+                  />
+                ))}
+              </div>
 
-          <SpaceCard
-            key={lesson.id}
-            lesson={{
-              id: lesson.id,
-              title: lesson.title,
-              url: lesson.subtitle,
-              description: lesson.subtitle,
-            }}
-            onOpenSpace={showSpacePopUp}
-          />
-
-          {/* <button
-            className="p-2 bg-slate-800 text-white rounded-md"
-            onClick={showSpacePopUp}
-          >
-            Start Space
-          </button> */}
-
-          {isShowingPop && (
-            <LearningSpace
-              lessonId="lesson-001"
-              popup
-              onClose={() => setIsShowingPop(false)}
-            />
+              {isShowingPop && (
+                <LearningSpace
+                  lessonId={activeSpaceId ?? ""}
+                  popup
+                  onClose={() => {
+                    setIsShowingPop(false);
+                    setActiveSpaceId(null);
+                  }}
+                />
+              )}
+            </>
           )}
 
           {/* Pagination Controls */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 mt-6">
-            {/* Results Info */}
-            {/* <div className="text-sm text-gray-600">
+          {/* <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 mt-6"> */}
+          {/* Results Info */}
+          {/* <div className="text-sm text-gray-600">
               Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, total)} of {total} results
             </div> */}
 
-            {/* Page Size Selector */}
-            {/* <div className="flex items-center gap-2">
+          {/* Page Size Selector */}
+          {/* <div className="flex items-center gap-2">
               <label htmlFor="pageSize" className="text-sm text-gray-600">
                 Show:
               </label>
@@ -178,10 +200,10 @@ const DashboardStemCoursesPage = () => {
               </select>
             </div> */}
 
-            {/* Page Navigation */}
-            <div className="flex items-center gap-2">
-              {/* Previous Button */}
-              {/* <button
+          {/* Page Navigation */}
+          {/* <div className="flex items-center gap-2"> */}
+          {/* Previous Button */}
+          {/* <button
                 onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
                 className="p-2 rounded-md border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -189,8 +211,8 @@ const DashboardStemCoursesPage = () => {
                 <FaChevronLeft />
               </button> */}
 
-              {/* First Page */}
-              {/* {page > 3 && totalPages > 5 && (
+          {/* First Page */}
+          {/* {page > 3 && totalPages > 5 && (
                 <>
                   <button
                     onClick={() => handlePageChange(1)}
@@ -202,8 +224,8 @@ const DashboardStemCoursesPage = () => {
                 </>
               )} */}
 
-              {/* Page Numbers */}
-              {/* {getPageNumbers().map((pageNum) => (
+          {/* Page Numbers */}
+          {/* {getPageNumbers().map((pageNum) => (
                 <button
                   key={pageNum}
                   onClick={() => handlePageChange(pageNum)}
@@ -217,8 +239,8 @@ const DashboardStemCoursesPage = () => {
                 </button>
               ))} */}
 
-              {/* Last Page */}
-              {/* {page < totalPages - 2 && totalPages > 5 && (
+          {/* Last Page */}
+          {/* {page < totalPages - 2 && totalPages > 5 && (
                 <>
                   <span className="px-2">...</span>
                   <button
@@ -230,26 +252,46 @@ const DashboardStemCoursesPage = () => {
                 </>
               )} */}
 
-              {/* Next Button */}
-              {/* <button
+          {/* Next Button */}
+          {/* <button
                 onClick={() => handlePageChange(page + 1)}
                 disabled={page === totalPages}
                 className="p-2 rounded-md border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FaChevronRight />
               </button> */}
-            </div>
-          </div>
-          {/* </> */}
-          {/* )} */}
+          {/* </div> */}
+          {/* </div> */}
 
           {/* Empty State */}
-          {/* {!loading && experimentData.length === 0 && (
-        <div className="flex flex-col items-center justify-center p-12 text-gray-500">
-          <p className="text-lg font-medium">No experiments found</p>
-          <p className="text-sm mt-2">Try adjusting your filters</p>
-        </div>
-      )} */}
+          {!loading && learningSpacesData.length === 0 && (
+            <div className="flex flex-col items-center justify-center p-12 text-gray-500">
+              <p className="text-lg font-medium">No learning spaces yet</p>
+              <p className="text-sm mt-2">
+                Learning spaces will appear here once your class teacher assigns
+                to you
+              </p>
+
+              {/* <SpaceCard
+                key={lesson.id}
+                lesson={{
+                  id: lesson.id,
+                  title: lesson.title,
+                  url: lesson.subtitle,
+                  description: lesson.subtitle,
+                }}
+                onOpenSpace={() => showSpacePopUp(lesson.id)}
+              />
+
+              {isShowingPop && (
+                <LearningSpace
+                  lessonId={activeSpaceId ?? ""}
+                  popup
+                  onClose={() => setIsShowingPop(false)}
+                />
+              )} */}
+            </div>
+          )}
         </div>
       </div>
     </div>
