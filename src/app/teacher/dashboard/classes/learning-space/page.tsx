@@ -2,25 +2,39 @@
 
 import { AssignLearningSpaceModal } from "@/components/Teacher/LearningSpaces/AsssignLearningSpace";
 import { CreateLearningSpaceModal } from "@/components/Teacher/LearningSpaces/CreateLearningSpace";
-import { getLearningSpaces } from "@/services/learningSpaceService";
+import {
+  getLearningSpaces,
+  publishLearningSpace,
+} from "@/services/learningSpaceService";
 // import { getClasses } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
 import React, { useEffect, useRef, useState } from "react";
 import { BsBook } from "react-icons/bs";
 //import { CgNotes } from "react-icons/cg";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaSpinner } from "react-icons/fa";
 import { LuClock3 } from "react-icons/lu";
 import { SlOptionsVertical } from "react-icons/sl";
 import { toast } from "react-toastify";
 // import { setActiveClickItemIndex } from "recharts/types/state/tooltipSlice";
 
+type Tag = {
+  id: string;
+  label: string;
+  subject: string;
+};
+
 interface LearningSpaceResponse {
+  id: string;
   title: string;
-  preSim: boolean;
-  draft: boolean;
-  published: boolean;
-  points: number;
-  time: string;
+  objective: string;
+  grade: string;
+  duration: 30;
+  simulationId: string;
+  status: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  tags: Tag[];
 }
 
 const TeacherLearningSpacePage = () => {
@@ -31,6 +45,9 @@ const TeacherLearningSpacePage = () => {
   const [spacesData, setSpacesData] = useState<LearningSpaceResponse[]>([]);
   const { token } = useUser();
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [spaceToAssign, setSpaceToAssign] = useState<string | null>(null);
+  const [spaceToPublish, setSpaceToPublish] = useState<string | null>(null);
+  const [loadingPublish, setLoadingPublish] = useState(false);
 
   const handleTogglePopup = (id: string) => {
     setActivePopupId((prev) => (prev === id ? null : id));
@@ -44,12 +61,30 @@ const TeacherLearningSpacePage = () => {
     setIsAssignModalOpen(false);
   };
 
-  const handleViewIls = (index: string) => {
-    toast.success(index);
+  const handleViewIls = (id: string) => {
+    toast.success(id);
   };
   //----------- REMEMBER TO IMPLEMENT THESE ONES LATER ------------//
   const handleeditIls = () => {};
   const handleAssignIls = () => {};
+  const handlePublish = async (id: string) => {
+    // ✅ accept id as param
+    try {
+      setLoadingPublish(true);
+      await publishLearningSpace(id); 
+      toast.success("Learning space published successfully");
+      refetchSpaces();
+    } catch (error: any) {
+      toast.error(
+        <div>
+          <p className="font-semibold">Failed to publish</p>
+          <p>{error.message}</p>
+        </div>,
+      );
+    } finally {
+      setLoadingPublish(false);
+    }
+  };
 
   const containerRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -75,7 +110,8 @@ const TeacherLearningSpacePage = () => {
       setIsLoadingSpaces(true);
       try {
         const data = await getLearningSpaces(token);
-        setSpacesData(data.items || []);
+        setSpacesData(data || []);
+        console.log(spacesData);
       } catch (err) {
         console.error("Error fetching Learning Spaces:", err);
       } finally {
@@ -88,7 +124,7 @@ const TeacherLearningSpacePage = () => {
   const refetchSpaces = async () => {
     try {
       const data = await getLearningSpaces(token);
-      setSpacesData(data.items || []);
+      setSpacesData(data || []);
     } catch (err) {
       console.error("Error fetching Learning Spaces:", err);
     } finally {
@@ -155,11 +191,11 @@ const TeacherLearningSpacePage = () => {
             </button>
           </div>
         )}
-        {spacesData.map((space, index) => (
+        {spacesData.map((space) => (
           // Card
           <div
             ref={containerRef}
-            key={index}
+            key={space.id}
             className="flex flex-col gap-2 lg:gap-4 bg-white rounded-md border border-gray-200 p-4"
           >
             <div className="flex justify-between">
@@ -170,16 +206,16 @@ const TeacherLearningSpacePage = () => {
                 <p className="lg:text-lg font-semibold">{space.title}</p>
               </div>
               <div className="relative">
-                <button onClick={() => handleTogglePopup(index.toString())}>
+                <button onClick={() => handleTogglePopup(space.id)}>
                   <SlOptionsVertical />
                 </button>
-                {activePopupId === index.toString() && (
+                {activePopupId === space.id && (
                   <div
                     ref={popupRef}
                     className="absolute right-0 bg-white rounded-lg w-32 md:w-40 text-left space-y-2 shadow-md border py-3 z-50"
                   >
                     <div
-                      onClick={() => handleViewIls(index.toString())}
+                      onClick={() => handleViewIls(space.id)}
                       className="cursor-pointer px-3 flex items-center text-sm md:text-base border-b border-gray-200 py-1"
                     >
                       View{" "}
@@ -191,7 +227,20 @@ const TeacherLearningSpacePage = () => {
                       Edit
                     </div>
                     <div
-                      onClick={() => setIsAssignModalOpen(true)}
+                      onClick={() => {
+                        handlePublish(space.id); 
+                        setActivePopupId(null);
+                      }}
+                      className="cursor-pointer px-3 flex items-center text-sm md:text-base py-1"
+                    >
+                      {loadingPublish ?  <span className="flex items-center gap-2"><FaSpinner className="animate-spin" /> Publishing...</span> : "Publish"}
+                    </div>
+                    <div
+                      onClick={() => {
+                        setSpaceToAssign(space.id);
+                        setIsAssignModalOpen(true);
+                        setActivePopupId(null);
+                      }}
                       className="cursor-pointer px-3 flex items-center text-sm md:text-base py-1"
                     >
                       Assign to class
@@ -201,16 +250,16 @@ const TeacherLearningSpacePage = () => {
               </div>
             </div>
             <div className="flex flex-row gap-4">
-              <p className="p-0.5 px-1 rounded bg-gray-200">
-                {space.points} Points
-              </p>
+              <p className="p-0.5 px-1 rounded bg-gray-200"> Points</p>
               <p className="flex gap-2 items-center">
-                <LuClock3 /> {space.time}
+                <LuClock3 /> {space.duration} hour(s)
               </p>
             </div>
             <div>
-              {space.preSim && (
-                <p className="text-gray-400">Pre-sim quiz available</p>
+              {space.status === "draft" ? (
+                <p className="text-gray-400">Draft</p>
+              ) : (
+                <p className="text-gray-400">Publish</p>
               )}
               {/* {space.postSim && <p>Post-sim quiz available</p>} */}
             </div>
@@ -231,6 +280,7 @@ const TeacherLearningSpacePage = () => {
           isOpen={isAssignModalOpen}
           onClose={() => setIsAssignModalOpen(false)}
           onSuccess={() => refetchSpaces()}
+          spaceId={spaceToAssign}
         />
       )}
     </div>

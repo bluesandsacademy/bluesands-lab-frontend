@@ -20,13 +20,13 @@ interface ClassResponse {
 export const AssignLearningSpaceModal = ({
   isOpen,
   onClose,
-  experimentName,
+  spaceId,
 }: any) => {
   const { user, token } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [isClassLoading, setIsClassLoading] = useState(false);
   const [formData, setFormData] = useState({
-    classID: "",
+    classroomId: "",
     type: "",
   });
   const [classList, setClassList] = useState<ClassResponse[]>([]);
@@ -36,7 +36,7 @@ export const AssignLearningSpaceModal = ({
       setIsClassLoading(true);
       try {
         const data = await getClasses(token);
-        setClassList(data.items || []);
+        setClassList(data || []);
       } catch (err) {
         console.error("Error fetching classes:", err);
       } finally {
@@ -54,14 +54,14 @@ export const AssignLearningSpaceModal = ({
     // console.log("Assigning experiment:", formData);
 
     // Validation
-    if (!formData.classID || !formData.type) {
+    if (!formData.classroomId || !formData.type) {
       toast.error("Please fill in all required fields");
       return;
     }
 
     try {
       setIsLoading(true);
-      const res = await assignLearningSpace(formData, user?.schoolId, token);
+      const res = await assignLearningSpace(formData, spaceId, token);
       console.log(res);
 
       // Simulate API call
@@ -106,8 +106,8 @@ export const AssignLearningSpaceModal = ({
               Assign To
             </label>
             <select
-              name="classId"
-              value={formData.classID}
+              name="classroomId"
+              value={formData.classroomId}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
             >
