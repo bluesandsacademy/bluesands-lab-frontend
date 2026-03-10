@@ -116,7 +116,7 @@ export async function assignLearningSpace(
       `/api/ils/${id}/assign`,
       spaceData,
       {
-        params: { id },
+        // params: { id },
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       }
     );
