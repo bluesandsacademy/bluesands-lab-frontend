@@ -26,9 +26,9 @@ export const AssignLearningSpaceModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isClassLoading, setIsClassLoading] = useState(false);
   const [formData, setFormData] = useState({
-    classroomId: "",
-    type: "",
-  });
+  classroomId: "",   // ✅ was classroomId
+  type: "",
+});
   const [classList, setClassList] = useState<ClassResponse[]>([]);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export const AssignLearningSpaceModal = ({
       toast.error(
         <div>
           <p className="font-semibold">Failed to assign Learning Space</p>
-          <p>${error.message}</p>
+          <p>{error.message}</p>
         </div>,
       );
     }
