@@ -3,6 +3,7 @@ import { getPhetSimulations } from "@/services/dashboard-service";
 import {
   addLearningSpace,
   publishLearningSpace,
+  updateLearningSpace,
 } from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
 import { useState, KeyboardEvent, useEffect } from "react";
@@ -409,6 +410,7 @@ export const CreateLearningSpaceModal = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [draftId, setDraftId] = useState<string | null>(null);
 
   // ── Form array input states  ──────────────────────────────────────────
   const [tagInput, setTagInput] = useState("");
@@ -664,54 +666,59 @@ export const CreateLearningSpaceModal = ({
 
   // ── Submit ────────────────────────────────────────────────────────────────
 
-  const handleSaveDraft = async () => {
-    if (!formData.title.trim()) {
-      toast.error("Please enter a title before saving as draft");
-      return;
-    }
-    try {
-      setIsSavingDraft(true);
-      //await new Promise((resolve) => setTimeout(resolve, 800));
-      // const res = await addLearningSpace(formData);
-      // console.log(res)
-      await addLearningSpace(formData);
+ const handleSaveDraft = async () => {
+  if (!formData.title.trim()) {
+    toast.error("Please enter a title before saving as draft");
+    return;
+  }
+  try {
+    setIsSavingDraft(true);
+
+    if (draftId) {
+      // Draft already exists — update it
+      await updateLearningSpace(formData, draftId, token);
+      toast.success("Draft updated successfully");
+    } else {
+      // No draft yet — create one and store the returned ID
+      const res = await addLearningSpace(formData, token);
+      setDraftId(res.id);  // ✅ store the ID for future saves
       toast.success("Draft saved successfully");
-    } catch {
-      toast.error("Failed to save draft");
-    } finally {
-      setIsSavingDraft(false);
     }
-  };
+  } catch {
+    toast.error("Failed to save draft");
+  } finally {
+    setIsSavingDraft(false);
+  }
+};
 
   const handlePublish = async () => {
-    if (!validateSetup()) return;
-    // FIX: only validate pre-quiz if it is included
-    if (
-      includePreQuiz &&
-      !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")
-    )
-      return;
-    if (!validateQuiz(formData.postSimAssessment, "Post-Sim Quiz")) return;
-    try {
-      setIsLoading(true);
-      const res = await addLearningSpace(formData);
-      const savedId = res.id
-      await publishLearningSpace(savedId)
+  if (!validateSetup()) return;
+  if (includePreQuiz && !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")) return;
+  if (!validateQuiz(formData.postSimAssessment, "Post-Sim Quiz")) return;
 
-      toast.success("Learning space published successfully");
-      onSuccess?.();
-      onClose();
-    } catch (error: any) {
-      toast.error(
-        <div>
-          <p className="font-semibold">Failed to publish</p>
-          <p>{error.message}</p>
-        </div>,
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  try {
+    setIsLoading(true);
+
+    // If already saved as draft, update it; otherwise create fresh
+    const savedId = draftId
+      ? (await updateLearningSpace(formData, draftId, token), draftId)
+      : (await addLearningSpace(formData, token)).id;
+
+    await publishLearningSpace(savedId, token);
+    toast.success("Learning space published successfully");
+    onSuccess?.();
+    onClose();
+  } catch (error: any) {
+    toast.error(
+      <div>
+        <p className="font-semibold">Failed to publish</p>
+        <p>{error.message}</p>
+      </div>
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // ── Render ────────────────────────────────────────────────────────────────
 
