@@ -4,11 +4,24 @@ import { useEffect, useState } from "react";
 import { IoMdCalendar } from "react-icons/io";
 import { LuClock3 } from "react-icons/lu";
 
-type SpaceData = {
+type TagData = {
+  id: string;
+  label: string;
+  subject: string;
+};
+
+export type SpaceData = {
   id: string;
   title: string;
-  url: string;
-  description: string;
+  objective?: string;
+  grade?: string;          // was: grade: string
+  duration?: number;       // was: duration: number
+  simulationId?: string;   // was: simulationId: string
+  status?: string;
+  createdBy?: string;      // was: createdBy: string
+  createdAt?: string;      // was: createdAt: string
+  updatedAt?: string;      // was: updatedAt: string
+  tags?: TagData[];        // was: tags: TagData[]
 };
 
 type SpaceCardProps = {
@@ -26,7 +39,7 @@ const SpaceCard = ({ lesson, onOpenSpace }: SpaceCardProps) => {
       setLoading(true);
       try {
         const data = await getLearningSpaceById(lesson.id, token);
-        setSpaceData(data.items || []);
+        setSpaceData(data || []);
       } catch (err) {
         console.error("Error fetching space:", err);
       } finally {
@@ -43,8 +56,8 @@ const SpaceCard = ({ lesson, onOpenSpace }: SpaceCardProps) => {
   };
 
   function truncateDesc(str: string) {
-    const words = str.split(/\s+/);
-    const wordStr = words.slice(0, 20).join(" ");
+    const words = str?.split(/\s+/);
+    const wordStr = words?.slice(0, 20).join(" ");
     return wordStr + "...";
   }
 
@@ -56,14 +69,15 @@ const SpaceCard = ({ lesson, onOpenSpace }: SpaceCardProps) => {
       <div className="flex flex-col gap-2 px-2">
         <p className="text-xs md:text-sm font-semibold">{lesson.title}</p>
         <p className="text-xs">
-          {lesson.description.length < 20
-            ? lesson.description
-            : truncateDesc(lesson.description)}
+          {/* {lesson.objective?.length < 20
+            ? lesson.objective
+            : truncateDesc(lesson.objective)} */}
+            {lesson.objective}
         </p>
         <div className="flex justify-between">
           <div className="flex flex-col gap-1">
             <p className="text-xs text-gray-600 flex items-center gap-1">
-              <LuClock3 className="text-blue-600" /> 90 Mins
+              <LuClock3 className="text-blue-600" /> {lesson.duration}
             </p>
             <p className="text-xs text-gray-600 flex items-center gap-1">
               <IoMdCalendar className="text-blue-600" />
