@@ -7,14 +7,15 @@
 // import { FaFlask } from "react-icons/fa";
 // import { HiOutlineClipboardCheck } from "react-icons/hi";
 
-// //import { QuizSessionEmbedded, QuizResults } from "@/components/Quiz/QuizSession";
 // import OrientationStep from "./OrientationStep";
 // import HypothesisStep  from "./HypothesisStep";
 // import ExperimentStep  from "./ExperimentStep";
 // import DiscussionStep  from "./DiscussionStep";
 // import RealWorldStep   from "./RealworldStep";
 // import AssessmentStep  from "./AssessmentStep";
-// import { QuizResults, QuizSessionEmbedded } from "@/app/quiz-session/[id]/page";
+// import { QuizResults, QuizSessionEmbedded } from "./QuizCore";
+// import { getLearningSpaceById } from "@/services/learningSpaceService";
+// import { useUser } from "@/services/UserContext";
 
 // // ── Types ─────────────────────────────────────────────────────
 
@@ -31,8 +32,8 @@
 //   id: string;
 //   type: StepType;
 //   label: string;
-//   optional?: boolean; // teacher-configurable; omitted steps are never shown
-//   enabled?: boolean;  // false = teacher disabled this optional step
+//   optional?: boolean;
+//   enabled?: boolean;
 //   [key: string]: unknown;
 // }
 
@@ -43,34 +44,23 @@
 //   steps: LessonStep[];
 // }
 
-// // Collected data from each step, keyed by stepId
 // type StepPayload = Record<string, unknown>;
 // type FormData    = Record<string, StepPayload>;
 
-// // Every step component receives these props
 // type StepComponentType = React.ComponentType<{
 //   data: LessonStep & { title: string; subtitle: string };
 //   onContinue: () => void;
-//   onStepComplete: (payload: StepPayload) => void; // called to push data into formData
+//   onStepComplete: (payload: StepPayload) => void;
 // }>;
 
 // // ── Step registry ─────────────────────────────────────────────
 
-// // QuizSession expects different props — wrap it so the interface is uniform
 // function PreQuizWrapper({ data, onContinue, onStepComplete }: any) {
 //   const handleQuizComplete = (results: QuizResults) => {
 //     onStepComplete({ stepId: data.id, quizResults: results });
 //     onContinue();
 //   };
-
-//   // data.quiz is the full quiz object embedded in lessonData by the teacher —
-//   // no external lookup needed
-//   return (
-//     <QuizSessionEmbedded
-//       quiz={data.quiz}
-//       onComplete={handleQuizComplete}
-//     />
-//   );
+//   return <QuizSessionEmbedded quiz={data.quiz} onComplete={handleQuizComplete} />;
 // }
 
 // const STEP_COMPONENTS: Record<StepType, StepComponentType> = {
@@ -153,7 +143,6 @@
 // // ── Form submission ───────────────────────────────────────────
 
 // async function submitLearningSpace(lessonId: string, formData: FormData): Promise<void> {
-//   // Replace with your real API endpoint
 //   const response = await fetch("/api/learning-space/submit", {
 //     method: "POST",
 //     headers: { "Content-Type": "application/json" },
@@ -165,22 +154,49 @@
 // // ── Shared lesson content ─────────────────────────────────────
 
 // function LessonContent({ lessonId, onClose }: { lessonId?: string; onClose?: () => void }) {
-//   const [lesson, setLesson]           = useState<Lesson | null>(null);
-//   const [currentStep, setCurrentStep] = useState(0);
-//   const [formData, setFormData]       = useState<FormData>({});
+//   const { token } = useUser();
+//   const [lesson, setLesson]             = useState<Lesson | null>(null);
+//   const [currentStep, setCurrentStep]   = useState(0);
+//   const [formData, setFormData]         = useState<FormData>({});
 //   const [isSubmitting, setIsSubmitting] = useState(false);
 //   const [submitError, setSubmitError]   = useState<string | null>(null);
+//   const [fetchError, setFetchError]     = useState<string | null>(null);
+//   const [loading, setLoading]           = useState(false);
 
 //   useEffect(() => {
-//     import("./lessonData.json").then((mod) => setLesson(mod.default as Lesson));
-//   }, [lessonId]);
+//     if (!lessonId) return;
 
-//   // Filter out optional steps the teacher hasn't enabled
+//     // Reset state when a new space is opened
+//     setLesson(null);
+//     setCurrentStep(0);
+//     setFormData({});
+//     setFetchError(null);
+//     setLoading(true);
+
+//     async function fetchLesson() {
+//       try {
+//         const data = await getLearningSpaceById(lessonId!, token);
+//         setLesson({
+//           id: data.id,
+//           title: data.title,
+//           subtitle: data.objective ?? "",
+//           steps: data.steps ?? [],
+//         });
+//       } catch (err) {
+//         console.error("Failed to load learning space:", err);
+//         setFetchError("Failed to load this learning space. Please try again.");
+//       } finally {
+//         setLoading(false);
+//       }
+//     }
+
+//     fetchLesson();
+//   }, [lessonId, token]);
+
 //   const activeSteps = lesson?.steps.filter(
 //     (step) => !step.optional || step.enabled === true
 //   ) ?? [];
 
-//   // Called by each step when the student completes it — merges payload into formData
 //   const handleStepComplete = useCallback((payload: StepPayload) => {
 //     setFormData((prev) => ({
 //       ...prev,
@@ -191,9 +207,7 @@
 //   const handleContinue = useCallback(() => {
 //     if (!lesson) return;
 //     const isLastStep = currentStep === activeSteps.length - 1;
-
 //     if (isLastStep) {
-//       // Final step — submit everything to the teacher
 //       setIsSubmitting(true);
 //       setSubmitError(null);
 //       submitLearningSpace(lessonId ?? lesson.id, formData)
@@ -208,7 +222,8 @@
 //     setCurrentStep((s) => Math.max(s - 1, 0));
 //   }, []);
 
-//   if (!lesson) {
+//   // Loading state
+//   if (loading) {
 //     return (
 //       <div className="flex h-64 items-center justify-center text-sm text-gray-400">
 //         Loading lesson...
@@ -216,11 +231,46 @@
 //     );
 //   }
 
-//   const steps    = activeSteps;
-//   const stepData = steps[currentStep];
-//   // Inject stepNumber and totalSteps dynamically so steps don't need them hardcoded
+//   // Error state
+//   if (fetchError) {
+//     return (
+//       <div className="flex h-64 flex-col items-center justify-center gap-3 text-sm text-rose-500">
+//         <p>{fetchError}</p>
+//         <button
+//           className="rounded-md bg-rose-50 px-4 py-2 text-rose-600 hover:bg-rose-100"
+//           onClick={() => { setFetchError(null); setLoading(true); }}
+//         >
+//           Retry
+//         </button>
+//       </div>
+//     );
+//   }
+
+//   if (!lesson) return null;
+
+//   // No steps configured yet for this space
+//   if (activeSteps.length === 0) {
+//     return (
+//       <div className="flex h-full flex-col bg-gray-50">
+//         <Header
+//           title={lesson.title}
+//           subtitle={lesson.subtitle}
+//           onBack={handleBack}
+//           onClose={onClose}
+//         />
+//         <div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-gray-400">
+//           <p className="font-medium text-gray-600">{lesson.title}</p>
+//           <p>{lesson.subtitle}</p>
+//           <p className="mt-4 text-xs text-gray-400">No steps have been configured for this space yet.</p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   const steps           = activeSteps;
+//   const stepData        = steps[currentStep];
 //   const enrichedStepData = { ...stepData, stepNumber: currentStep + 1, totalSteps: steps.length };
-//   const StepView = STEP_COMPONENTS[stepData.type];
+//   const StepView        = STEP_COMPONENTS[stepData.type];
 
 //   return (
 //     <div className="flex h-full flex-col bg-gray-50">
@@ -240,7 +290,6 @@
 //         />
 //       </div>
 
-//       {/* Submission feedback */}
 //       {isSubmitting && (
 //         <div className="border-t border-gray-100 bg-white px-5 py-3 text-center text-sm text-indigo-500">
 //           Submitting your work to the teacher…
@@ -277,9 +326,6 @@
 // }
 
 // // ── Main export ───────────────────────────────────────────────
-// //
-// //  Full page:  <LearningSpace lessonId="lesson-001" />
-// //  Popup:      <LearningSpace lessonId="lesson-001" popup onClose={() => setOpen(false)} />
 
 // export default function LearningSpace({
 //   lessonId,
@@ -302,7 +348,6 @@
 //   );
 // }
 
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -312,7 +357,6 @@ import { BsLightbulb, BsChatSquareText, BsGlobe, BsTrophy } from "react-icons/bs
 import { FaFlask } from "react-icons/fa";
 import { HiOutlineClipboardCheck } from "react-icons/hi";
 
-
 import OrientationStep from "./OrientationStep";
 import HypothesisStep  from "./HypothesisStep";
 import ExperimentStep  from "./ExperimentStep";
@@ -320,6 +364,8 @@ import DiscussionStep  from "./DiscussionStep";
 import RealWorldStep   from "./RealworldStep";
 import AssessmentStep  from "./AssessmentStep";
 import { QuizResults, QuizSessionEmbedded } from "./QuizCore";
+import { getLearningSpaceById } from "@/services/learningSpaceService";
+import { useUser } from "@/services/UserContext";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -332,12 +378,46 @@ type StepType =
   | "real-world"
   | "assessment";
 
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+}
+
+interface QuizData {
+  quizTitle: string;
+  description: string;
+  points: string;
+  questions: QuizQuestion[];
+}
+
+/** Shape returned by the API (teacher's saved FormData) */
+interface ApiLearningSpace {
+  id: string;
+  title: string;
+  objective: string;
+  score: string;
+  duration: string;
+  simulationId: string;
+  preSimAssessment: QuizData;
+  postSimAssessment: QuizData;
+  tags: string[];
+  introductionMessage: string;
+  engagementQuestion: string;
+  hypothesisQuestion: string;
+  experimentProcedures: string[];
+  discussionPrompt: string;
+  realWorldApplications: string[];
+  relatedCareers: string[];
+  realWorldTask: string;
+}
+
 interface LessonStep {
   id: string;
   type: StepType;
   label: string;
-  optional?: boolean; // teacher-configurable; omitted steps are never shown
-  enabled?: boolean;  // false = teacher disabled this optional step
+  optional?: boolean;
+  enabled?: boolean;
   [key: string]: unknown;
 }
 
@@ -348,34 +428,113 @@ interface Lesson {
   steps: LessonStep[];
 }
 
-// Collected data from each step, keyed by stepId
 type StepPayload = Record<string, unknown>;
 type FormData    = Record<string, StepPayload>;
 
-// Every step component receives these props
 type StepComponentType = React.ComponentType<{
   data: LessonStep & { title: string; subtitle: string };
   onContinue: () => void;
-  onStepComplete: (payload: StepPayload) => void; // called to push data into formData
+  onStepComplete: (payload: StepPayload) => void;
 }>;
+
+// ── API → Steps mapper ────────────────────────────────────────
+/**
+ * Converts the flat API response into an ordered array of LessonSteps.
+ * Each step only appears if its key data is non-empty/truthy.
+ */
+function mapApiToSteps(api: ApiLearningSpace): LessonStep[] {
+  const steps: LessonStep[] = [];
+
+  // 1. Pre-Sim Assessment (optional – only if questions exist)
+  if (api.preSimAssessment?.questions?.length > 0) {
+    steps.push({
+      id: "pre-quiz",
+      type: "pre-quiz",
+      label: "Pre-Quiz",
+      quiz: api.preSimAssessment,
+    });
+  }
+
+  // 2. Orientation / Introduction
+  if (api.introductionMessage || api.engagementQuestion || api.objective) {
+    steps.push({
+      id: "orientation",
+      type: "orientation",
+      label: "Introduction",
+      introductionMessage: api.introductionMessage,
+      engagementQuestion:  api.engagementQuestion,
+      objective:           api.objective,
+    });
+  }
+
+  // 3. Hypothesis
+  if (api.hypothesisQuestion) {
+    steps.push({
+      id: "hypothesis",
+      type: "hypothesis",
+      label: "Hypothesis",
+      hypothesisQuestion: api.hypothesisQuestion,
+    });
+  }
+
+  // 4. Experiment / Simulation
+  if (api.simulationId || api.experimentProcedures?.length > 0) {
+    steps.push({
+      id: "experiment",
+      type: "experiment",
+      label: "Experiment",
+      simulationId:         api.simulationId,
+      experimentProcedures: api.experimentProcedures ?? [],
+    });
+  }
+
+  // 5. Discussion
+  if (api.discussionPrompt) {
+    steps.push({
+      id: "discussion",
+      type: "discussion",
+      label: "Discussion",
+      discussionPrompt: api.discussionPrompt,
+    });
+  }
+
+  // 6. Real-World Application
+  if (
+    api.realWorldApplications?.length > 0 ||
+    api.relatedCareers?.length > 0 ||
+    api.realWorldTask
+  ) {
+    steps.push({
+      id: "real-world",
+      type: "real-world",
+      label: "Real World",
+      realWorldApplications: api.realWorldApplications ?? [],
+      relatedCareers:        api.relatedCareers ?? [],
+      realWorldTask:         api.realWorldTask,
+    });
+  }
+
+  // 7. Post-Sim Assessment (optional – only if questions exist)
+  if (api.postSimAssessment?.questions?.length > 0) {
+    steps.push({
+      id: "assessment",
+      type: "assessment",
+      label: "Assessment",
+      quiz: api.postSimAssessment,
+    });
+  }
+
+  return steps;
+}
 
 // ── Step registry ─────────────────────────────────────────────
 
-// QuizSession expects different props — wrap it so the interface is uniform
 function PreQuizWrapper({ data, onContinue, onStepComplete }: any) {
   const handleQuizComplete = (results: QuizResults) => {
     onStepComplete({ stepId: data.id, quizResults: results });
     onContinue();
   };
-
-  // data.quiz is the full quiz object embedded in lessonData by the teacher —
-  // no external lookup needed
-  return (
-    <QuizSessionEmbedded
-      quiz={data.quiz}
-      onComplete={handleQuizComplete}
-    />
-  );
+  return <QuizSessionEmbedded quiz={data.quiz} onComplete={handleQuizComplete} />;
 }
 
 const STEP_COMPONENTS: Record<StepType, StepComponentType> = {
@@ -458,7 +617,6 @@ function StepBar({ steps, currentIndex }: { steps: LessonStep[]; currentIndex: n
 // ── Form submission ───────────────────────────────────────────
 
 async function submitLearningSpace(lessonId: string, formData: FormData): Promise<void> {
-  // Replace with your real API endpoint
   const response = await fetch("/api/learning-space/submit", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -470,22 +628,46 @@ async function submitLearningSpace(lessonId: string, formData: FormData): Promis
 // ── Shared lesson content ─────────────────────────────────────
 
 function LessonContent({ lessonId, onClose }: { lessonId?: string; onClose?: () => void }) {
-  const [lesson, setLesson]           = useState<Lesson | null>(null);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData]       = useState<FormData>({});
+  const { token } = useUser();
+  const [lesson, setLesson]             = useState<Lesson | null>(null);
+  const [currentStep, setCurrentStep]   = useState(0);
+  const [formData, setFormData]         = useState<FormData>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError]   = useState<string | null>(null);
+  const [fetchError, setFetchError]     = useState<string | null>(null);
+  const [loading, setLoading]           = useState(false);
+
+  const fetchLesson = useCallback(async () => {
+    if (!lessonId) return;
+    setFetchError(null);
+    setLoading(true);
+    try {
+      const data: ApiLearningSpace = await getLearningSpaceById(lessonId, token);
+      const steps = mapApiToSteps(data);
+      setLesson({
+        id:       data.id,
+        title:    data.title,
+        subtitle: data.objective ?? "",
+        steps,
+      });
+    } catch (err) {
+      console.error("Failed to load learning space:", err);
+      setFetchError("Failed to load this learning space. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [lessonId, token]);
 
   useEffect(() => {
-    import("./lessonData.json").then((mod) => setLesson(mod.default as Lesson));
-  }, [lessonId]);
+    // Reset all state when a new space is opened
+    setLesson(null);
+    setCurrentStep(0);
+    setFormData({});
+    fetchLesson();
+  }, [lessonId]); // intentionally only re-run when lessonId changes
 
-  // Filter out optional steps the teacher hasn't enabled
-  const activeSteps = lesson?.steps.filter(
-    (step) => !step.optional || step.enabled === true
-  ) ?? [];
+  const activeSteps = lesson?.steps ?? [];
 
-  // Called by each step when the student completes it — merges payload into formData
   const handleStepComplete = useCallback((payload: StepPayload) => {
     setFormData((prev) => ({
       ...prev,
@@ -496,9 +678,7 @@ function LessonContent({ lessonId, onClose }: { lessonId?: string; onClose?: () 
   const handleContinue = useCallback(() => {
     if (!lesson) return;
     const isLastStep = currentStep === activeSteps.length - 1;
-
     if (isLastStep) {
-      // Final step — submit everything to the teacher
       setIsSubmitting(true);
       setSubmitError(null);
       submitLearningSpace(lessonId ?? lesson.id, formData)
@@ -513,19 +693,53 @@ function LessonContent({ lessonId, onClose }: { lessonId?: string; onClose?: () 
     setCurrentStep((s) => Math.max(s - 1, 0));
   }, []);
 
-  if (!lesson) {
+  // ── Render states ──────────────────────────────────────────
+
+  if (loading) {
     return (
       <div className="flex h-64 items-center justify-center text-sm text-gray-400">
-        Loading lesson...
+        Loading lesson…
       </div>
     );
   }
 
-  const steps    = activeSteps;
-  const stepData = steps[currentStep];
-  // Inject stepNumber and totalSteps dynamically so steps don't need them hardcoded
-  const enrichedStepData = { ...stepData, stepNumber: currentStep + 1, totalSteps: steps.length };
-  const StepView = STEP_COMPONENTS[stepData.type];
+  if (fetchError) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center gap-3 text-sm text-rose-500">
+        <p>{fetchError}</p>
+        <button
+          className="rounded-md bg-rose-50 px-4 py-2 text-rose-600 hover:bg-rose-100"
+          onClick={fetchLesson}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (!lesson) return null;
+
+  if (activeSteps.length === 0) {
+    return (
+      <div className="flex h-full flex-col bg-gray-50">
+        <Header
+          title={lesson.title}
+          subtitle={lesson.subtitle}
+          onBack={handleBack}
+          onClose={onClose}
+        />
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-gray-400">
+          <p className="font-medium text-gray-600">{lesson.title}</p>
+          <p>{lesson.subtitle}</p>
+          <p className="mt-4 text-xs">No content has been configured for this space yet.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const stepData        = activeSteps[currentStep];
+  const enrichedStepData = { ...stepData, stepNumber: currentStep + 1, totalSteps: activeSteps.length };
+  const StepView        = STEP_COMPONENTS[stepData.type];
 
   return (
     <div className="flex h-full flex-col bg-gray-50">
@@ -545,15 +759,17 @@ function LessonContent({ lessonId, onClose }: { lessonId?: string; onClose?: () 
         />
       </div>
 
-      {/* Submission feedback */}
       {isSubmitting && (
         <div className="border-t border-gray-100 bg-white px-5 py-3 text-center text-sm text-indigo-500">
-          Submitting your work to the teacher…
+          Submitting your work…
         </div>
       )}
       {submitError && (
         <div className="border-t border-rose-100 bg-rose-50 px-5 py-3 text-center text-sm text-rose-600">
-          {submitError} — <button className="underline" onClick={() => submitLearningSpace(lessonId ?? lesson.id, formData)}>Retry</button>
+          {submitError} —{" "}
+          <button className="underline" onClick={() => submitLearningSpace(lessonId ?? lesson.id, formData)}>
+            Retry
+          </button>
         </div>
       )}
     </div>
@@ -582,9 +798,6 @@ function LearningSpacePopup({ lessonId, onClose }: { lessonId?: string; onClose:
 }
 
 // ── Main export ───────────────────────────────────────────────
-//
-//  Full page:  <LearningSpace lessonId="lesson-001" />
-//  Popup:      <LearningSpace lessonId="lesson-001" popup onClose={() => setOpen(false)} />
 
 export default function LearningSpace({
   lessonId,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FiPlay, FiArrowRight, FiMic, FiCheckCircle } from "react-icons/fi";
 
 export default function OrientationStep({ data, onContinue }: any) {
-  const [selected, setSelected] = useState(data.poll.defaultSelected);
+  const [selected, setSelected] = useState(data?.poll?.defaultSelected);
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -72,7 +72,7 @@ export default function OrientationStep({ data, onContinue }: any) {
               <div className="mb-3 flex items-start justify-between">
                 <div>
                   <p className="text-sm font-semibold text-gray-800">What do you think?</p>
-                  <p className="text-xs text-gray-400">{data.poll.subtext}</p>
+                  <p className="text-xs text-gray-400">{data?.poll?.subtext}</p>
                 </div>
                 <button className="flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-500 transition hover:border-indigo-300 hover:text-indigo-500">
                   <FiMic size={12} /> Voice
