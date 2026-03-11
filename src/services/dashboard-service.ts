@@ -232,6 +232,19 @@ export async function getPhetSimulations(
   return res.data;
 }
 
+export async function getPhetSimulationsById(
+  id: string,
+  token?: string | null,
+) {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+
+  const res = await apiClient.get(`/api/phet/simulations/${id}`, config);
+  return res.data;
+}
+
 export async function getStudentRewards(token?: string | null) {
   const config = {
     withCredentials: true,

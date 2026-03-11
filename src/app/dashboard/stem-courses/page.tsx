@@ -12,7 +12,7 @@ import { useUser } from "@/services/UserContext";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BiSolidEraser } from "react-icons/bi";
-import { FaChevronRight } from "react-icons/fa";
+import { FaChevronRight, FaSpinner } from "react-icons/fa";
 import { IoMdStar } from "react-icons/io";
 import { LuNotebookPen } from "react-icons/lu";
 
@@ -165,13 +165,8 @@ const DashboardStemCoursesPage = () => {
       <StatCards stats={courseStats} />
       <div className="m-4 mt-6 lg:mt-12 flex flex-col gap-5">
         <p className="font-semibold lg:text-lg">Available Learning Spaces</p>
-{/* <button onClick={()=> console.log(learningSpacesData)}> show data</button> */}
+        {/* <button onClick={()=> console.log(learningSpacesData)}> show data</button> */}
         <div className=" flex flex-row flex-wrap gap-5">
-          {learningSpacesData?.length < 1 ? (
-            <p>No spaces available</p>
-          ) : (
-            <p>Available Spaces</p>
-          )}
 
           {/* Learning Space Grid */}
           {!loading && learningSpacesData.length > 0 && (
@@ -288,8 +283,13 @@ const DashboardStemCoursesPage = () => {
           {/* </div> */}
 
           {/* Empty State */}
+          {loading && (
+            <div className="flex w-full flex-col items-center justify-center p-12">
+              <FaSpinner className="text-5xl animate-spin text-bgBlue"/>
+            </div>
+          )}
           {!loading && learningSpacesData.length === 0 && (
-            <div className="flex flex-col items-center justify-center p-12 text-gray-500">
+            <div className="flex w-full flex-col items-center justify-center p-12 text-gray-500">
               <p className="text-lg font-medium">No learning spaces yet</p>
               <p className="text-sm mt-2">
                 Learning spaces will appear here once your class teacher assigns
