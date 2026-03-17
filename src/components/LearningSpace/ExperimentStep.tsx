@@ -5,7 +5,6 @@ import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { BsCheckCircleFill } from "react-icons/bs";
 import { FaFlask } from "react-icons/fa";
 import { getPhetSimulationsById } from "@/services/dashboard-service";
-import { toast } from "react-toastify";
 import { useUser } from "@/services/UserContext";
 
 interface PostSimQuestion {

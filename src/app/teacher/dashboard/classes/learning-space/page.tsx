@@ -257,9 +257,9 @@ const TeacherLearningSpacePage = () => {
             </div>
             <div>
               {space.status === "draft" ? (
-                <p className="text-gray-400">Draft</p>
+                <p className="text-gray-400 border border-gray-400 rounded-full px-1 w-fit">Draft</p>
               ) : (
-                <p className="text-gray-400">Publish</p>
+                <p className="text-green-500 border border-green-500 rounded-full px-1 w-fit">Published</p>
               )}
               {/* {space.postSim && <p>Post-sim quiz available</p>} */}
             </div>
