@@ -619,7 +619,7 @@ export const AdminLearningMetricStats: StatCardData[] = [
 export const AdminUserOverviewStats: StatCardData[] = [
   {
     title: "Subscribed Users",
-    value: "1182",
+    value: "1632",
     icon: "/images/svg/subscribed.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
