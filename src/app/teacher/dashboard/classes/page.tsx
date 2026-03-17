@@ -57,35 +57,38 @@ const TeacherClassManagementPage = () => {
           </button> */}
         </div>
         <div className="flex flex-col md:flex-row md:flex-wrap gap-2 justify-between p-2 rounded-md bg-white">
-          <select
-            name="class"
-            id="class"
-            className="text-sm p-2 rounded border border-gray-100"
-          >
-            <option value="Physics 101">Physics 101</option>
-            <option value="Chemistry 101">Chemistry 101</option>
-            <option value="Math 101">Math 101</option>
-          </select>
+          <div className="flex flex-col md:flex-row  gap-2 md:gap-4">
+            <button
+              onClick={() => setIsCreateSpaceOpen(true)}
+              className="bg-[#00B69B] w-fit text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
+            >
+              {" "}
+              <CgNotes /> Create Learning Space
+            </button>
+            <Link href={"/teacher/dashboard/classes/learning-space"}>
+              <button className="bg-[#006FCC] text-xs lg:text-sm h-full p-2 rounded-md text-white flex items-center gap-1.5">
+                <FaRegEdit /> My Learning Spaces
+              </button>
+            </Link>
+          </div>
 
           <div className="flex gap-2 lg:gap-4 flex-col md:flex-row">
+            <select
+              name="class"
+              id="class"
+              className="text-sm p-2 rounded border border-gray-100"
+            >
+              <option value="Physics 101">Physics 101</option>
+              <option value="Chemistry 101">Chemistry 101</option>
+              <option value="Math 101">Math 101</option>
+            </select>
+
             <button className="flex flex-col text-xs bg-blue-50 rounded-md p-1.5 items-start">
               <p className="text-[7px]">CLASS CODE</p>
               <p className="italic flex items-center gap-1.5 text-bgBlue">
                 PHY101 <IoCopyOutline />
               </p>
             </button>
-            <button
-              onClick={() => setIsCreateSpaceOpen(true)}
-              className="bg-[#00B69B] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
-            >
-              {" "}
-              <CgNotes /> Create Learning Space
-            </button>
-            <Link href={"/teacher/dashboard/classes/learning-space"}>
-              <button className="bg-[#006FCC] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5">
-                <FaRegEdit /> My Learning Spaces
-              </button>
-            </Link>
           </div>
         </div>
         <StatCards stats={statsConfig} />

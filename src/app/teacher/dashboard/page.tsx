@@ -1,6 +1,6 @@
 "use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
-import SchoolWideTrend from "@/components/School/Dashboard/SchoolWideTrend";
+// import SchoolWideTrend from "@/components/School/Dashboard/SchoolWideTrend";
 import TeacherWelcomeBanner from "@/components/Teacher/TeacherWelcomeBanner";
 import { useUser } from "@/services/UserContext";
 import { useState } from "react";
@@ -70,7 +70,27 @@ const TeacherDashboardOverviewPage = () => {
   const [stats, setStats] = useState<StatCardData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user, token } = useUser();
-  const firstName = user?.fullName?.split(" ")[0];
+
+  function getTeacherFirstName(
+    fullName: string | undefined,
+  ): string | undefined {
+    let fstName = null;
+    //checking if the name starts with a title
+    if (
+      fullName?.startsWith("Mr") ||
+      fullName?.startsWith("Ms") ||
+      fullName?.startsWith("Mrs") ||
+      fullName?.startsWith("Miss")
+    ) {
+      fstName = fullName.split(" ")[1];
+    } else {
+      fstName = fullName?.split(" ")[0];
+    }
+
+    return fstName;
+  }
+  //const firstName = user?.fullName?.split(" ")[0];
+  const firstName = getTeacherFirstName(user?.fullName);
 
   const lineChartData = [
     { month: "Jan", average: 0 },
