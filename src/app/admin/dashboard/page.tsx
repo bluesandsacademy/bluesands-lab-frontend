@@ -33,6 +33,8 @@ const lineChartData = [
   { month: "Aug", users: 428, schools: 15 },
   { month: "Sep", users: 125, schools: 14 },
   { month: "Oct", users: 200, schools: 32 },
+  { month: "Nov", users: 350, schools: 36 },
+  { month: "Dec", users: 100, schools: 8 },
 ];
 
 const pieChartData = [

@@ -635,7 +635,7 @@ export const AdminUserOverviewStats: StatCardData[] = [
   },
   {
     title: "Male Users",
-    value: "722",
+    value: "972",
     icon: "/images/svg/male.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -643,7 +643,7 @@ export const AdminUserOverviewStats: StatCardData[] = [
   },
   {
     title: "Female Users",
-    value: "531",
+    value: "731",
     icon: "/images/svg/female.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
