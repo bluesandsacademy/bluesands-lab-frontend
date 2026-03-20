@@ -4,8 +4,8 @@ import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import LearningSpace from "@/components/LearningSpace/LearningSpace";
 import { CreateLearningSpaceModal } from "@/components/Teacher/LearningSpaces/CreateLearningSpace";
 import { UseAppTour } from "@/hooks/UseAppTour";
-import { useTour } from "@reactour/tour";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CgNotes } from "react-icons/cg";
 import { FaPlus, FaRegEdit } from "react-icons/fa";
@@ -50,6 +50,7 @@ const statsConfig: StatCardData[] = [
 const TeacherClassManagementPage = () => {
   const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
   const { startTour } = UseAppTour();
+  const router = useRouter()
 
   return (
     <>
@@ -70,7 +71,8 @@ const TeacherClassManagementPage = () => {
         <div className="flex flex-col md:flex-row md:flex-wrap gap-2 justify-between p-2 rounded-md bg-white">
           <div className="flex flex-col md:flex-row  gap-2 md:gap-4">
             <button
-              onClick={() => setIsCreateSpaceOpen(true)}
+              // onClick={() => setIsCreateSpaceOpen(true)}
+              onClick={()=> router.push("/teacher/dashboard/classes/create-space")}
               className="create-ils bg-[#00B69B] w-fit text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
             >
               {" "}
