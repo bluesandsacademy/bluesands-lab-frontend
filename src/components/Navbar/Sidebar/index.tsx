@@ -12,6 +12,8 @@ import { HiX } from "react-icons/hi";
 import { useUser } from "@/services/UserContext";
 import { useRouter } from "next/navigation";
 import NProgress from "nprogress";
+import { useEffect, useState } from "react";
+// inpmmport TeacherTourGuide from "@/components/Teacher/TeacherTourGuide";
 
 // interface SidebarItemObject {
 //     title: string
@@ -28,12 +30,27 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useUser();
   const router = useRouter();
+  const [loaded, setLoaded] = useState(false);
+  const [startTour, setStartTour] = useState(true);
+
+  useEffect(() => setLoaded(true), []);
+
+  const handleStartTour = () => {
+    setStartTour(true);
+  };
+  const handleTourEnd = () => {
+    setStartTour(false);
+  };
 
   function handleLogout() {
     NProgress.start(); // Start the loading bar
     logout();
     router.push("/auth/login");
     NProgress.done(); // Stop the loading bar
+  }
+
+  if (!loaded) {
+    return null;
   }
 
   return (
@@ -79,6 +96,15 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
         </div>
 
         <div className="flex flex-col gap-y-3 w-full">
+          {/* Tutorial Button
+          <div>
+            <button
+              className="border border-gray-500 rounded p-0.5"
+              onClick={handleStartTour}
+            >
+              See Tutorials
+            </button>
+          </div> */}
           {user?.role === "schoolAdmin" || user?.role === "SchoolAdmin"
             ? sideNavLinks.map((link, index) => {
                 return (
@@ -91,8 +117,8 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                             ? user?.role === "student"
                               ? "bg-bgBlue text-white"
                               : user?.role === "SchoolAdmin"
-                              ? "bg-blue-950 text-white"
-                              : "bg-gray-700 text-white" // fallback for other roles
+                                ? "bg-blue-950 text-white"
+                                : "bg-gray-700 text-white" // fallback for other roles
                             : "text-gray-700 hover:bg-gray-100"
                         }
                       `}
@@ -105,8 +131,8 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                         pathname === link.url
                           ? "filter brightness-0 invert"
                           : index === 0
-                          ? "filter brightness-0"
-                          : ""
+                            ? "filter brightness-0"
+                            : ""
                       }`}
                     />
                     {link.title}
@@ -114,82 +140,82 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
                 );
               })
             : user?.role === "globalAdmin" || user?.role === "GlobalAdmin"
-            ? adminSideNavLinks.map((link, index) => {
-                return (
-                  <Link
-                    key={index}
-                    href={link.url}
-                    className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
-                      pathname === link.url ? "bg-bgBlue text-white" : ""
-                    }`}
-                    onClick={onClose} // Close sidebar on mobile when link is clicked
-                  >
-                    <img
-                      src={link.icon}
-                      alt={link.title}
-                      className={`w-5 h-5 ${
-                        pathname === link.url
-                          ? "filter brightness-0 invert"
-                          : index === 0
-                          ? "filter brightness-0"
-                          : ""
+              ? adminSideNavLinks.map((link, index) => {
+                  return (
+                    <Link
+                      key={index}
+                      href={link.url}
+                      className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
+                        pathname === link.url ? "bg-bgBlue text-white" : ""
                       }`}
-                    />
-                    {link.title}
-                  </Link>
-                );
-              })
-            : user?.role === "teacher" || user?.role === "Teacher"
-            ? teacherSideNavLinks.map((link, index) => {
-                return (
-                  <Link
-                    key={index}
-                    href={link.url}
-                    className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
-                      pathname === link.url ? "bg-[#303C48] text-white" : ""
-                    }`}
-                    onClick={onClose} // Close sidebar on mobile when link is clicked
-                  >
-                    <img
-                      src={link.icon}
-                      alt={link.title}
-                      className={`w-5 h-5 ${
-                        pathname === link.url
-                          ? "filter brightness-0 invert"
-                          : index === 0
-                          ? "filter brightness-0"
-                          : ""
-                      }`}
-                    />
-                    {link.title}
-                  </Link>
-                );
-              })
-            : sidebarLinks.map((link, index) => {
-                return (
-                  <Link
-                    key={index}
-                    href={link.url}
-                    className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
-                      pathname === link.url ? "bg-bgBlue text-white" : ""
-                    }`}
-                    onClick={onClose} // Close sidebar on mobile when link is clicked
-                  >
-                    <img
-                      src={link.icon}
-                      alt={link.title}
-                      className={`w-5 h-5 ${
-                        pathname === link.url
-                          ? "filter brightness-0 invert"
-                          : index === 0
-                          ? "filter brightness-0"
-                          : ""
-                      }`}
-                    />
-                    {link.title}
-                  </Link>
-                );
-              })}
+                      onClick={onClose} // Close sidebar on mobile when link is clicked
+                    >
+                      <img
+                        src={link.icon}
+                        alt={link.title}
+                        className={`w-5 h-5 ${
+                          pathname === link.url
+                            ? "filter brightness-0 invert"
+                            : index === 0
+                              ? "filter brightness-0"
+                              : ""
+                        }`}
+                      />
+                      {link.title}
+                    </Link>
+                  );
+                })
+              : user?.role === "teacher" || user?.role === "Teacher"
+                ? teacherSideNavLinks.map((link, index) => {
+                    return (
+                      <Link
+                        key={index}
+                        href={link.url}
+                        className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
+                          pathname === link.url ? "bg-[#303C48] text-white" : ""
+                        }`}
+                        onClick={onClose} // Close sidebar on mobile when link is clicked
+                      >
+                        <img
+                          src={link.icon}
+                          alt={link.title}
+                          className={`w-5 h-5 ${
+                            pathname === link.url
+                              ? "filter brightness-0 invert"
+                              : index === 0
+                                ? "filter brightness-0"
+                                : ""
+                          }`}
+                        />
+                        {link.title}
+                      </Link>
+                    );
+                  })
+                : sidebarLinks.map((link, index) => {
+                    return (
+                      <Link
+                        key={index}
+                        href={link.url}
+                        className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
+                          pathname === link.url ? "bg-bgBlue text-white" : ""
+                        }`}
+                        onClick={onClose} // Close sidebar on mobile when link is clicked
+                      >
+                        <img
+                          src={link.icon}
+                          alt={link.title}
+                          className={`w-5 h-5 ${
+                            pathname === link.url
+                              ? "filter brightness-0 invert"
+                              : index === 0
+                                ? "filter brightness-0"
+                                : ""
+                          }`}
+                        />
+                        {link.title}
+                      </Link>
+                    );
+                  })}
           <hr className="my-2" />
 
           {user?.role === "globalAdmin" ||
@@ -220,21 +246,21 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
               user?.role === "schoolAdmin" || user?.role === "SchoolAdmin"
                 ? "/school/dashboard/contact-support"
                 : user?.role === "teacher" || user?.role === "Teacher"
-                ? "/teacher/dashboard/contact-support"
-                : user?.role === "globalAdmin" || user?.role === "GlobalAdmin"
-                ? "/admin/dashboard/customer-support"
-                : "/dashboard/support"
+                  ? "/teacher/dashboard/contact-support"
+                  : user?.role === "globalAdmin" || user?.role === "GlobalAdmin"
+                    ? "/admin/dashboard/customer-support"
+                    : "/dashboard/support"
             }
             className={`flex items-center text-sm md:text-[0.85rem] gap-x-3 px-3 py-2 rounded-md w-full ${
               pathname === "/dashboard/support"
                 ? "bg-bgBlue text-white"
                 : pathname === "/school/dashboard/contact-support"
-                ? "bg-blue-950 text-white"
-                : pathname === "/teacher/dashboard/contact-support"
-                ? "bg-[#303C48] text-white"
-                : pathname === "/admin/dashboard/customer-support"
-                ? "bg-bgBlue text-white"
-                : ""
+                  ? "bg-blue-950 text-white"
+                  : pathname === "/teacher/dashboard/contact-support"
+                    ? "bg-[#303C48] text-white"
+                    : pathname === "/admin/dashboard/customer-support"
+                      ? "bg-bgBlue text-white"
+                      : ""
             }`}
           >
             <img
@@ -253,8 +279,8 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
               {user?.role === "schoolAdmin" || user?.role === "SchoolAdmin"
                 ? "Contact Support"
                 : user?.role === "globalAdmin" || user?.role === "GlobalAdmin"
-                ? "Customer Support"
-                : "Admin Support"}
+                  ? "Customer Support"
+                  : "Admin Support"}
             </p>
           </Link>
           <button
@@ -280,6 +306,16 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
             />
           </Link>
         </div>
+
+        {/* {(user?.role === "Teacher" || user?.role === "teacher") && startTour ? (
+          <TeacherTourGuide
+            start={startTour}
+            setStartTour={setStartTour}
+            onTourEnd={handleTourEnd}
+          />
+        ) : (
+          ""
+        )} */}
       </nav>
     </>
   );

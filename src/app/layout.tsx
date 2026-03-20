@@ -6,6 +6,8 @@ import { UserProvider } from "@/services/UserContext";
 import { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
 import AuthGuard from "@/services/AuthGuard";
+import Providers from "./Providers";
+
 
 export const metadata: Metadata = {
   title: "Blue Sands Stem Labs",
@@ -39,7 +41,9 @@ export default function RootLayout({
           pauseOnHover
         />
         <UserProvider>
-          <AuthGuard> {children} </AuthGuard>
+          <Providers>
+            <AuthGuard> {children} </AuthGuard>
+          </Providers>
         </UserProvider>
       </body>
     </html>

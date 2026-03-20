@@ -3,6 +3,8 @@
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import LearningSpace from "@/components/LearningSpace/LearningSpace";
 import { CreateLearningSpaceModal } from "@/components/Teacher/LearningSpaces/CreateLearningSpace";
+import { UseAppTour } from "@/hooks/UseAppTour";
+import { useTour } from "@reactour/tour";
 import Link from "next/link";
 import { useState } from "react";
 import { CgNotes } from "react-icons/cg";
@@ -47,10 +49,19 @@ const statsConfig: StatCardData[] = [
 
 const TeacherClassManagementPage = () => {
   const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
+  const { startTour } = UseAppTour();
 
   return (
     <>
       <div className="flex flex-col gap-4 p-2 lg:p-4">
+        <div className="flex">
+          <button
+            onClick={() => startTour("teacherClassMgt")}
+            className="border border-blue-900 rounded py-0.5 px-2 text-blue-900"
+          >
+            View Page Tutorial
+          </button>
+        </div>
         <div className="flex justify-end">
           {/* <button className="bg-[#303C48] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5">
             <FaPlus /> Create New Class
@@ -60,13 +71,13 @@ const TeacherClassManagementPage = () => {
           <div className="flex flex-col md:flex-row  gap-2 md:gap-4">
             <button
               onClick={() => setIsCreateSpaceOpen(true)}
-              className="bg-[#00B69B] w-fit text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
+              className="create-ils bg-[#00B69B] w-fit text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
             >
               {" "}
               <CgNotes /> Create Learning Space
             </button>
             <Link href={"/teacher/dashboard/classes/learning-space"}>
-              <button className="bg-[#006FCC] text-xs lg:text-sm h-full p-2 rounded-md text-white flex items-center gap-1.5">
+              <button className="view-ils  bg-[#006FCC] text-xs lg:text-sm h-full p-2 rounded-md text-white flex items-center gap-1.5">
                 <FaRegEdit /> My Learning Spaces
               </button>
             </Link>
@@ -91,9 +102,11 @@ const TeacherClassManagementPage = () => {
             </button>
           </div>
         </div>
-        <StatCards stats={statsConfig} />
+        <div className="teacher-class-metrics">
+          <StatCards stats={statsConfig} />
+        </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 teacher-view-students">
           <div className="flex justify-between items-end">
             <p className="text-sm font-semibold">Student List</p>
             <button className="bg-[#006FCC] text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5">
@@ -138,7 +151,7 @@ const TeacherClassManagementPage = () => {
         </div>
 
         {/* Table */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 teacher-view-assignments">
           <p className="text-sm font-semibold">Recent Assignments</p>
           <div
             className="flex flex-col
