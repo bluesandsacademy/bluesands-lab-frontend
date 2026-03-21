@@ -8,6 +8,7 @@ import {
 } from "@/services/learningSpaceService";
 // import { getClasses } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { BsBook } from "react-icons/bs";
 //import { CgNotes } from "react-icons/cg";
@@ -88,6 +89,7 @@ const TeacherLearningSpacePage = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  const router = useRouter()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -144,7 +146,8 @@ const TeacherLearningSpacePage = () => {
         </div>
 
         <button
-          onClick={() => setIsCreateSpaceOpen(true)}
+          // onClick={() => setIsCreateSpaceOpen(true)}
+          onClick={()=> router.push("/teacher/dashboard/classes/create-space")}
           className="bg-blue-800 text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
         >
           {" "}
@@ -183,7 +186,8 @@ const TeacherLearningSpacePage = () => {
               based teaching.
             </p>
             <button
-              onClick={() => setIsCreateSpaceOpen(true)}
+              // onClick={() => setIsCreateSpaceOpen(true)}
+              onClick={()=> router.push("/teacher/dashboard/classes/create-space")}
               className="bg-blue-800 text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
             >
               {" "}
@@ -267,13 +271,13 @@ const TeacherLearningSpacePage = () => {
         ))}
       </div>
 
-      {isCreateSpaceOpen && (
+      {/* {isCreateSpaceOpen && (
         <CreateLearningSpaceModal
           isOpen={isCreateSpaceOpen}
           onClose={() => setIsCreateSpaceOpen(false)}
           onSuccess={() => refetchSpaces()}
         />
-      )}
+      )} */}
 
       {isAssignModalOpen && (
         <AssignLearningSpaceModal
