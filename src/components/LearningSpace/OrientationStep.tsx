@@ -26,7 +26,7 @@ export default function OrientationStep({ data, onContinue }: any) {
         <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-indigo-400">
           Guiding Question
         </span>
-        <p className="text-base font-semibold text-gray-800">"{data.guidingQuestion}"</p>
+        <p className="text-base font-semibold text-gray-800">"{data.engagementQuestion}"</p>
       </div>
 
       {/* Media */}

@@ -15,7 +15,7 @@ export type SpaceData = {
   title: string;
   objective?: string;
   grade?: string;          // was: grade: string
-  duration?: number;       // was: duration: number
+  duration: string | number;       // was: duration: number
   simulationId?: string;   // was: simulationId: string
   status?: string;
   createdBy?: string;      // was: createdBy: string
@@ -28,6 +28,23 @@ type SpaceCardProps = {
   lesson: SpaceData;
   onOpenSpace?: (spaceId: string) => void; // optional prop
 };
+
+const durationMap: Record<string, string> = {
+  "0.25": "15 minutes",
+  "0.5": "30 minutes",
+  "0.75": "45 minutes",
+  "1": "1 hour",
+  "1.5": "1.5 hours",
+  "2": "2 hours",
+  "2.5": "2.5 hours",
+  "3": "3 hours",
+};
+
+function formatDuration(hours: string | number): string {
+  const key = String(hours);
+  return durationMap[key] ?? `${key} hour(s)`;
+}
+
 
 const SpaceCard = ({ lesson, onOpenSpace }: SpaceCardProps) => {
   const { token } = useUser();
@@ -77,7 +94,7 @@ const SpaceCard = ({ lesson, onOpenSpace }: SpaceCardProps) => {
         <div className="flex justify-between">
           <div className="flex flex-col gap-1">
             <p className="text-xs text-gray-600 flex items-center gap-1">
-              <LuClock3 className="text-blue-600" /> {lesson.duration}
+              <LuClock3 className="text-blue-600" /> {formatDuration(lesson.duration)}
             </p>
             <p className="text-xs text-gray-600 flex items-center gap-1">
               <IoMdCalendar className="text-blue-600" />
