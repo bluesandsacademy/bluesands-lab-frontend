@@ -51,7 +51,7 @@ type FormData = {
   title: string;
   objective: string;
   score: string;
-  duration: string;
+  duration: number;
   simulationId: string;
   preSimAssessment: QuizData;
   postSimAssessment: QuizData;
@@ -440,7 +440,7 @@ export const CreateLearningSpaceModal = ({
     title: "",
     objective: "",
     score: "",
-    duration: "",
+    duration: 0,
     simulationId: "",
     preSimAssessment: { ...EMPTY_QUIZ },
     postSimAssessment: { ...EMPTY_QUIZ },
