@@ -65,7 +65,7 @@ type QuizData = {
 type FormData = {
   title: string;
   objective: string;
-  score: string;
+  // score: string;
   duration: number;
   simulationId: string;
   preSimAssessment: QuizData;
@@ -1002,7 +1002,7 @@ export const CreateLearningSpacePage = ({
   const [formData, setFormData] = useState<FormData>({
     title: "",
     objective: "",
-    score: "",
+    // score: "",
     duration: 0,
     simulationId: "",
     preSimAssessment: { ...EMPTY_QUIZ },

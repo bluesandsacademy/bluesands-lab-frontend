@@ -35,8 +35,7 @@ export default function RealWorldStep({ data, onContinue }: any) {
       {/* Example cards */}
       <div className="grid grid-cols-3 gap-3">
         {data.realWorldApplications?.map((ex: any) => (
-          <div
-            key={ex.id}
+          <div key={ex.id}
             className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"
           >
             <div className="h-32 w-full overflow-hidden bg-gray-100">
