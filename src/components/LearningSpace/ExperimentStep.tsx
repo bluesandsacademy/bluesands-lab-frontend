@@ -8,10 +8,16 @@ import { getPhetSimulationsById } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
 
 interface PostSimQuestion {
-  id: string;
   question: string;
   options: string[];
   correctAnswer: string;
+}
+
+interface PostSimAssessment {
+  quizTitle: string;
+  description: string;
+  points: string;
+  questions: PostSimQuestion[];
 }
 
 interface PhetSimResponseObject {
@@ -48,16 +54,18 @@ export default function ExperimentStep({
   onStepComplete,
 }: any) {
   const [observation, setObservation] = useState("");
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [simulationUrl, setSimulationUrl] = useState("");
   const [simId, setSimId] = useState(data.simulationId);
   const [loading, setLoading] = useState(false);
   const { token } = useUser();
 
-  const allQuizAnswered = data?.postSimQuiz?.every(
-    (q: PostSimQuestion) => quizAnswers[q.id],
-  );
+  const questions: PostSimQuestion[] = data?.postSimAssessment?.questions ?? [];
+
+  const allQuizAnswered =
+    questions.length > 0 &&
+    questions.every((_: PostSimQuestion, i: number) => quizAnswers[i] !== undefined);
 
   useEffect(() => {
     async function fetchSimulation() {
@@ -81,17 +89,17 @@ export default function ExperimentStep({
     if (!observation.trim() || !allQuizAnswered) return;
     setSubmitted(true);
 
-    const correctCount = data.postSimQuiz.filter(
-      (q: PostSimQuestion) => quizAnswers[q.id] === q.correctAnswer,
+    const correctCount = questions.filter(
+      (q: PostSimQuestion, i: number) => quizAnswers[i] === q.correctAnswer,
     ).length;
 
     onStepComplete?.({
       stepId: data.id,
       observation,
-      postSimQuiz: {
+      postSimAssessment: {
         answers: quizAnswers,
         score: correctCount,
-        total: data.postSimQuiz.length,
+        total: questions.length,
       },
     });
   };
@@ -119,7 +127,7 @@ export default function ExperimentStep({
           Experiment Procedures
         </p>
         <ul className="flex flex-col gap-2">
-          {data?.objectives?.map((obj: string, i: number) => (
+          {data?.experimentProcedures?.map((obj: string, i: number) => (
             <li
               key={i}
               className="flex items-start gap-2 text-sm text-gray-700"
@@ -141,7 +149,6 @@ export default function ExperimentStep({
             Live Simulation — PhET Interactive
           </span>
           <a
-            // href={data.phetUrl}
             href={simulationUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -151,8 +158,7 @@ export default function ExperimentStep({
           </a>
         </div>
         <iframe
-          // src={data.phetUrl}
-          src={simulationUrl}
+          src={simulationUrl? simulationUrl : undefined}
           title="PhET Simulation"
           className="w-full"
           style={{ height: 480 }}
@@ -163,7 +169,7 @@ export default function ExperimentStep({
       {/* Observation */}
       <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <p className="text-sm font-semibold text-gray-800">
-          {data.observationPrompt}
+          {/* {data?.discussionPrompt} */}
         </p>
         <p className="mb-3 mt-0.5 text-xs text-gray-400">
           Record what you observed while running the simulation.
@@ -181,20 +187,21 @@ export default function ExperimentStep({
       {/* Post-simulation quiz */}
       <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <p className="mb-1 text-sm font-semibold text-gray-800">
-          Post-Simulation Quiz
+          {data?.postSimAssessment?.quizTitle ?? "Post-Simulation Quiz"}
         </p>
         <p className="mb-4 text-xs text-gray-400">
-          Answer these questions based on what you observed in the simulation.
+          {data?.postSimAssessment?.description ??
+            "Answer these questions based on what you observed in the simulation."}
         </p>
 
         <div className="flex flex-col gap-6">
-          {data?.postSimQuiz?.map((q: PostSimQuestion, qi: number) => {
-            const selected = quizAnswers[q.id];
+          {questions.map((q: PostSimQuestion, qi: number) => {
+            const selected = quizAnswers[qi];
             const isCorrect = submitted && selected === q.correctAnswer;
             const isWrong = submitted && selected !== q.correctAnswer;
 
             return (
-              <div key={q.id}>
+              <div key={qi}>
                 <p className="mb-2 text-sm font-medium text-gray-700">
                   {qi + 1}. {q.question}
                 </p>
@@ -218,7 +225,7 @@ export default function ExperimentStep({
                         key={opt}
                         disabled={submitted}
                         onClick={() =>
-                          setQuizAnswers((prev) => ({ ...prev, [q.id]: opt }))
+                          setQuizAnswers((prev) => ({ ...prev, [qi]: opt }))
                         }
                         className={`rounded-xl border px-4 py-2.5 text-left text-sm transition-all ${style} disabled:cursor-default`}
                       >
@@ -237,11 +244,12 @@ export default function ExperimentStep({
             <FiCheckCircle />
             Quiz submitted! Score:{" "}
             {
-              data.postSimQuiz.filter(
-                (q: PostSimQuestion) => quizAnswers[q.id] === q.correctAnswer,
+              questions.filter(
+                (q: PostSimQuestion, i: number) =>
+                  quizAnswers[i] === q.correctAnswer,
               ).length
             }
-            /{data.postSimQuiz.length}
+            /{questions.length}
           </div>
         )}
       </div>

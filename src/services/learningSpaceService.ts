@@ -17,7 +17,7 @@ export interface LearningSpaceObject {
   title: string;
   objective: string;
   score: string;
-  duration: string;
+  duration: number;
   simulationId: string;
   preSimAssessment: QuizObject;
   postSimAssessment: QuizObject;

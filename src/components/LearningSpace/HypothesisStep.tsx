@@ -29,7 +29,7 @@ export default function HypothesisStep({ data, onContinue }: any) {
         <span className="mb-1 block text-xs font-semibold uppercase tracking-widest text-indigo-400">
           Framing Question
         </span>
-        <p className="text-base font-semibold text-gray-800">"{data.framingQuestion}"</p>
+        <p className="text-base font-semibold text-gray-800">"{data.hypothesisQuestion}"</p>
       </div>
 
       {/* Hypothesis input */}
@@ -68,15 +68,15 @@ export default function HypothesisStep({ data, onContinue }: any) {
       </div>
 
       {/* Peer hypotheses */}
-      <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+      {/* <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-4 flex items-center gap-3">
           <p className="text-sm font-semibold text-gray-800">Peer Hypotheses</p>
           <span className="rounded-full bg-indigo-50 px-3 py-0.5 text-xs font-semibold text-indigo-500">
-            {data.peers.length} classmates
+            {data.peers?.length} classmates
           </span>
         </div>
         <div className="flex flex-col gap-4">
-          {data.peers.map((peer: any) => (
+          {data.peers?.map((peer: any) => (
             <div key={peer.id} className="flex items-start gap-3">
               <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${peer.avatarColor}`}>
                 {peer.initials}
@@ -88,7 +88,7 @@ export default function HypothesisStep({ data, onContinue }: any) {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       <div className="flex justify-end">
         <button

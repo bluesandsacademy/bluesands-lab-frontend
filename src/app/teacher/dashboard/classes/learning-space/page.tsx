@@ -38,6 +38,23 @@ interface LearningSpaceResponse {
   tags: Tag[];
 }
 
+const durationMap: Record<string, string> = {
+  "0.25": "15 minutes",
+  "0.5": "30 minutes",
+  "0.75": "45 minutes",
+  "1": "1 hour",
+  "1.5": "1.5 hours",
+  "2": "2 hours",
+  "2.5": "2.5 hours",
+  "3": "3 hours",
+};
+
+function formatDuration(hours: string | number): string {
+  const key = String(hours);
+  return durationMap[key] ?? `${key} hour(s)`;
+}
+
+
 const TeacherLearningSpacePage = () => {
   const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -66,13 +83,15 @@ const TeacherLearningSpacePage = () => {
     toast.success(id);
   };
   //----------- REMEMBER TO IMPLEMENT THESE ONES LATER ------------//
-  const handleeditIls = () => { console.log("nnn")};
+  const handleeditIls = () => {
+    console.log("nnn");
+  };
   const handleAssignIls = () => {};
   const handlePublish = async (id: string) => {
     // ✅ accept id as param
     try {
       setLoadingPublish(true);
-      await publishLearningSpace(id); 
+      await publishLearningSpace(id);
       toast.success("Learning space published successfully");
       refetchSpaces();
     } catch (error: any) {
@@ -89,7 +108,7 @@ const TeacherLearningSpacePage = () => {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -147,7 +166,7 @@ const TeacherLearningSpacePage = () => {
 
         <button
           // onClick={() => setIsCreateSpaceOpen(true)}
-          onClick={()=> router.push("/teacher/dashboard/classes/create-space")}
+          onClick={() => router.push("/teacher/dashboard/classes/create-space")}
           className="bg-blue-800 text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
         >
           {" "}
@@ -187,7 +206,9 @@ const TeacherLearningSpacePage = () => {
             </p>
             <button
               // onClick={() => setIsCreateSpaceOpen(true)}
-              onClick={()=> router.push("/teacher/dashboard/classes/create-space")}
+              onClick={() =>
+                router.push("/teacher/dashboard/classes/create-space")
+              }
               className="bg-blue-800 text-xs lg:text-sm p-2 rounded-md text-white flex items-center gap-1.5"
             >
               {" "}
@@ -196,7 +217,7 @@ const TeacherLearningSpacePage = () => {
           </div>
         )}
         {spacesData.map((space) => (
-          // Card
+          // SPACE Card Component
           <div
             ref={containerRef}
             key={space.id}
@@ -232,12 +253,18 @@ const TeacherLearningSpacePage = () => {
                     </div>
                     <div
                       onClick={() => {
-                        handlePublish(space.id); 
+                        handlePublish(space.id);
                         setActivePopupId(null);
                       }}
                       className="cursor-pointer px-3 flex items-center text-sm md:text-base py-1"
                     >
-                      {loadingPublish ?  <span className="flex items-center gap-2"><FaSpinner className="animate-spin" /> Publishing...</span> : "Publish"}
+                      {loadingPublish ? (
+                        <span className="flex items-center gap-2">
+                          <FaSpinner className="animate-spin" /> Publishing...
+                        </span>
+                      ) : (
+                        "Publish"
+                      )}
                     </div>
                     <div
                       onClick={() => {
@@ -256,14 +283,18 @@ const TeacherLearningSpacePage = () => {
             <div className="flex flex-row gap-4">
               <p className="p-0.5 px-1 rounded bg-gray-200"> Points</p>
               <p className="flex gap-2 items-center">
-                <LuClock3 /> {space.duration} hour(s)
+                <LuClock3 /> {formatDuration(space.duration)}
               </p>
             </div>
             <div>
               {space.status === "draft" ? (
-                <p className="text-gray-400 border border-gray-400 rounded-full px-1 w-fit">Draft</p>
+                <p className="text-gray-400 border border-gray-400 rounded-full px-1 w-fit">
+                  Draft
+                </p>
               ) : (
-                <p className="text-green-500 border border-green-500 rounded-full px-1 w-fit">Published</p>
+                <p className="text-green-500 border border-green-500 rounded-full px-1 w-fit">
+                  Published
+                </p>
               )}
               {/* {space.postSim && <p>Post-sim quiz available</p>} */}
             </div>
