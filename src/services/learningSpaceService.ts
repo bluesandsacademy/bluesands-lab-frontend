@@ -16,7 +16,7 @@ export interface QuizObject {
 export interface LearningSpaceObject {
   title: string;
   objective: string;
-  score: string;
+  // score: string;
   duration: number;
   simulationId: string;
   preSimAssessment: QuizObject;
