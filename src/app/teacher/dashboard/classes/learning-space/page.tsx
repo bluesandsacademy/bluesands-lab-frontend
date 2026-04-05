@@ -1,22 +1,19 @@
 "use client";
 
 import { AssignLearningSpaceModal } from "@/components/Teacher/LearningSpaces/AsssignLearningSpace";
-import { CreateLearningSpaceModal } from "@/components/Teacher/LearningSpaces/CreateLearningSpace";
+// import { CreateLearningSpaceModal } from "@/components/Teacher/LearningSpaces/CreateLearningSpace";
 import {
   getLearningSpaces,
   publishLearningSpace,
 } from "@/services/learningSpaceService";
-// import { getClasses } from "@/services/dashboard-service";
 import { useUser } from "@/services/UserContext";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { BsBook } from "react-icons/bs";
-//import { CgNotes } from "react-icons/cg";
 import { FaPlus, FaSpinner } from "react-icons/fa";
 import { LuClock3 } from "react-icons/lu";
 import { SlOptionsVertical } from "react-icons/sl";
 import { toast } from "react-toastify";
-// import { setActiveClickItemIndex } from "recharts/types/state/tooltipSlice";
 
 type Tag = {
   id: string;
@@ -79,16 +76,20 @@ const TeacherLearningSpacePage = () => {
     setIsAssignModalOpen(false);
   };
 
-  const handleViewIls = (id: string) => {
-    toast.success(id);
-  };
-  //----------- REMEMBER TO IMPLEMENT THESE ONES LATER ------------//
-  const handleeditIls = () => {
-    console.log("nnn");
-  };
-  const handleAssignIls = () => {};
+const handleViewIls = (spaceId: string) => {
+  router.push(`/teacher/dashboard/classes/view-space/${spaceId}`);
+};
+ 
+// const handleeditIls = (space: { id: string; [key: string]: any }) => {
+//   router.push(`/teacher/dashboard/classes/edit-space/${space.id}`);
+// };
+
+const handleeditIls = (spaceId: string) => {
+  router.push(`/teacher/dashboard/classes/edit-space/${spaceId}`);
+};
+
+  
   const handlePublish = async (id: string) => {
-    // ✅ accept id as param
     try {
       setLoadingPublish(true);
       await publishLearningSpace(id);
@@ -246,7 +247,7 @@ const TeacherLearningSpacePage = () => {
                       View{" "}
                     </div>
                     <div
-                      onClick={handleeditIls}
+                      onClick={()=> handleeditIls(space.id)}
                       className="cursor-pointer px-3 flex items-center text-sm md:text-base border-b border-gray-200 py-1"
                     >
                       Edit

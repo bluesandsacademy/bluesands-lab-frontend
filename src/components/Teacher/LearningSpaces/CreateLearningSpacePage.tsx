@@ -1,7 +1,4 @@
-import {
-  getPhetSimulations,
-  getPhetSimulationsById,
-} from "@/services/dashboard-service";
+import { getPhetSimulations, getPhetSimulationsById } from "@/services/dashboard-service";
 import {
   addLearningSpace,
   publishLearningSpace,
@@ -65,8 +62,7 @@ type QuizData = {
 type FormData = {
   title: string;
   objective: string;
-  // score: string;
-  duration: number;
+  duration: string;
   simulationId: string;
   preSimAssessment: QuizData;
   postSimAssessment: QuizData;
@@ -132,8 +128,7 @@ const SIMULATION_SUBJECT: SimulationTool[] = [
   {
     id: "physics",
     label: "Physics Lab",
-    description:
-      "Interactive physics experiments with forces, motions and energy",
+    description: "Interactive physics experiments with forces, motions and energy",
     icon: <FaFlask className="w-5 h-5" />,
   },
   {
@@ -156,16 +151,16 @@ const SIMULATION_SUBJECT: SimulationTool[] = [
   },
 ];
 
-const DURATION_OPTIONS = {
-  "15 minutes": 0.25,
-  "30 minutes": 0.5,
-  "45 minutes": 0.75,
-  "1 hour": 1,
-  "1.5 hours": 1.5,
-  "2 hours": 2,
-  "2.5 hours": 2.5,
-  "3 hours": 3,
-};
+const DURATION_OPTIONS = [
+  "15 minutes",
+  "30 minutes",
+  "45 minutes",
+  "1 hour",
+  "1.5 hours",
+  "2 hours",
+  "2.5 hours",
+  "3 hours",
+];
 
 const EMPTY_QUIZ: QuizData = {
   quizTitle: "",
@@ -272,32 +267,14 @@ type AutoSaveBadgeProps = { status: "idle" | "saving" | "saved" | "error" };
 
 const AutoSaveBadge = ({ status }: AutoSaveBadgeProps) => {
   const config = {
-    idle: {
-      label: "Auto-save on",
-      icon: <FaCloud className="w-3 h-3" />,
-      cls: "text-gray-400 bg-gray-50 border-gray-200",
-    },
-    saving: {
-      label: "Saving…",
-      icon: <FaSpinner className="w-3 h-3 animate-spin" />,
-      cls: "text-blue-600 bg-blue-50 border-blue-200",
-    },
-    saved: {
-      label: "Saved",
-      icon: <FaCheck className="w-3 h-3" />,
-      cls: "text-green-600 bg-green-50 border-green-200",
-    },
-    error: {
-      label: "Save failed",
-      icon: <FaTimes className="w-3 h-3" />,
-      cls: "text-red-500 bg-red-50 border-red-200",
-    },
+    idle: { label: "Auto-save on", icon: <FaCloud className="w-3 h-3" />, cls: "text-gray-400 bg-gray-50 border-gray-200" },
+    saving: { label: "Saving…", icon: <FaSpinner className="w-3 h-3 animate-spin" />, cls: "text-blue-600 bg-blue-50 border-blue-200" },
+    saved: { label: "Saved", icon: <FaCheck className="w-3 h-3" />, cls: "text-green-600 bg-green-50 border-green-200" },
+    error: { label: "Save failed", icon: <FaTimes className="w-3 h-3" />, cls: "text-red-500 bg-red-50 border-red-200" },
   }[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-all duration-300 ${config.cls}`}
-    >
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium transition-all duration-300 ${config.cls}`}>
       {config.icon}
       {config.label}
     </span>
@@ -313,28 +290,17 @@ type QuizEditorProps = {
 };
 
 const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
-  const handleField = (
-    field: keyof Omit<QuizData, "questions">,
-    value: string,
-  ) => {
+  const handleField = (field: keyof Omit<QuizData, "questions">, value: string) => {
     onChange({ ...data, [field]: value });
   };
 
-  const handleQuestionChange = (
-    index: number,
-    field: "question" | "correctAnswer",
-    value: string,
-  ) => {
+  const handleQuestionChange = (index: number, field: "question" | "correctAnswer", value: string) => {
     const updated = [...data.questions];
     updated[index] = { ...updated[index], [field]: value };
     onChange({ ...data, questions: updated });
   };
 
-  const handleOptionChange = (
-    qIndex: number,
-    optIndex: number,
-    value: string,
-  ) => {
+  const handleOptionChange = (qIndex: number, optIndex: number, value: string) => {
     const updated = [...data.questions];
     const opts = [...updated[qIndex].options];
     opts[optIndex] = value;
@@ -345,19 +311,13 @@ const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
   const addQuestion = () => {
     onChange({
       ...data,
-      questions: [
-        ...data.questions,
-        { question: "", options: ["", "", "", ""], correctAnswer: "" },
-      ],
+      questions: [...data.questions, { question: "", options: ["", "", "", ""], correctAnswer: "" }],
     });
   };
 
   const removeQuestion = (index: number) => {
     if (data.questions.length > 1) {
-      onChange({
-        ...data,
-        questions: data.questions.filter((_, i) => i !== index),
-      });
+      onChange({ ...data, questions: data.questions.filter((_, i) => i !== index) });
     }
   };
 
@@ -365,9 +325,7 @@ const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
     <div className="space-y-4">
       <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full mb-1">
         <span className="w-2 h-2 rounded-full bg-blue-950 animate-pulse" />
-        <span className="text-xs font-semibold text-blue-950 uppercase tracking-wider">
-          {label}
-        </span>
+        <span className="text-xs font-semibold text-blue-950 uppercase tracking-wider">{label}</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -384,9 +342,7 @@ const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Points
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Points</label>
           <input
             type="number"
             value={data.points}
@@ -413,10 +369,7 @@ const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
       <div className="border-t pt-4">
         <h3 className="text-sm font-semibold text-gray-900 mb-4">Questions</h3>
         {data.questions.map((question, qIndex) => (
-          <div
-            key={qIndex}
-            className="mb-5 p-4 border border-gray-200 rounded-lg bg-gray-50"
-          >
+          <div key={qIndex} className="mb-5 p-4 border border-gray-200 rounded-lg bg-gray-50">
             <div className="flex justify-between items-center mb-3">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                 Question {qIndex + 1}
@@ -438,9 +391,7 @@ const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
               <input
                 type="text"
                 value={question.question}
-                onChange={(e) =>
-                  handleQuestionChange(qIndex, "question", e.target.value)
-                }
+                onChange={(e) => handleQuestionChange(qIndex, "question", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                 placeholder="Enter your question"
               />
@@ -458,9 +409,7 @@ const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
                     <input
                       type="text"
                       value={option}
-                      onChange={(e) =>
-                        handleOptionChange(qIndex, optIndex, e.target.value)
-                      }
+                      onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
                       className="flex-1 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                       placeholder={`Option ${String.fromCharCode(65 + optIndex)}`}
                     />
@@ -474,16 +423,13 @@ const QuizEditor = ({ label, data, onChange }: QuizEditorProps) => {
               </label>
               <select
                 value={question.correctAnswer}
-                onChange={(e) =>
-                  handleQuestionChange(qIndex, "correctAnswer", e.target.value)
-                }
+                onChange={(e) => handleQuestionChange(qIndex, "correctAnswer", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
               >
                 <option value="">Select correct answer</option>
                 {question.options.map((option, optIndex) => (
                   <option key={optIndex} value={option}>
-                    {String.fromCharCode(65 + optIndex)}.{" "}
-                    {option || `Option ${String.fromCharCode(65 + optIndex)}`}
+                    {String.fromCharCode(65 + optIndex)}. {option || `Option ${String.fromCharCode(65 + optIndex)}`}
                   </option>
                 ))}
               </select>
@@ -536,12 +482,8 @@ const SimPreviewModal = ({ sim, onClose }: SimPreviewModalProps) => {
           {/* Description */}
           {sim.description && (
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Description
-              </h3>
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {sim.description}
-              </p>
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Description</h3>
+              <p className="text-sm text-gray-700 leading-relaxed">{sim.description}</p>
             </div>
           )}
 
@@ -549,27 +491,19 @@ const SimPreviewModal = ({ sim, onClose }: SimPreviewModalProps) => {
           {sim.sampleLearningGoals && (
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <h3 className="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <FaGraduationCap className="w-3.5 h-3.5" /> Sample Learning
-                Goals
+                <FaGraduationCap className="w-3.5 h-3.5" /> Sample Learning Goals
               </h3>
-              <p className="text-sm text-blue-800 leading-relaxed whitespace-pre-line">
-                {sim.sampleLearningGoals}
-              </p>
+              <p className="text-sm text-blue-800 leading-relaxed whitespace-pre-line">{sim.sampleLearningGoals}</p>
             </div>
           )}
 
           {/* Keywords */}
           {sim.keywords && (
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Keywords
-              </h3>
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Keywords</h3>
               <div className="flex flex-wrap gap-2">
                 {sim.keywords.split(",").map((kw) => (
-                  <span
-                    key={kw}
-                    className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200"
-                  >
+                  <span key={kw} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-200">
                     {kw.trim()}
                   </span>
                 ))}
@@ -581,9 +515,7 @@ const SimPreviewModal = ({ sim, onClose }: SimPreviewModalProps) => {
           {sim.runnableResource && (
             <div className="border border-gray-200 rounded-xl overflow-hidden">
               <div className="bg-gray-100 px-4 py-2 border-b flex items-center justify-between">
-                <span className="text-xs font-semibold text-gray-600">
-                  Live Preview
-                </span>
+                <span className="text-xs font-semibold text-gray-600">Live Preview</span>
                 <a
                   href={sim.runnableResource}
                   target="_blank"
@@ -634,9 +566,7 @@ const ResourcesPanel = ({ sim, isLoading }: ResourcesPanelProps) => {
     return (
       <div className="bg-white border border-dashed border-gray-300 rounded-xl p-5 text-center">
         <FaBook className="w-6 h-6 text-gray-300 mx-auto mb-2" />
-        <p className="text-xs text-gray-400 font-medium">
-          Select a simulation to see resources
-        </p>
+        <p className="text-xs text-gray-400 font-medium">Select a simulation to see resources</p>
       </div>
     );
   }
@@ -644,13 +574,13 @@ const ResourcesPanel = ({ sim, isLoading }: ResourcesPanelProps) => {
   const resources = [
     sim.teacherTipsDoc && {
       label: "Teacher Tips",
-      // href: sim.teacherTipsDoc,
+      href: sim.teacherTipsDoc,
       icon: <FaChalkboardTeacher className="w-3.5 h-3.5" />,
       color: "text-blue-700 bg-blue-50 border-blue-200 hover:bg-blue-100",
     },
     sim.pdfUrl && {
       label: "PDF Guide",
-      // href: sim.pdfUrl,
+      href: sim.pdfUrl,
       icon: <FaFilePdf className="w-3.5 h-3.5" />,
       color: "text-red-600 bg-red-50 border-red-200 hover:bg-red-100",
     },
@@ -660,12 +590,7 @@ const ResourcesPanel = ({ sim, isLoading }: ResourcesPanelProps) => {
       icon: <FaExternalLinkAlt className="w-3.5 h-3.5" />,
       color: "text-green-700 bg-green-50 border-green-200 hover:bg-green-100",
     },
-  ].filter(Boolean) as {
-    label: string;
-    href: string;
-    icon: React.ReactNode;
-    color: string;
-  }[];
+  ].filter(Boolean) as { label: string; href: string; icon: React.ReactNode; color: string }[];
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -683,9 +608,7 @@ const ResourcesPanel = ({ sim, isLoading }: ResourcesPanelProps) => {
             <FaGraduationCap className="w-3.5 h-3.5 text-gray-400" />
             <span>
               Grades <strong>{sim.lowGradeLevel}</strong>
-              {sim.highGradeLevel && sim.highGradeLevel !== sim.lowGradeLevel
-                ? `–${sim.highGradeLevel}`
-                : ""}
+              {sim.highGradeLevel && sim.highGradeLevel !== sim.lowGradeLevel ? `–${sim.highGradeLevel}` : ""}
             </span>
           </div>
         )}
@@ -701,18 +624,14 @@ const ResourcesPanel = ({ sim, isLoading }: ResourcesPanelProps) => {
         {/* Screens */}
         {sim.numberOfScreens > 0 && (
           <div className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
-            <span className="font-semibold">{sim.numberOfScreens}</span> screen
-            {sim.numberOfScreens !== 1 ? "s" : ""}
-            {sim.screenNames ? `: ${sim.screenNames}` : ""}
+            <span className="font-semibold">{sim.numberOfScreens}</span> screen{sim.numberOfScreens !== 1 ? "s" : ""}{sim.screenNames ? `: ${sim.screenNames}` : ""}
           </div>
         )}
 
         {/* Resource links */}
         {resources.length > 0 && (
           <div className="border-t pt-3 space-y-2">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-              Available Resources
-            </p>
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Available Resources</p>
             {resources.map((r) => (
               <a
                 key={r.label}
@@ -732,12 +651,8 @@ const ResourcesPanel = ({ sim, isLoading }: ResourcesPanelProps) => {
         {/* Sample learning goals */}
         {sim.sampleLearningGoals && (
           <div className="border-t pt-3">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-              Learning Goals
-            </p>
-            <p className="text-xs text-gray-600 leading-relaxed line-clamp-4">
-              {sim.sampleLearningGoals}
-            </p>
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Learning Goals</p>
+            <p className="text-xs text-gray-600 leading-relaxed line-clamp-4">{sim.sampleLearningGoals}</p>
           </div>
         )}
       </div>
@@ -763,12 +678,9 @@ const OnboardingGuide = ({ onStart }: OnboardingGuideProps) => {
             <FaFlask className="w-3.5 h-3.5" />
             Interactive Learning Space
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
-            Before you start building
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">Before you start building</h1>
           <p className="text-gray-500 text-base max-w-lg mx-auto leading-relaxed">
-            Here's a quick overview of what you'll configure and how the process
-            works.
+            Here's a quick overview of what you'll configure and how the process works.
           </p>
         </div>
 
@@ -785,17 +697,11 @@ const OnboardingGuide = ({ onStart }: OnboardingGuideProps) => {
                   : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
               }`}
             >
-              <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${activeCard === i ? step.iconBg : "bg-gray-100 text-gray-400"}`}
-              >
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${activeCard === i ? step.iconBg : "bg-gray-100 text-gray-400"}`}>
                 {step.icon}
               </div>
-              <h3 className="text-sm font-bold text-gray-800 mb-1">
-                {step.title}
-              </h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                {step.description}
-              </p>
+              <h3 className="text-sm font-bold text-gray-800 mb-1">{step.title}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">{step.description}</p>
             </button>
           ))}
         </div>
@@ -810,9 +716,7 @@ const OnboardingGuide = ({ onStart }: OnboardingGuideProps) => {
             Start Building
             <FaChevronRight className="w-3 h-3" />
           </button>
-          <p className="text-xs text-gray-400">
-            Takes about 10–15 minutes to complete
-          </p>
+          <p className="text-xs text-gray-400">Takes about 10–15 minutes to complete</p>
         </div>
       </div>
     </div>
@@ -840,9 +744,7 @@ const colorMap = {
 const Section = ({ icon, title, subtitle, color, children }: SectionProps) => (
   <div className="border border-gray-200 rounded-xl p-5 space-y-4 bg-white">
     <div className="flex items-start gap-3">
-      <div className={`p-2 rounded-lg flex-shrink-0 ${colorMap[color]}`}>
-        {icon}
-      </div>
+      <div className={`p-2 rounded-lg flex-shrink-0 ${colorMap[color]}`}>{icon}</div>
       <div>
         <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
         {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
@@ -855,85 +757,33 @@ const Section = ({ icon, title, subtitle, color, children }: SectionProps) => (
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
 const BookIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
   </svg>
 );
 
 const TargetIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    viewBox="0 0 24 24"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <circle cx="12" cy="12" r="6" />
-    <circle cx="12" cy="12" r="2" />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
   </svg>
 );
 
 const GradeIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 14l9-5-9-5-9 5 9 5z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
   </svg>
 );
 
 const LabIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
   </svg>
 );
 
 const TagIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
   </svg>
 );
 
@@ -942,16 +792,22 @@ const TagIcon = () => (
 type CreateLearningSpacePageProps = {
   onSuccess?: () => void;
   onCancel?: () => void;
+  /** Pass the full space object to pre-fill the form for editing */
+  initialData?: Partial<FormData> & { id?: string };
+  /** Defaults to "create". In edit mode the guide is skipped and the header shows "Edit Learning Space" */
+  mode?: "create" | "edit";
 };
 
 export const CreateLearningSpacePage = ({
   onSuccess,
   onCancel,
+  initialData,
+  mode = "create",
 }: CreateLearningSpacePageProps) => {
   const { user, token } = useUser();
 
-  // ── Phase: guide → form ────────────────────────────────────────────────────
-  const [phase, setPhase] = useState<"guide" | "form">("guide");
+  // ── Phase: guide → form (skip guide when editing) ─────────────────────────
+  const [phase, setPhase] = useState<"guide" | "form">(mode === "edit" ? "form" : "guide");
 
   // ── Step ──────────────────────────────────────────────────────────────────
   const [currentStep, setCurrentStep] = useState(0);
@@ -959,22 +815,16 @@ export const CreateLearningSpacePage = ({
   // ── Loading states ─────────────────────────────────────────────────────────
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
-  const [autoSaveStatus, setAutoSaveStatus] = useState<
-    "idle" | "saving" | "saved" | "error"
-  >("idle");
-  const [draftId, setDraftId] = useState<string | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  // Pre-seed draftId when editing so saves call update instead of create
+  const [draftId, setDraftId] = useState<string | null>(initialData?.id ?? null);
 
   // ── Experiment state ───────────────────────────────────────────────────────
   const [simListLoading, setSimListLoading] = useState(false);
   const [simDetailLoading, setSimDetailLoading] = useState(false);
-  const [experimentData, setExperimentData] = useState<ExperimentResponse[]>(
-    [],
-  );
-  const [selectedSimDetail, setSelectedSimDetail] =
-    useState<PhetSimulationDetail | null>(null);
-  const [previewSim, setPreviewSim] = useState<PhetSimulationDetail | null>(
-    null,
-  );
+  const [experimentData, setExperimentData] = useState<ExperimentResponse[]>([]);
+  const [selectedSimDetail, setSelectedSimDetail] = useState<PhetSimulationDetail | null>(null);
+  const [previewSim, setPreviewSim] = useState<PhetSimulationDetail | null>(null);
   const [activeSubject, setActiveSubject] = useState<string>("");
   const [fetchFilters, setFetchFilters] = useState({
     physics: "",
@@ -992,18 +842,19 @@ export const CreateLearningSpacePage = ({
   const [careersInput, setCareersInput] = useState("");
   const [proceduresInput, setProceduresInput] = useState("");
 
-  // ── Pre-quiz toggle ────────────────────────────────────────────────────────
-  const [includePreQuiz, setIncludePreQuiz] = useState(true);
+  // ── Pre-quiz toggle — false if editing and no pre-quiz was configured ───────
+  const [includePreQuiz, setIncludePreQuiz] = useState(
+    mode === "edit" ? !!(initialData?.preSimAssessment?.quizTitle) : true
+  );
 
   // ── Scroll ref: scroll-to-top on step change ───────────────────────────────
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // ── Form ──────────────────────────────────────────────────────────────────
+  // ── Form — merged with initialData so edit mode pre-fills every field ───────
   const [formData, setFormData] = useState<FormData>({
     title: "",
     objective: "",
-    // score: "",
-    duration: 0,
+    duration: "",
     simulationId: "",
     preSimAssessment: { ...EMPTY_QUIZ },
     postSimAssessment: { ...EMPTY_QUIZ },
@@ -1016,7 +867,11 @@ export const CreateLearningSpacePage = ({
     realWorldApplications: [],
     relatedCareers: [],
     realWorldTask: "",
+    ...initialData, // spread last — overrides defaults with existing values
   });
+
+  // Also pre-set includePreQuiz based on whether a pre-quiz title exists
+  // (done via initializer so it only runs once)
 
   // ── Auto-save ref (holds latest formData + draftId for the interval) ───────
   const autoSaveRef = useRef({ formData, draftId, token });
@@ -1050,10 +905,7 @@ export const CreateLearningSpacePage = ({
     async function fetchDetail() {
       setSimDetailLoading(true);
       try {
-        const detail = await getPhetSimulationsById(
-          formData.simulationId,
-          token,
-        );
+        const detail = await getPhetSimulationsById(formData.simulationId, token);
         setSelectedSimDetail(detail);
       } catch (err) {
         console.error("Error fetching simulation detail:", err);
@@ -1079,12 +931,15 @@ export const CreateLearningSpacePage = ({
       const { formData: fd, draftId: did, token: tok } = autoSaveRef.current;
       if (!fd.title.trim()) return; // nothing worth saving yet
 
+      // Strip score (and any other removed fields) before auto-saving
+      const { score: _score, ...cleanFd } = fd as any;
+
       setAutoSaveStatus("saving");
       try {
         if (did) {
-          await updateLearningSpace(fd, did, tok);
+          await updateLearningSpace(cleanFd, did, tok);
         } else {
-          const res = await addLearningSpace(fd, tok);
+          const res = await addLearningSpace(cleanFd, tok);
           setDraftId(res.id);
         }
         setAutoSaveStatus("saved");
@@ -1101,9 +956,7 @@ export const CreateLearningSpacePage = ({
   // ── Handlers ──────────────────────────────────────────────────────────────
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleCourseFilterChange = (subjectId: string) => {
@@ -1139,120 +992,65 @@ export const CreateLearningSpacePage = ({
   // ── Real-World Applications ───────────────────────────────────────────────
 
   const handleRwaKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && realWorldInput.trim()) {
-      e.preventDefault();
-      handleAddRwa();
-    }
+    if (e.key === "Enter" && realWorldInput.trim()) { e.preventDefault(); handleAddRwa(); }
   };
   const handleAddRwa = () => {
     const v = realWorldInput.trim();
     if (v && !formData.realWorldApplications.includes(v)) {
-      setFormData({
-        ...formData,
-        realWorldApplications: [...formData.realWorldApplications, v],
-      });
+      setFormData({ ...formData, realWorldApplications: [...formData.realWorldApplications, v] });
       setRealWorldInput("");
     }
   };
   const handleRemoveRwa = (rwa: string) =>
-    setFormData({
-      ...formData,
-      realWorldApplications: formData.realWorldApplications.filter(
-        (r) => r !== rwa,
-      ),
-    });
+    setFormData({ ...formData, realWorldApplications: formData.realWorldApplications.filter((r) => r !== rwa) });
 
   // ── Related Careers ───────────────────────────────────────────────────────
 
   const handleCareerKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && careersInput.trim()) {
-      e.preventDefault();
-      handleAddCareer();
-    }
+    if (e.key === "Enter" && careersInput.trim()) { e.preventDefault(); handleAddCareer(); }
   };
   const handleAddCareer = () => {
     const v = careersInput.trim();
     if (v && !formData.relatedCareers.includes(v)) {
-      setFormData({
-        ...formData,
-        relatedCareers: [...formData.relatedCareers, v],
-      });
+      setFormData({ ...formData, relatedCareers: [...formData.relatedCareers, v] });
       setCareersInput("");
     }
   };
   const handleRemoveCareer = (career: string) =>
-    setFormData({
-      ...formData,
-      relatedCareers: formData.relatedCareers.filter((c) => c !== career),
-    });
+    setFormData({ ...formData, relatedCareers: formData.relatedCareers.filter((c) => c !== career) });
 
   // ── Experiment Procedures ─────────────────────────────────────────────────
 
   const handleProceduresKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && proceduresInput.trim()) {
-      e.preventDefault();
-      handleAddProcedure();
-    }
+    if (e.key === "Enter" && proceduresInput.trim()) { e.preventDefault(); handleAddProcedure(); }
   };
   const handleAddProcedure = () => {
     const v = proceduresInput.trim();
     if (v && !formData.experimentProcedures.includes(v)) {
-      setFormData({
-        ...formData,
-        experimentProcedures: [...formData.experimentProcedures, v],
-      });
+      setFormData({ ...formData, experimentProcedures: [...formData.experimentProcedures, v] });
       setProceduresInput("");
     }
   };
   const handleRemoveProcedure = (procedure: string) =>
-    setFormData({
-      ...formData,
-      experimentProcedures: formData.experimentProcedures.filter(
-        (p) => p !== procedure,
-      ),
-    });
+    setFormData({ ...formData, experimentProcedures: formData.experimentProcedures.filter((p) => p !== procedure) });
 
   // ── Validation ────────────────────────────────────────────────────────────
 
   const validateSetup = () => {
-    if (!formData.title.trim()) {
-      toast.error("Please enter a title");
-      return false;
-    }
-    if (!formData.objective.trim()) {
-      toast.error("Please enter a learning objective");
-      return false;
-    }
-    if (!formData.duration) {
-      toast.error("Please select a duration");
-      return false;
-    }
+    if (!formData.title.trim()) { toast.error("Please enter a title"); return false; }
+    if (!formData.objective.trim()) { toast.error("Please enter a learning objective"); return false; }
+    if (!formData.duration) { toast.error("Please select a duration"); return false; }
     return true;
   };
 
   const validateQuiz = (quiz: QuizData, label: string) => {
-    if (!quiz.quizTitle.trim()) {
-      toast.error(`${label}: Please enter a quiz title`);
-      return false;
-    }
-    if (!quiz.description.trim()) {
-      toast.error(`${label}: Please enter a description`);
-      return false;
-    }
+    if (!quiz.quizTitle.trim()) { toast.error(`${label}: Please enter a quiz title`); return false; }
+    if (!quiz.description.trim()) { toast.error(`${label}: Please enter a description`); return false; }
     for (let i = 0; i < quiz.questions.length; i++) {
       const q = quiz.questions[i];
-      if (!q.question) {
-        toast.error(`${label} Q${i + 1}: Question text is empty`);
-        return false;
-      }
-      if (q.options.some((o) => !o)) {
-        toast.error(`${label} Q${i + 1}: All options must be filled`);
-        return false;
-      }
-      if (!q.correctAnswer) {
-        toast.error(`${label} Q${i + 1}: Select a correct answer`);
-        return false;
-      }
+      if (!q.question) { toast.error(`${label} Q${i + 1}: Question text is empty`); return false; }
+      if (q.options.some((o) => !o)) { toast.error(`${label} Q${i + 1}: All options must be filled`); return false; }
+      if (!q.correctAnswer) { toast.error(`${label} Q${i + 1}: Select a correct answer`); return false; }
     }
     return true;
   };
@@ -1261,16 +1059,21 @@ export const CreateLearningSpacePage = ({
 
   const handleNext = () => {
     if (currentStep === 0 && !validateSetup()) return;
-    if (
-      currentStep === 1 &&
-      includePreQuiz &&
-      !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")
-    )
-      return;
+    if (currentStep === 1 && includePreQuiz && !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")) return;
     setCurrentStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
   const handleBack = () => setCurrentStep((s) => Math.max(s - 1, 0));
+
+  // ── Clean payload — strips any fields the API should not receive ─────────
+  // score was removed from the schema; this guards against it re-appearing
+  // via initialData spreads or stale API responses.
+  const buildPayload = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { ...rest } = formData as any;
+    delete rest.score;
+    return rest;
+  };
 
   // ── Save Draft ────────────────────────────────────────────────────────────
 
@@ -1282,10 +1085,10 @@ export const CreateLearningSpacePage = ({
     try {
       setIsSavingDraft(true);
       if (draftId) {
-        await updateLearningSpace(formData, draftId, token);
+        await updateLearningSpace(buildPayload(), draftId, token);
         toast.success("Draft updated successfully");
       } else {
-        const res = await addLearningSpace(formData, token);
+        const res = await addLearningSpace(buildPayload(), token);
         setDraftId(res.id);
         toast.success("Draft saved successfully");
       }
@@ -1300,28 +1103,31 @@ export const CreateLearningSpacePage = ({
 
   const handlePublish = async () => {
     if (!validateSetup()) return;
-    if (
-      includePreQuiz &&
-      !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")
-    )
-      return;
+    if (includePreQuiz && !validateQuiz(formData.preSimAssessment, "Pre-Sim Quiz")) return;
     if (!validateQuiz(formData.postSimAssessment, "Post-Sim Quiz")) return;
 
     try {
       setIsLoading(true);
-      const savedId = draftId
-        ? (await updateLearningSpace(formData, draftId, token), draftId)
-        : (await addLearningSpace(formData, token)).id;
 
-      await publishLearningSpace(savedId, token);
-      toast.success("Learning space published successfully");
+      if (mode === "edit" && draftId) {
+        // Edit mode — just update, no re-publish needed
+        await updateLearningSpace(buildPayload(), draftId, token);
+        toast.success("Learning space updated successfully");
+      } else {
+        // Create mode — save then publish
+        const savedId = draftId
+          ? (await updateLearningSpace(buildPayload(), draftId, token), draftId)
+          : (await addLearningSpace(buildPayload(), token)).id;
+        await publishLearningSpace(savedId, token);
+        toast.success("Learning space published successfully");
+      }
       onSuccess?.();
     } catch (error: any) {
       toast.error(
         <div>
-          <p className="font-semibold">Failed to publish</p>
+          <p className="font-semibold">{mode === "edit" ? "Failed to update" : "Failed to publish"}</p>
           <p>{error.message}</p>
-        </div>,
+        </div>
       );
     } finally {
       setIsLoading(false);
@@ -1364,32 +1170,22 @@ export const CreateLearningSpacePage = ({
                   <FaFlask className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-sm font-bold text-gray-900 leading-none">
-                    Create Learning Space
-                  </h1>
+                  <h1 className="text-sm font-bold text-gray-900 leading-none">{mode === "edit" ? "Edit Learning Space" : "Create Learning Space"}</h1>
                   {formData.title && (
-                    <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[200px]">
-                      {formData.title}
-                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[200px]">{formData.title}</p>
                   )}
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden xs:block">
-                <AutoSaveBadge status={autoSaveStatus} />
-              </div>
+              <div className="hidden xs:block"><AutoSaveBadge status={autoSaveStatus} /></div>
               <button
                 onClick={handleSaveDraft}
                 disabled={isSavingDraft || isLoading}
                 className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 font-medium disabled:opacity-50 transition-colors"
               >
-                {isSavingDraft ? (
-                  <FaSpinner className="animate-spin w-3 h-3" />
-                ) : (
-                  <FaSave className="w-3 h-3" />
-                )}
+                {isSavingDraft ? <FaSpinner className="animate-spin w-3 h-3" /> : <FaSave className="w-3 h-3" />}
                 Save Draft
               </button>
             </div>
@@ -1403,631 +1199,446 @@ export const CreateLearningSpacePage = ({
         */}
         <div className="flex-1 lg:overflow-hidden">
           <div className="max-w-screen-xl lg:h-full mx-auto w-full px-4 sm:px-6 flex flex-col">
+
             {/* Step Tracker */}
             <div className="pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
               <StepTracker currentStep={currentStep} />
             </div>
 
             {/* Two-column layout */}
-            <div
-              className={`flex gap-6 lg:flex-1 lg:min-h-0 ${showResourcesPanel ? "flex-col lg:flex-row" : "flex-col"}`}
-            >
+            <div className={`flex gap-6 lg:flex-1 lg:min-h-0 ${showResourcesPanel ? "flex-col lg:flex-row" : "flex-col"}`}>
               {/* ── Form column ──────────────────────────────────────── */}
               <div
                 ref={scrollContainerRef}
                 className="flex-1 lg:overflow-y-auto space-y-5 pb-8"
               >
-                {/* ── Step 0: Setup ── */}
-                {currentStep === 0 && (
-                  <>
-                    <Section
-                      icon={<BookIcon />}
-                      title="Basic Information"
-                      subtitle="Give your learning space a clear, descriptive title"
-                      color="purple"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Title / Topic
-                        </label>
-                        <input
-                          type="text"
-                          name="title"
-                          value={formData.title}
-                          onChange={handleChange}
-                          placeholder="e.g. Introduction to Newton's Laws of Motion"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                        />
-                      </div>
-                    </Section>
-
-                    <Section
-                      icon={<TargetIcon />}
-                      title="Learning Objective"
-                      subtitle="What will students achieve by the end of this session?"
-                      color="orange"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Objective
-                        </label>
-                        <textarea
-                          name="objective"
-                          value={formData.objective}
-                          onChange={handleChange}
-                          rows={3}
-                          placeholder="Students will be able to identify and explain Newton's three laws..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 resize-none"
-                        />
-                        <p className="text-xs text-gray-400 mt-1">
-                          Try using verbs like &quot;identify&quot;,
-                          &quot;explain&quot;, &quot;analyze&quot;,
-                          &quot;create&quot;
-                        </p>
-                      </div>
-                    </Section>
-
-                    <Section
-                      icon={<GradeIcon />}
-                      title="Duration"
-                      subtitle="Set time allocation for the session"
-                      color="green"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Duration
-                        </label>
-                        <select
-                          name="duration"
-                          value={formData.duration}
-                          onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
-                        >
-                          <option value="">Select duration</option>
-                          {Object.entries(DURATION_OPTIONS).map((duration, value) => (
-                            <option key={value} value={value}>
-                              {duration[0]}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </Section>
-
-                    <Section
-                      icon={<LabIcon />}
-                      title="Simulation / Lab Tool"
-                      subtitle="Choose an interactive simulation for hands-on learning"
-                      color="blue"
-                    >
-                      {/* Subject filters */}
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-                        {SIMULATION_SUBJECT.map((tool) => {
-                          const isSelected = activeSubject === tool.id;
-                          return (
-                            <button
-                              key={tool.id}
-                              type="button"
-                              onClick={() => handleCourseFilterChange(tool.id)}
-                              className={`relative text-left p-3.5 rounded-xl border-2 transition-all duration-150
-                              ${isSelected ? "border-blue-950 bg-blue-50" : "border-gray-200 hover:border-gray-300 bg-white"}`}
-                            >
-                              {isSelected && (
-                                <span className="absolute top-2 right-2 bg-blue-950 text-white rounded-full p-0.5">
-                                  <FaCheck className="w-2.5 h-2.5" />
-                                </span>
-                              )}
-                              <div
-                                className={`mb-2 p-2 rounded-lg inline-flex ${isSelected ? "bg-blue-100 text-blue-950" : "bg-gray-100 text-gray-600"}`}
-                              >
-                                {tool.icon}
-                              </div>
-                              <p className="text-xs font-semibold text-gray-800">
-                                {tool.label}
-                              </p>
-                              <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
-                                {tool.description}
-                              </p>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Simulation select with preview button */}
-                      <div className="mt-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Simulation
-                        </label>
-                        <div className="flex gap-2">
-                          <select
-                            name="simulationId"
-                            value={formData.simulationId}
-                            onChange={handleChange}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
-                          >
-                            <option value="">
-                              {simListLoading
-                                ? "Loading simulations…"
-                                : "Select a simulation"}
-                            </option>
-                            {experimentData.map((exp) => (
-                              <option key={exp.id} value={exp.id}>
-                                {exp.title}
-                              </option>
-                            ))}
-                          </select>
-
-                          {/* Preview button — enabled when sim detail is loaded */}
-                          <button
-                            type="button"
-                            disabled={!selectedSimDetail || simDetailLoading}
-                            onClick={() => setPreviewSim(selectedSimDetail)}
-                            title="Preview simulation"
-                            className="flex items-center gap-1.5 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {simDetailLoading ? (
-                              <FaSpinner className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <FaEye className="w-4 h-4" />
-                            )}
-                            <span className="hidden sm:inline">Preview</span>
-                          </button>
-                        </div>
-                      </div>
-                    </Section>
-
-                    <Section
-                      icon={<TagIcon />}
-                      title="Curriculum Tags"
-                      subtitle="Add tags to help organize and discover this learning space"
-                      color="red"
-                    >
-                      <div>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={tagInput}
-                            onChange={(e) => setTagInput(e.target.value)}
-                            onKeyDown={handleTagKeyDown}
-                            placeholder="Type a tag and press Enter..."
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleAddTag}
-                            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600"
-                          >
-                            <FaPlus className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                        {formData.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {formData.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-900 text-xs rounded-full border border-blue-200"
-                              >
-                                {tag}
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveTag(tag)}
-                                  className="hover:text-red-500 transition-colors"
-                                >
-                                  <FaTimes className="w-2.5 h-2.5" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </Section>
-                  </>
-                )}
-
-                {/* ── Step 1: Pre-Sim Quiz ── */}
-                {currentStep === 1 && (
-                  <Section
-                    icon={<TargetIcon />}
-                    title="Pre-Simulation Assessment"
-                    subtitle="Test prior knowledge before students begin the simulation"
-                    color="orange"
-                  >
-                    <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl">
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">
-                          Include Pre-Simulation Quiz
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Turn off to skip this assessment
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setIncludePreQuiz((v) => !v)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors
-                        ${includePreQuiz ? "bg-blue-950 text-white" : "bg-gray-200 text-gray-600"}`}
-                      >
-                        {includePreQuiz ? (
-                          <>
-                            <FaToggleOn className="w-4 h-4" /> Enabled
-                          </>
-                        ) : (
-                          <>
-                            <FaToggleOff className="w-4 h-4" /> Disabled
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    {includePreQuiz ? (
-                      <QuizEditor
-                        label="Pre-Simulation Quiz"
-                        data={formData.preSimAssessment}
-                        onChange={(updated) =>
-                          setFormData({
-                            ...formData,
-                            preSimAssessment: updated,
-                          })
-                        }
+              {/* ── Step 0: Setup ── */}
+              {currentStep === 0 && (
+                <>
+                  <Section icon={<BookIcon />} title="Basic Information" subtitle="Give your learning space a clear, descriptive title" color="purple">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Title / Topic</label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleChange}
+                        placeholder="e.g. Introduction to Newton's Laws of Motion"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
                       />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl mt-2">
-                        <FaToggleOff className="w-8 h-8 mb-2 text-gray-300" />
-                        <p className="text-sm font-medium text-gray-500">
-                          Pre-simulation quiz is disabled
-                        </p>
-                        <p className="text-xs mt-1">
-                          Students will go directly to the simulation.
-                        </p>
-                      </div>
-                    )}
+                    </div>
                   </Section>
-                )}
 
-                {/* ── Step 2: Orientation ── */}
-                {currentStep === 2 && (
-                  <>
-                    <Section
-                      icon={<BookIcon />}
-                      title="Teacher Introduction Message"
-                      subtitle="Message from the teacher displayed before the simulation begins"
-                      color="orange"
-                    >
+                  <Section icon={<TargetIcon />} title="Learning Objective" subtitle="What will students achieve by the end of this session?" color="orange">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Objective</label>
                       <textarea
-                        name="introductionMessage"
-                        value={formData.introductionMessage}
+                        name="objective"
+                        value={formData.objective}
                         onChange={handleChange}
                         rows={3}
-                        placeholder="Today, we're going to explore how density affects whether objects sink or float..."
+                        placeholder="Students will be able to identify and explain Newton's three laws..."
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 resize-none"
                       />
-                    </Section>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Try using verbs like &quot;identify&quot;, &quot;explain&quot;, &quot;analyze&quot;, &quot;create&quot;
+                      </p>
+                    </div>
+                  </Section>
 
-                    <Section
-                      icon={<TargetIcon />}
-                      title="Engagement Question"
-                      subtitle="A question to spark curiosity before the experiment"
-                      color="blue"
-                    >
-                      <input
-                        type="text"
-                        name="engagementQuestion"
-                        value={formData.engagementQuestion}
+                  <Section icon={<GradeIcon />} title="Duration" subtitle="Set time allocation for the session" color="green">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                      <select
+                        name="duration"
+                        value={formData.duration}
                         onChange={handleChange}
-                        placeholder="e.g Why do some things float or sink?"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                      />
-                    </Section>
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
+                      >
+                        <option value="">Select duration</option>
+                        {DURATION_OPTIONS.map((d) => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </Section>
 
-                    <Section
-                      icon={<BookIcon />}
-                      title="Hypothesis Question"
-                      subtitle="Ask students to form a prediction before experimenting"
-                      color="red"
-                    >
-                      <input
-                        type="text"
-                        name="hypothesisQuestion"
-                        value={formData.hypothesisQuestion}
-                        onChange={handleChange}
-                        placeholder="e.g What will happen if we increase the density of an object in water?"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                      />
-                    </Section>
-
-                    <Section
-                      icon={<LabIcon />}
-                      title="Experiment Procedures"
-                      subtitle="Step-by-step procedures to guide the student in carrying out the experiment"
-                      color="orange"
-                    >
-                      <div>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={proceduresInput}
-                            onChange={(e) => setProceduresInput(e.target.value)}
-                            onKeyDown={handleProceduresKeyDown}
-                            placeholder="Type a procedure step and press Enter..."
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                          />
+                  <Section icon={<LabIcon />} title="Simulation / Lab Tool" subtitle="Choose an interactive simulation for hands-on learning" color="blue">
+                    {/* Subject filters */}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                      {SIMULATION_SUBJECT.map((tool) => {
+                        const isSelected = activeSubject === tool.id;
+                        return (
                           <button
+                            key={tool.id}
                             type="button"
-                            onClick={handleAddProcedure}
-                            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600"
+                            onClick={() => handleCourseFilterChange(tool.id)}
+                            className={`relative text-left p-3.5 rounded-xl border-2 transition-all duration-150
+                              ${isSelected ? "border-blue-950 bg-blue-50" : "border-gray-200 hover:border-gray-300 bg-white"}`}
                           >
-                            <FaPlus className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                        {formData.experimentProcedures.length > 0 && (
-                          <ol className="flex flex-col gap-2 mt-3">
-                            {formData.experimentProcedures.map(
-                              (procedure, i) => (
-                                <li
-                                  key={procedure}
-                                  className="flex items-center gap-2.5 px-3 py-2 bg-blue-50 text-blue-900 text-xs rounded-lg border border-blue-200"
-                                >
-                                  <span className="font-bold text-blue-400 w-4 flex-shrink-0">
-                                    {i + 1}.
-                                  </span>
-                                  <span className="flex-1">{procedure}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleRemoveProcedure(procedure)
-                                    }
-                                    className="hover:text-red-500 transition-colors flex-shrink-0"
-                                  >
-                                    <FaTimes className="w-2.5 h-2.5" />
-                                  </button>
-                                </li>
-                              ),
+                            {isSelected && (
+                              <span className="absolute top-2 right-2 bg-blue-950 text-white rounded-full p-0.5">
+                                <FaCheck className="w-2.5 h-2.5" />
+                              </span>
                             )}
-                          </ol>
-                        )}
-                      </div>
-                    </Section>
-
-                    <Section
-                      icon={<TagIcon />}
-                      title="Discussion Prompt"
-                      subtitle="A question or debate topic for after the experiment"
-                      color="green"
-                    >
-                      <input
-                        type="text"
-                        name="discussionPrompt"
-                        value={formData.discussionPrompt}
-                        onChange={handleChange}
-                        placeholder="e.g Was your hypothesis correct? What would you do differently?"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                      />
-                    </Section>
-
-                    <Section
-                      icon={<TargetIcon />}
-                      title="Real-World Applications"
-                      subtitle="Connect the experiment to real-world scenarios"
-                      color="orange"
-                    >
-                      <div>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={realWorldInput}
-                            onChange={(e) => setRealWorldInput(e.target.value)}
-                            onKeyDown={handleRwaKeyDown}
-                            placeholder="e.g Ships floating in water use Archimedes' principle..."
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleAddRwa}
-                            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600"
-                          >
-                            <FaPlus className="w-3.5 h-3.5" />
+                            <div className={`mb-2 p-2 rounded-lg inline-flex ${isSelected ? "bg-blue-100 text-blue-950" : "bg-gray-100 text-gray-600"}`}>
+                              {tool.icon}
+                            </div>
+                            <p className="text-xs font-semibold text-gray-800">{tool.label}</p>
+                            <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">{tool.description}</p>
                           </button>
-                        </div>
-                        {formData.realWorldApplications.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {formData.realWorldApplications.map((rwa) => (
-                              <span
-                                key={rwa}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-900 text-xs rounded-full border border-blue-200"
-                              >
-                                {rwa}
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveRwa(rwa)}
-                                  className="hover:text-red-500 transition-colors"
-                                >
-                                  <FaTimes className="w-2.5 h-2.5" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                        );
+                      })}
+                    </div>
+
+                    {/* Simulation select with preview button */}
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Simulation</label>
+                      <div className="flex gap-2">
+                        <select
+                          name="simulationId"
+                          value={formData.simulationId}
+                          onChange={handleChange}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 bg-white"
+                        >
+                          <option value="">
+                            {simListLoading ? "Loading simulations…" : "Select a simulation"}
+                          </option>
+                          {experimentData.map((exp) => (
+                            <option key={exp.id} value={exp.id}>{exp.title}</option>
+                          ))}
+                        </select>
+
+                        {/* Preview button — enabled when sim detail is loaded */}
+                        <button
+                          type="button"
+                          disabled={!selectedSimDetail || simDetailLoading}
+                          onClick={() => setPreviewSim(selectedSimDetail)}
+                          title="Preview simulation"
+                          className="flex items-center gap-1.5 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {simDetailLoading ? (
+                            <FaSpinner className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <FaEye className="w-4 h-4" />
+                          )}
+                          <span className="hidden sm:inline">Preview</span>
+                        </button>
                       </div>
-                    </Section>
+                    </div>
+                  </Section>
 
-                    <Section
-                      icon={<GradeIcon />}
-                      title="Related Occupations / Careers"
-                      subtitle="Show students how this connects to real careers"
-                      color="red"
-                    >
-                      <div>
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={careersInput}
-                            onChange={(e) => setCareersInput(e.target.value)}
-                            onKeyDown={handleCareerKeyDown}
-                            placeholder="Type a career and press Enter..."
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleAddCareer}
-                            className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600"
-                          >
-                            <FaPlus className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                        {formData.relatedCareers.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {formData.relatedCareers.map((career) => (
-                              <span
-                                key={career}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-900 text-xs rounded-full border border-blue-200"
-                              >
-                                {career}
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveCareer(career)}
-                                  className="hover:text-red-500 transition-colors"
-                                >
-                                  <FaTimes className="w-2.5 h-2.5" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                  <Section icon={<TagIcon />} title="Curriculum Tags" subtitle="Add tags to help organize and discover this learning space" color="red">
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={handleTagKeyDown}
+                          placeholder="Type a tag and press Enter..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddTag}
+                          className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600"
+                        >
+                          <FaPlus className="w-3.5 h-3.5" />
+                        </button>
                       </div>
-                    </Section>
+                      {formData.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {formData.tags.map((tag) => (
+                            <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-900 text-xs rounded-full border border-blue-200">
+                              {tag}
+                              <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-red-500 transition-colors">
+                                <FaTimes className="w-2.5 h-2.5" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Section>
+                </>
+              )}
 
-                    <Section
-                      icon={<TargetIcon />}
-                      title="Student Real-World Task"
-                      subtitle="A prompt asking students to find an example in their own life"
-                      color="purple"
+              {/* ── Step 1: Pre-Sim Quiz ── */}
+              {currentStep === 1 && (
+                <Section icon={<TargetIcon />} title="Pre-Simulation Assessment" subtitle="Test prior knowledge before students begin the simulation" color="orange">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                    <div>
+                      <p className="text-sm font-medium text-gray-800">Include Pre-Simulation Quiz</p>
+                      <p className="text-xs text-gray-500">Turn off to skip this assessment</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIncludePreQuiz((v) => !v)}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors
+                        ${includePreQuiz ? "bg-blue-950 text-white" : "bg-gray-200 text-gray-600"}`}
                     >
-                      <input
-                        type="text"
-                        name="realWorldTask"
-                        value={formData.realWorldTask}
-                        onChange={handleChange}
-                        placeholder="e.g Find one real world example near you and describe the connection"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
-                      />
-                    </Section>
-                  </>
-                )}
+                      {includePreQuiz ? <><FaToggleOn className="w-4 h-4" /> Enabled</> : <><FaToggleOff className="w-4 h-4" /> Disabled</>}
+                    </button>
+                  </div>
 
-                {/* ── Step 3: Post-Sim Quiz ── */}
-                {currentStep === 3 && (
-                  <Section
-                    icon={<LabIcon />}
-                    title="Post-Simulation Assessment"
-                    subtitle="Evaluate what students learned after completing the simulation"
-                    color="blue"
-                  >
+                  {includePreQuiz ? (
                     <QuizEditor
-                      label="Post-Simulation Quiz"
-                      data={formData.postSimAssessment}
-                      onChange={(updated) =>
-                        setFormData({ ...formData, postSimAssessment: updated })
-                      }
+                      label="Pre-Simulation Quiz"
+                      data={formData.preSimAssessment}
+                      onChange={(updated) => setFormData({ ...formData, preSimAssessment: updated })}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400 border-2 border-dashed border-gray-200 rounded-xl mt-2">
+                      <FaToggleOff className="w-8 h-8 mb-2 text-gray-300" />
+                      <p className="text-sm font-medium text-gray-500">Pre-simulation quiz is disabled</p>
+                      <p className="text-xs mt-1">Students will go directly to the simulation.</p>
+                    </div>
+                  )}
+                </Section>
+              )}
+
+              {/* ── Step 2: Orientation ── */}
+              {currentStep === 2 && (
+                <>
+                  <Section icon={<BookIcon />} title="Teacher Introduction Message" subtitle="Message from the teacher displayed before the simulation begins" color="orange">
+                    <textarea
+                      name="introductionMessage"
+                      value={formData.introductionMessage}
+                      onChange={handleChange}
+                      rows={3}
+                      placeholder="Today, we're going to explore how density affects whether objects sink or float..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950 resize-none"
                     />
                   </Section>
-                )}
 
-                {/* ── Footer navigation ─────────────────────────────────────── */}
-                <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 pb-8 border-t border-gray-200 mt-2">
-                  {/* Save draft — full width on mobile, auto on sm+ */}
+                  <Section icon={<TargetIcon />} title="Engagement Question" subtitle="A question to spark curiosity before the experiment" color="blue">
+                    <input
+                      type="text"
+                      name="engagementQuestion"
+                      value={formData.engagementQuestion}
+                      onChange={handleChange}
+                      placeholder="e.g Why do some things float or sink?"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                    />
+                  </Section>
+
+                  <Section icon={<BookIcon />} title="Hypothesis Question" subtitle="Ask students to form a prediction before experimenting" color="red">
+                    <input
+                      type="text"
+                      name="hypothesisQuestion"
+                      value={formData.hypothesisQuestion}
+                      onChange={handleChange}
+                      placeholder="e.g What will happen if we increase the density of an object in water?"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                    />
+                  </Section>
+
+                  <Section icon={<LabIcon />} title="Experiment Procedures" subtitle="Step-by-step procedures to guide the student in carrying out the experiment" color="orange">
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={proceduresInput}
+                          onChange={(e) => setProceduresInput(e.target.value)}
+                          onKeyDown={handleProceduresKeyDown}
+                          placeholder="Type a procedure step and press Enter..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                        />
+                        <button type="button" onClick={handleAddProcedure} className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+                          <FaPlus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      {formData.experimentProcedures.length > 0 && (
+                        <ol className="flex flex-col gap-2 mt-3">
+                          {formData.experimentProcedures.map((procedure, i) => (
+                            <li key={procedure} className="flex items-center gap-2.5 px-3 py-2 bg-blue-50 text-blue-900 text-xs rounded-lg border border-blue-200">
+                              <span className="font-bold text-blue-400 w-4 flex-shrink-0">{i + 1}.</span>
+                              <span className="flex-1">{procedure}</span>
+                              <button type="button" onClick={() => handleRemoveProcedure(procedure)} className="hover:text-red-500 transition-colors flex-shrink-0">
+                                <FaTimes className="w-2.5 h-2.5" />
+                              </button>
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </div>
+                  </Section>
+
+                  <Section icon={<TagIcon />} title="Discussion Prompt" subtitle="A question or debate topic for after the experiment" color="green">
+                    <input
+                      type="text"
+                      name="discussionPrompt"
+                      value={formData.discussionPrompt}
+                      onChange={handleChange}
+                      placeholder="e.g Was your hypothesis correct? What would you do differently?"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                    />
+                  </Section>
+
+                  <Section icon={<TargetIcon />} title="Real-World Applications" subtitle="Connect the experiment to real-world scenarios" color="orange">
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={realWorldInput}
+                          onChange={(e) => setRealWorldInput(e.target.value)}
+                          onKeyDown={handleRwaKeyDown}
+                          placeholder="e.g Ships floating in water use Archimedes' principle..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                        />
+                        <button type="button" onClick={handleAddRwa} className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+                          <FaPlus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      {formData.realWorldApplications.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {formData.realWorldApplications.map((rwa) => (
+                            <span key={rwa} className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-900 text-xs rounded-full border border-blue-200">
+                              {rwa}
+                              <button type="button" onClick={() => handleRemoveRwa(rwa)} className="hover:text-red-500 transition-colors">
+                                <FaTimes className="w-2.5 h-2.5" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Section>
+
+                  <Section icon={<GradeIcon />} title="Related Occupations / Careers" subtitle="Show students how this connects to real careers" color="red">
+                    <div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={careersInput}
+                          onChange={(e) => setCareersInput(e.target.value)}
+                          onKeyDown={handleCareerKeyDown}
+                          placeholder="Type a career and press Enter..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                        />
+                        <button type="button" onClick={handleAddCareer} className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+                          <FaPlus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      {formData.relatedCareers.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {formData.relatedCareers.map((career) => (
+                            <span key={career} className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-900 text-xs rounded-full border border-blue-200">
+                              {career}
+                              <button type="button" onClick={() => handleRemoveCareer(career)} className="hover:text-red-500 transition-colors">
+                                <FaTimes className="w-2.5 h-2.5" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Section>
+
+                  <Section icon={<TargetIcon />} title="Student Real-World Task" subtitle="A prompt asking students to find an example in their own life" color="purple">
+                    <input
+                      type="text"
+                      name="realWorldTask"
+                      value={formData.realWorldTask}
+                      onChange={handleChange}
+                      placeholder="e.g Find one real world example near you and describe the connection"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-950"
+                    />
+                  </Section>
+                </>
+              )}
+
+              {/* ── Step 3: Post-Sim Quiz ── */}
+              {currentStep === 3 && (
+                <Section icon={<LabIcon />} title="Post-Simulation Assessment" subtitle="Evaluate what students learned after completing the simulation" color="blue">
+                  <QuizEditor
+                    label="Post-Simulation Quiz"
+                    data={formData.postSimAssessment}
+                    onChange={(updated) => setFormData({ ...formData, postSimAssessment: updated })}
+                  />
+                </Section>
+              )}
+
+              {/* ── Footer navigation ─────────────────────────────────────── */}
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 pb-8 border-t border-gray-200 mt-2">
+                {/* Save draft — full width on mobile, auto on sm+ */}
+                <button
+                  onClick={handleSaveDraft}
+                  disabled={isSavingDraft || isLoading}
+                  className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 font-medium disabled:opacity-50 transition-colors"
+                >
+                  {isSavingDraft ? <FaSpinner className="animate-spin w-3.5 h-3.5" /> : <FaSave className="w-3.5 h-3.5" />}
+                  Save Draft
+                </button>
+
+                {/* Back / Next / Publish — full width row on mobile */}
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <button
-                    onClick={handleSaveDraft}
-                    disabled={isSavingDraft || isLoading}
-                    className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 font-medium disabled:opacity-50 transition-colors"
+                    onClick={currentStep === 0 ? onCancel : handleBack}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors"
                   >
-                    {isSavingDraft ? (
-                      <FaSpinner className="animate-spin w-3.5 h-3.5" />
-                    ) : (
-                      <FaSave className="w-3.5 h-3.5" />
-                    )}
-                    Save Draft
+                    <FaChevronLeft className="w-3 h-3" />
+                    {currentStep === 0 ? "Cancel" : "Back"}
                   </button>
 
-                  {/* Back / Next / Publish — full width row on mobile */}
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  {currentStep < STEPS.length - 1 && (
                     <button
-                      onClick={currentStep === 0 ? onCancel : handleBack}
-                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 transition-colors"
+                      onClick={handleNext}
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 sm:py-2 text-sm bg-blue-950 text-white rounded-lg hover:bg-blue-800 active:scale-95 transition-all"
                     >
-                      <FaChevronLeft className="w-3 h-3" />
-                      {currentStep === 0 ? "Cancel" : "Back"}
+                      Next
+                      <FaChevronRight className="w-3 h-3" />
                     </button>
+                  )}
 
-                    {currentStep < STEPS.length - 1 && (
-                      <button
-                        onClick={handleNext}
-                        className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 sm:py-2 text-sm bg-blue-950 text-white rounded-lg hover:bg-blue-800 active:scale-95 transition-all"
-                      >
-                        Next
-                        <FaChevronRight className="w-3 h-3" />
-                      </button>
-                    )}
-
-                    {currentStep === STEPS.length - 1 && (
-                      <button
-                        onClick={handlePublish}
-                        disabled={isLoading || isSavingDraft}
-                        className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 sm:py-2 text-sm rounded-lg text-white transition-all
+                  {currentStep === STEPS.length - 1 && (
+                    <button
+                      onClick={handlePublish}
+                      disabled={isLoading || isSavingDraft}
+                      className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 sm:py-2 text-sm rounded-lg text-white transition-all
                         ${isLoading ? "bg-blue-800 cursor-not-allowed" : "bg-blue-950 hover:bg-blue-800 active:scale-95"}
                         disabled:opacity-50`}
-                      >
-                        {isLoading ? (
-                          <>
-                            <FaSpinner className="animate-spin w-4 h-4" />{" "}
-                            Publishing…
-                          </>
-                        ) : (
-                          <>
-                            <FaPaperPlane className="w-3.5 h-3.5" /> Publish
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
+                    >
+                      {isLoading ? (
+                        <><FaSpinner className="animate-spin w-4 h-4" /> {mode === "edit" ? "Saving…" : "Publishing…"}</>
+                      ) : (
+                        <><FaPaperPlane className="w-3.5 h-3.5" /> {mode === "edit" ? "Save Changes" : "Publish"}</>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
-
-              {/* ── Resources sidebar (step 0 only) ─────────────────────── */}
-              {showResourcesPanel && (
-                <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0 lg:overflow-y-auto pb-8 space-y-4">
-                  <ResourcesPanel
-                    sim={selectedSimDetail}
-                    isLoading={simDetailLoading}
-                  />
-
-                  {/* Quick tips card */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                    <h3 className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <FaLightbulb className="w-3 h-3" /> Tips
-                    </h3>
-                    <ul className="space-y-1.5">
-                      {[
-                        "Pick a simulation first to unlock resources",
-                        "Use the Preview button to try the sim before selecting",
-                        "Teacher tips include classroom activity guides",
-                      ].map((tip) => (
-                        <li
-                          key={tip}
-                          className="flex items-start gap-2 text-xs text-amber-800"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </aside>
-              )}
             </div>
-            {/* end two-column flex */}
-          </div>
-          {/* end h-full column wrapper */}
-        </div>
-        {/* end flex-1 overflow-hidden */}
+
+            {/* ── Resources sidebar (step 0 only) ─────────────────────── */}
+            {showResourcesPanel && (
+              <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0 lg:overflow-y-auto pb-8 space-y-4">
+                <ResourcesPanel sim={selectedSimDetail} isLoading={simDetailLoading} />
+
+                {/* Quick tips card */}
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <h3 className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <FaLightbulb className="w-3 h-3" /> Tips
+                  </h3>
+                  <ul className="space-y-1.5">
+                    {[
+                      "Pick a simulation first to unlock resources",
+                      "Use the Preview button to try the sim before selecting",
+                      "Teacher tips include classroom activity guides",
+                    ].map((tip) => (
+                      <li key={tip} className="flex items-start gap-2 text-xs text-amber-800">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                        {tip}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </aside>
+            )}
+            </div>{/* end two-column flex */}
+          </div>{/* end h-full column wrapper */}
+        </div>{/* end flex-1 overflow-hidden */}
       </div>
     </>
   );
