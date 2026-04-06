@@ -549,7 +549,7 @@ export const quizResultStats: StatCardData[] = [
 export const AdminGeneralMetricStats: StatCardData[] = [
   {
     title: "Total Platform Users",
-    value: "1253",
+    value: "1703",
     icon: "/images/icon/total_users.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -557,7 +557,7 @@ export const AdminGeneralMetricStats: StatCardData[] = [
   },
   {
     title: "Total Schools Registered",
-    value: "76",
+    value: "131",
     icon: "/images/icon/total_schools.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
