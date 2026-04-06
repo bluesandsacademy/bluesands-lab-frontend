@@ -6,6 +6,7 @@ import { login } from "@/services/auth-service";
 import { useUser } from "@/services/UserContext";
 import NProgress from "nprogress";
 import { toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function UserLogin() {
   useEffect(() => {
@@ -148,6 +149,7 @@ export default function UserLogin() {
             >
               {isSubmitting ? "Logging in..." : "Login"}
             </button>
+            <GoogleLogin onSuccess={()=> toast.success("Login Successful")}/>
             <p className="text-gray-500 text-center text-xs md:text-base">
               Don't have an account?{" "}
               <Link

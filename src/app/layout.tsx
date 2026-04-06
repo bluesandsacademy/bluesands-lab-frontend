@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
 import AuthGuard from "@/services/AuthGuard";
 import Providers from "./Providers";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 
 export const metadata: Metadata = {
@@ -41,9 +42,11 @@ export default function RootLayout({
           pauseOnHover
         />
         <UserProvider>
+          <GoogleOAuthProvider clientId="">
           <Providers>
             <AuthGuard> {children} </AuthGuard>
           </Providers>
+          </GoogleOAuthProvider>
         </UserProvider>
       </body>
     </html>
