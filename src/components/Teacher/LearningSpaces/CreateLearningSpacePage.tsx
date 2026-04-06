@@ -77,21 +77,49 @@ type FormData = {
   realWorldTask: string;
 };
 
+// interface ExperimentResponse {
+//   id: string;
+//   title: string;
+//   thumbnailUrl: string;
+//   topic: string;
+//   description: string;
+//   learningGoals: string;
+//   lowGradeLevel: string;
+//   mainTopics: string;
+//   physics: boolean;
+//   chemistry: boolean;
+//   biology: boolean;
+//   math: boolean;
+//   earthSpace: boolean;
+//   keywords: string;
+// }
+
 interface ExperimentResponse {
   id: string;
   title: string;
-  thumbnailUrl: string;
-  topic: string;
-  description: string;
-  learningGoals: string;
-  lowGradeLevel: string;
-  mainTopics: string;
+  type: string;
+  numberOfScreens: number;
+  screenNames: string;
+  simPage: string;
+  simString: string;
+  teacherTipsDoc: string;
+  pdfUrl: string;
   physics: boolean;
+  mathStatistics: boolean;
   chemistry: boolean;
-  biology: boolean;
-  math: boolean;
   earthSpace: boolean;
+  biology: boolean;
+  lowGradeLevel: string;
+  highGradeLevel: string;
+  mainTopics: string;
   keywords: string;
+  description: string;
+  sampleLearningGoals: string;
+  translations: string;
+  published: string;
+  runnableResource: string;
+  cheerpJRunnable: string;
+  filename: string;
 }
 
 interface PhetSimulationDetail {
@@ -879,6 +907,15 @@ export const CreateLearningSpacePage = ({
     autoSaveRef.current = { formData, draftId, token };
   }, [formData, draftId, token]);
 
+
+  // Function to get only runnable html resources from phet simulations
+  function getHtmlResources(arr: ExperimentResponse[]) {
+  return arr
+    .sort((a, b) => a.runnableResource.localeCompare(b.runnableResource))
+    .filter(item => item.runnableResource.endsWith(".html"));
+}
+
+
   // ── Fetch simulation list ─────────────────────────────────────────────────
   useEffect(() => {
     if (phase !== "form") return;
@@ -886,7 +923,8 @@ export const CreateLearningSpacePage = ({
       setSimListLoading(true);
       try {
         const data = await getPhetSimulations(token, fetchFilters);
-        setExperimentData(data.items || []);
+        const runnables = getHtmlResources(data.items)
+        setExperimentData(runnables || []);
       } catch (err) {
         console.error("Error fetching experiments:", err);
       } finally {

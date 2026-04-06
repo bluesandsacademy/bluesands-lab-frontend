@@ -1,8 +1,12 @@
+"use client"
+import { GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
-export const metadata = {
-  title: "Get Started | Create your Blue Sands Account",
-};
+// ------- MOVE TO LAYOUT PAGE --------
+// export const metadata = {
+//   title: "Get Started | Create your Blue Sands Account",
+// };
 
 const linkOptions = [
   {
@@ -58,6 +62,7 @@ export default function RegisterUser() {
             {link.title}
           </Link>
         ))}
+        <GoogleLogin onSuccess={()=>{}}/>
       </div>
     </section>
   );
