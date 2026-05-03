@@ -19,8 +19,9 @@ import DiscussionStep from "./DiscussionStep";
 import RealWorldStep from "./RealworldStep";
 import AssessmentStep from "./AssessmentStep";
 import { QuizResults, QuizSessionEmbedded } from "./QuizCore";
-import { getLearningSpaceById } from "@/services/learningSpaceService";
+import { getLearningSpaceById, submitLearningSpace } from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
+import { toast } from "react-toastify";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -191,12 +192,26 @@ function mapApiToSteps(api: ApiLearningSpace): LessonStep[] {
 // ── Step registry ─────────────────────────────────────────────
 
 function PreQuizWrapper({ data, onContinue, onStepComplete }: any) {
+  // Normalize API questions to include id and default missing fields
+  const normalizedQuiz = {
+    title: data.quiz.quizTitle ?? "Pre-Quiz",
+    duration: 10, // default duration in minutes
+    questions: data.quiz.questions.map((q: any, index: number) => ({
+      id: `q-${index}`,           // generates stable id from index
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.correctAnswer,
+      explanation: q.explanation ?? "",
+    })),
+  };
+
   const handleQuizComplete = (results: QuizResults) => {
     onStepComplete({ stepId: data.id, quizResults: results });
-    onContinue();
+    onContinue({ stepId: data.id, quizResults: results }); // ✅ pass payload to onContinue too
   };
+
   return (
-    <QuizSessionEmbedded quiz={data.quiz} onComplete={handleQuizComplete} />
+    <QuizSessionEmbedded quiz={normalizedQuiz} onComplete={handleQuizComplete} />
   );
 }
 
@@ -308,23 +323,14 @@ function StepBar({
 }
 
 // ── Form submission ───────────────────────────────────────────
+// const {token} = useUser();
 
-async function submitLearningSpace(
-  lessonId: string,
-  formData: FormData,
-): Promise<void> {
-  const response = await fetch("/api/learning-space/submit", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      lessonId,
-      submittedAt: new Date().toISOString(),
-      steps: formData,
-    }),
-  });
-  if (!response.ok)
-    throw new Error(`Submission failed: ${response.statusText}`);
-}
+// async function handleSubmitLearningSpace(
+//    lessonId: string,
+//   formData: FormData,
+// ){
+//   const response = await submitLearningSpace(lessonId, formData, token);
+// }
 
 // ── Shared lesson content ─────────────────────────────────────
 
@@ -335,7 +341,7 @@ function LessonContent({
   lessonId?: string;
   onClose?: () => void;
 }) {
-  const { token } = useUser();
+  const { token } = useUser(); // ✅ inside component
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({});
@@ -349,10 +355,7 @@ function LessonContent({
     setFetchError(null);
     setLoading(true);
     try {
-      const data: ApiLearningSpace = await getLearningSpaceById(
-        lessonId,
-        token,
-      );
+      const data: ApiLearningSpace = await getLearningSpaceById(lessonId, token);
       const steps = mapApiToSteps(data);
       setLesson({
         id: data.id,
@@ -369,14 +372,31 @@ function LessonContent({
   }, [lessonId, token]);
 
   useEffect(() => {
-    // Reset all state when a new space is opened
     setLesson(null);
     setCurrentStep(0);
     setFormData({});
     fetchLesson();
-  }, [lessonId]); // intentionally only re-run when lessonId changes
+  }, [lessonId]);
 
   const activeSteps = lesson?.steps ?? [];
+
+  //  Accept the last step's payload directly so we don't rely on stale formData state
+  const doSubmit = useCallback(
+    async (finalFormData: FormData) => {
+      if (!lesson) return;
+      setIsSubmitting(true);
+      setSubmitError(null);
+      try {
+        await submitLearningSpace(lessonId ?? lesson.id, finalFormData, token);
+        toast.success("Learning space submitted!");
+      } catch (err: any) {
+        setSubmitError(err.message ?? "Submission failed.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [lesson, lessonId, token],
+  );
 
   const handleStepComplete = useCallback(
     (payload: StepPayload) => {
@@ -388,25 +408,32 @@ function LessonContent({
     [currentStep],
   );
 
-  const handleContinue = useCallback(() => {
-    if (!lesson) return;
-    const isLastStep = currentStep === activeSteps.length - 1;
-    if (isLastStep) {
-      setIsSubmitting(true);
-      setSubmitError(null);
-      submitLearningSpace(lessonId ?? lesson.id, formData)
-        .catch((err) => setSubmitError(err.message))
-        .finally(() => setIsSubmitting(false));
-    } else {
-      setCurrentStep((s) => s + 1);
-    }
-  }, [lesson, activeSteps.length, currentStep, lessonId, formData]);
+  const handleContinue = useCallback(
+    (lastPayload?: StepPayload) => {
+      if (!lesson) return;
+      const isLastStep = currentStep === activeSteps.length - 1;
+
+      if (isLastStep) {
+        // Merge the final payload immediately — don't wait for setFormData to flush
+        const finalFormData: FormData = lastPayload
+          ? {
+              ...formData,
+              [String(lastPayload.stepId ?? currentStep)]: lastPayload,
+            }
+          : formData;
+        doSubmit(finalFormData);
+      } else {
+        setCurrentStep((s) => s + 1);
+      }
+    },
+    [lesson, activeSteps.length, currentStep, formData, doSubmit],
+  );
 
   const handleBack = useCallback(() => {
     setCurrentStep((s) => Math.max(s - 1, 0));
   }, []);
 
-  // ── Render states ──────────────────────────────────────────
+//   // ── Render states ──────────────────────────────────────────
 
   if (loading) {
     return (
@@ -452,13 +479,28 @@ function LessonContent({
     );
   }
 
-  const stepData = activeSteps[currentStep];
-  const enrichedStepData = {
-    ...stepData,
-    stepNumber: currentStep + 1,
-    totalSteps: activeSteps.length,
-  };
-  const StepView = STEP_COMPONENTS[stepData.type];
+
+  // const stepData = activeSteps[currentStep];
+  // const StepView = STEP_COMPONENTS[stepData.type];
+
+    // Guard: clamp currentStep in case it's ever out of bounds
+  const safeStep = Math.min(currentStep, activeSteps.length - 1);
+  const stepData = activeSteps[safeStep];
+
+  // Guard: unknown step type should never crash the app
+   const StepView = stepData ? STEP_COMPONENTS[stepData.type] : null;
+
+     if (!stepData || !StepView) {
+    return (
+      <div className="flex h-64 items-center justify-center text-sm text-gray-400">
+        Step not found.
+      </div>
+    );
+  }
+
+  // TypeScript knows StepView is non-null past this point,
+  // but this assertion makes it explicit for the JSX renderer
+  const StepComponent = StepView as StepComponentType;
 
   return (
     <div className="flex h-full flex-col bg-gray-50">
@@ -471,9 +513,11 @@ function LessonContent({
       <StepBar steps={activeSteps} currentIndex={currentStep} />
 
       <div className="flex-1 overflow-y-auto">
-        <StepView
+        <StepComponent
           data={{
-            ...enrichedStepData,
+            ...stepData,
+            stepNumber: currentStep + 1,
+            totalSteps: activeSteps.length,
             title: lesson.title,
             subtitle: lesson.subtitle,
           }}
@@ -490,10 +534,7 @@ function LessonContent({
       {submitError && (
         <div className="border-t border-rose-100 bg-rose-50 px-5 py-3 text-center text-sm text-rose-600">
           {submitError} —{" "}
-          <button
-            className="underline"
-            onClick={() => submitLearningSpace(lessonId ?? lesson.id, formData)}
-          >
+          <button className="underline" onClick={() => doSubmit(formData)}>
             Retry
           </button>
         </div>
@@ -501,7 +542,6 @@ function LessonContent({
     </div>
   );
 }
-
 // ── Popup wrapper ─────────────────────────────────────────────
 
 function LearningSpacePopup({

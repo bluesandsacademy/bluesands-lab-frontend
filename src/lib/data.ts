@@ -549,7 +549,8 @@ export const quizResultStats: StatCardData[] = [
 export const AdminGeneralMetricStats: StatCardData[] = [
   {
     title: "Total Platform Users",
-    value: "1703",
+    // value: "1703(jun-dec, 2025) + 2720(jan-april)",
+    value: "4423",
     icon: "/images/icon/total_users.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -573,7 +574,8 @@ export const AdminGeneralMetricStats: StatCardData[] = [
   },
   {
     title: "Total Payments",
-    value: "NGN 19,410,000",
+    // value: "NGN 19,410,000",
+    value: "NGN 19,511,250",
     icon: "/images/icon/total_payments.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -600,26 +602,29 @@ export const AdminLearningMetricStats: StatCardData[] = [
   },
   {
     title: "Total Quiz Scores",
-    value: "66%",
+    // value: "66%",
+    value: "84%",
     icon: "/images/icon/clipboard.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
-    timeFrame: "overall",
+    timeFrame: "this year",
   },
   {
     title: "Total Experiment Attempts",
-    value: "182 Attempt(s)",
+    // value: "182 Attempt(s)(last year) + ",
+     value: "225 Attempt(s)",
     icon: "/images/icon/microscope.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
-    timeFrame: "overall",
+    timeFrame: "this year",
   },
 ];
 
 export const AdminUserOverviewStats: StatCardData[] = [
   {
     title: "Subscribed Users",
-    value: "1632",
+    // value: "1632",
+    value: "4352",
     icon: "/images/svg/subscribed.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -635,7 +640,8 @@ export const AdminUserOverviewStats: StatCardData[] = [
   },
   {
     title: "Male Users",
-    value: "972",
+    // value: "972",
+    value: "2565",
     icon: "/images/svg/male.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
@@ -643,7 +649,8 @@ export const AdminUserOverviewStats: StatCardData[] = [
   },
   {
     title: "Female Users",
-    value: "731",
+    // value: "731", last year
+    value: "1858",
     icon: "/images/svg/female.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
