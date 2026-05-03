@@ -147,3 +147,26 @@ export async function assignLearningSpace(
     throw error;
   }
 }
+
+
+export async function submitLearningSpace(
+  lessonId: string,
+  learningSpaceSubmissionData: {}, //incude lesson id and probably studentid
+  // schoolId?: string | null,
+  token?: string | null
+) {
+  try {
+    const res = await apiClient.post(
+      "/api/submissions",
+      {lessonID: lessonId, submission: learningSpaceSubmissionData},
+      {
+        // params: { schoolId },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Failed to submit learning space:", error);
+    throw error;
+  }
+}

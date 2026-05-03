@@ -5,7 +5,7 @@ import { BsGlobe } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { FaBriefcase, FaGlobeAfrica, FaImage } from "react-icons/fa";
 
-export default function RealWorldStep({ data, onContinue }: any) {
+export default function RealWorldStep({ data, onContinue, onStepComplete }: any) {
   const [note, setNote] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -13,6 +13,20 @@ export default function RealWorldStep({ data, onContinue }: any) {
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setPhoto(URL.createObjectURL(file));
+  };
+
+  const handleContinue = () => {
+    // Build this step's payload
+    const payload = {
+      stepId: data.id,
+      note,
+      photo, // blob URL — swap for a real upload URL if you handle file uploads server-side
+    };
+
+    // Pass payload both to the collector and directly to onContinue
+    // so the parent can merge it immediately before submitting
+    onStepComplete(payload);
+    onContinue(payload);
   };
 
   return (
@@ -34,28 +48,18 @@ export default function RealWorldStep({ data, onContinue }: any) {
 
       {/* Example cards */}
       <div className="grid grid-cols-3 gap-3">
-        {data.realWorldApplications?.map((ex: any) => (
-          <div key={ex.id}
+        {data.realWorldApplications?.map((ex: string, index: number) => (
+          <div
+            key={index}
             className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm"
           >
             <div className="h-32 w-full overflow-hidden bg-gray-100">
-              {ex.imageUrl ? (
-                <img
-                  src={ex.imageUrl}
-                  alt={ex}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-xs text-gray-400">
-                  <FaGlobeAfrica size={70} />
-                </div>
-              )}
+              <div className="flex h-full items-center justify-center text-xs text-gray-400">
+                <FaGlobeAfrica size={70} />
+              </div>
             </div>
             <div className="p-3">
               <p className="text-sm font-semibold text-gray-800">{ex}</p>
-              <p className="mt-1 text-xs text-gray-500 leading-relaxed">
-                {ex.description}
-              </p>
             </div>
           </div>
         ))}
@@ -65,15 +69,16 @@ export default function RealWorldStep({ data, onContinue }: any) {
       <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
         <p className="text-sm mb-2 font-semibold text-indigo-600">Related Careers</p>
         <div className="flex flex-wrap gap-3">
-          {data.relatedCareers.map((career: string, index:number)=>(
-            <div key={index} className="flex items-center p-2 justify-center gap-2 bg-blue-200 rounded">
-              <FaBriefcase className="text-blue-700"/>
-              <p className="text-sm text-blue-700 m-auto flex items-center justify-center">{career}</p>
+          {data.relatedCareers.map((career: string, index: number) => (
+            <div
+              key={index}
+              className="flex items-center p-2 justify-center gap-2 bg-blue-200 rounded"
+            >
+              <FaBriefcase className="text-blue-700" />
+              <p className="text-sm text-blue-700">{career}</p>
             </div>
-          
-        ))}
+          ))}
         </div>
-        
       </div>
 
       {/* Optional task */}
@@ -84,7 +89,7 @@ export default function RealWorldStep({ data, onContinue }: any) {
           rows={3}
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder={data.optionalTask?.placeholder}
+          placeholder="Write your notes here…"
           className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-indigo-400 focus:bg-white"
         />
 
@@ -98,11 +103,7 @@ export default function RealWorldStep({ data, onContinue }: any) {
 
         {photo ? (
           <div className="mt-3 overflow-hidden rounded-xl border border-gray-200">
-            <img
-              src={photo}
-              alt="Upload preview"
-              className="max-h-48 w-full object-cover"
-            />
+            <img src={photo} alt="Upload preview" className="max-h-48 w-full object-cover" />
           </div>
         ) : (
           <button
@@ -116,7 +117,7 @@ export default function RealWorldStep({ data, onContinue }: any) {
 
       <div className="flex justify-end">
         <button
-          onClick={onContinue}
+          onClick={handleContinue}
           className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
         >
           Continue <FiArrowRight />

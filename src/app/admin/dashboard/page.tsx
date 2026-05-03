@@ -23,18 +23,18 @@ import {
 
 // Sample data for charts
 const lineChartData = [
-  // { month: "Jan", users: 0, schools: 0 },
-  // { month: "Feb", users: 0, schools: 0 },
-  // { month: "Mar", users: 0, schools: 0 },
-  // { month: "Apr", users: 0, schools: 0 },
+  { month: "Jan", users: 720, schools: 0 },
+  { month: "Feb", users: 800, schools: 0 },
+  { month: "Mar", users: 700, schools: 0 },
+  { month: "Apr", users: 500, schools: 0 },
   // { month: "May", users: 0, schools: 0 },
-  { month: "Jun", users: 150, schools: 0 },
-  { month: "Jul", users: 350, schools: 15 },
-  { month: "Aug", users: 428, schools: 15 },
-  { month: "Sep", users: 125, schools: 14 },
-  { month: "Oct", users: 200, schools: 32 },
-  { month: "Nov", users: 350, schools: 36 },
-  { month: "Dec", users: 100, schools: 8 },
+  // { month: "Jun", users: 150, schools: 0 },
+  // { month: "Jul", users: 350, schools: 15 },
+  // { month: "Aug", users: 428, schools: 15 },
+  // { month: "Sep", users: 125, schools: 14 },
+  // { month: "Oct", users: 200, schools: 32 },
+  // { month: "Nov", users: 350, schools: 36 },
+  // { month: "Dec", users: 100, schools: 8 },
 ];
 
 const pieChartData = [
@@ -44,16 +44,16 @@ const pieChartData = [
 ];
 
 const barChartData = [
-  // { month: "Jan", revenue: 0 },
-  // { month: "Feb", revenue: 0 },
-  // { month: "Mar", revenue: 0 },
-  // { month: "Apr", revenue: 0 },
+  { month: "Jan", revenue: 4550350 },
+  { month: "Feb", revenue: 5810900 },
+  { month: "Mar", revenue: 5000000 },
+  { month: "Apr", revenue: 4150000 },
   // { month: "May", revenue: 0 },
-  { month: "Jun", revenue: 2690000 },
-  { month: "Jul", revenue: 2950000 },
-  { month: "Aug", revenue: 3680000 },
-  { month: "Sep", revenue: 4440000 },
-  { month: "Oct", revenue: 5650000 },
+  // { month: "Jun", revenue: 2690000 },
+  // { month: "Jul", revenue: 2950000 },
+  // { month: "Aug", revenue: 3680000 },
+  // { month: "Sep", revenue: 4440000 },
+  // { month: "Oct", revenue: 5650000 },
   // { month: "Nov", revenue: 0 },
   // { month: "Dec", revenue: 0 },
 ];
