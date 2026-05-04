@@ -23,10 +23,10 @@ import {
 
 // Sample data for charts
 const lineChartData = [
-  { month: "Jan", users: 720, schools: 0 },
-  { month: "Feb", users: 800, schools: 0 },
-  { month: "Mar", users: 700, schools: 0 },
-  { month: "Apr", users: 500, schools: 0 },
+  { month: "Jan", users: 720, schools: 40 },
+  { month: "Feb", users: 800, schools: 60 },
+  { month: "Mar", users: 700, schools: 44 },
+  { month: "Apr", users: 500, schools: 30 },
   // { month: "May", users: 0, schools: 0 },
   // { month: "Jun", users: 150, schools: 0 },
   // { month: "Jul", users: 350, schools: 15 },
