@@ -558,7 +558,8 @@ export const AdminGeneralMetricStats: StatCardData[] = [
   },
   {
     title: "Total Schools Registered",
-    value: "131",
+    // value: "131",
+    value: "174",
     icon: "/images/icon/total_schools.svg",
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
