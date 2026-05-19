@@ -21,8 +21,8 @@ const IndividualPaymentPage = () => {
 
   const VAT_RATE = 0.075; // 7.5%
   const baseAmount = 5000;
-  const VALID_COUPON = "abjedtech2025";
-  const COUPON_DISCOUNT = 0.6; // 60% discount
+  const VALID_COUPON = "EdTech2026";
+  const COUPON_DISCOUNT = 0.5; // 50% discount
 
   // Calculate discount and amounts
   const discount = couponApplied ? baseAmount * COUPON_DISCOUNT : 0;
