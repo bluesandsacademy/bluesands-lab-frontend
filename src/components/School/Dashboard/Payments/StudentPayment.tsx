@@ -232,8 +232,8 @@ const SchoolStudentPayment = () => {
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState("");
 
-  const VALID_COUPON = "abjedtech2025";
-  const COUPON_DISCOUNT = 0.6; // 60% discount
+  const VALID_COUPON = "EdTech2026";
+  const COUPON_DISCOUNT = 0.5; // 50% discount
 
   // Function to get price per student based on quantity
   const getPricePerStudent = (count: number): number => {
