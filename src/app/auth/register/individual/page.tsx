@@ -50,7 +50,7 @@ export default function RegisterIndividualAccount() {
 
     if (isSubmitting) return; // Prevent multiple submissions
     setIsSubmitting(true); // Set submitting state to true
-    NProgress.start(); // Start the loading bar
+    NProgress.start(); 
 
     try {
       await registerNewUser(payload);
