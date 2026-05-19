@@ -7,6 +7,7 @@ import { useUser } from "@/services/UserContext";
 import NProgress from "nprogress";
 import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function UserLogin() {
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function UserLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+    const [rememberPassword, setRememberPassword] = useState<boolean>(false);
   const router = useRouter();
   const { setUser, setToken, isLoggedIn } = useUser(); //also import isLoggedin
 
@@ -26,6 +28,10 @@ export default function UserLogin() {
       router.push("/dashboard");
     }
   }, [isLoggedIn, router]);
+
+   function handleRememberPassword() {
+    setRememberPassword(!rememberPassword);
+  }
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -115,21 +121,27 @@ export default function UserLogin() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
+          <PasswordInput
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            label="Password"
+            required
+          />
+          <div className="w-full flex gap-x-3 items-center">
+            <input
+              type="checkbox"
+              className="w-4 h-4 md:w-5 md:h-5"
+              id="rememberPassword"
+              checked={rememberPassword}
+              onChange={handleRememberPassword}
+            />
             <label
-              htmlFor="password"
+              htmlFor="rememberPassword"
               className="font-medium text-gray-700 text-sm md:text-md"
             >
-              Password
+              Remember Password
             </label>
-            <input
-              type="password"
-              className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-base"
-              id="password"
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
           </div>
           <div className="w-full flex flex-col gap-y-3">
             <Link

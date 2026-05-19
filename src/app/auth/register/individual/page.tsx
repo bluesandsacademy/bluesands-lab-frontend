@@ -5,6 +5,7 @@ import NProgress from "nprogress";
 import { countries, genderOptions } from "@/lib/data";
 import { UserObject, registerNewUser } from "@/services/auth-service";
 import { toast } from "react-toastify";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function RegisterIndividualAccount() {
   useEffect(() => {
@@ -19,8 +20,8 @@ export default function RegisterIndividualAccount() {
   const [gender, setGender] = useState("");
   const [country, setCountry] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [couponCode, setCouponCode] = useState("");
-  const [rememberPassword, setRememberPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -35,16 +36,17 @@ export default function RegisterIndividualAccount() {
     couponCode,
   };
 
-  function handleRememberPassword() {
-    setRememberPassword(!rememberPassword);
-  }
-
   const handleModalClose = () => {
     setShowModal(false);
   };
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
 
     if (isSubmitting) return; // Prevent multiple submissions
     setIsSubmitting(true); // Set submitting state to true
@@ -238,23 +240,21 @@ export default function RegisterIndividualAccount() {
               ))}
             </select>
           </div>
-          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
-            <label
-              htmlFor="password"
-              className="font-medium text-gray-700 text-sm md:text-md"
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              className="rounded-md border px-2 md:px-3 py-1 md:py-3 w-full text-gray-600 text-sm md:text-lg"
-              id="password"
-              value={password}
-              minLength={6}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+          <PasswordInput
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            label="Password"
+            minLength={6}
+            required
+          />
+          <PasswordInput
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            label="Confirm Password"
+            required
+          />
           <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="couponCode"
@@ -270,21 +270,7 @@ export default function RegisterIndividualAccount() {
               onChange={(e) => setCouponCode(e.target.value)}
             />
           </div>
-          <div className="w-full flex gap-x-3 items-center">
-            <input
-              type="checkbox"
-              className="w-4 h-4 md:w-5 md:h-5"
-              id="rememberPassword"
-              checked={rememberPassword}
-              onChange={handleRememberPassword}
-            />
-            <label
-              htmlFor="rememberPassword"
-              className="font-medium text-gray-700 text-sm md:text-md"
-            >
-              Remember Password
-            </label>
-          </div>
+          
           <div className="w-full flex flex-col gap-y-3">
             <button
               type="submit"
