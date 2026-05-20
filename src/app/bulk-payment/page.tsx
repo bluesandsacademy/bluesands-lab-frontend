@@ -52,7 +52,7 @@ const SchoolStudentPaymentPage = () => {
 
     if (couponCode.trim().toLowerCase() === VALID_COUPON.toLowerCase()) {
       setCouponApplied(true);
-      toast.success("Coupon applied! 60% discount added");
+      toast.success("Coupon applied! 50% discount added");
     } else {
       setCouponError("Invalid coupon code");
       toast.error("Invalid coupon code");
@@ -313,7 +313,7 @@ const SchoolStudentPaymentPage = () => {
             )}
             {couponApplied && (
               <p className="text-xs text-green-600 mt-1 font-semibold">
-                ✓ 60% discount applied!
+                ✓ 50% discount applied!
               </p>
             )}
           </div>
@@ -336,7 +336,7 @@ const SchoolStudentPaymentPage = () => {
           {/* Discount Row */}
           {couponApplied && discountAmount > 0 && (
             <div className="flex justify-between text-green-600">
-              <p className="text-sm font-semibold">Discount (60%):</p>
+              <p className="text-sm font-semibold">Discount (50%):</p>
               <p className="text-sm font-semibold">
                 -₦{formatCurrency(discountAmount)}
               </p>
