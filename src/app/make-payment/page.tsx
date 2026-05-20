@@ -186,7 +186,7 @@ const IndividualPaymentPage = () => {
 
     if (couponCode.toLowerCase() === VALID_COUPON.toLowerCase()) {
       setCouponApplied(true);
-      toast.success("Coupon applied! 60% discount activated.");
+      toast.success("Coupon applied! 50% discount activated.");
     } else {
       setCouponError("Invalid coupon code");
       toast.error("Invalid coupon code");
@@ -263,7 +263,7 @@ const IndividualPaymentPage = () => {
           {couponError && <p className="text-xs text-red-600">{couponError}</p>}
           {couponApplied && (
             <p className="text-xs text-green-600 font-semibold">
-              ✓ Coupon applied: 60% discount
+              ✓ Coupon applied: 50% discount
             </p>
           )}
           <div className="text-xs space-y-1">
@@ -281,7 +281,7 @@ const IndividualPaymentPage = () => {
 
           {couponApplied && (
             <div className="flex justify-between text-green-600">
-              <p className="text-sm">Discount (60%):</p>
+              <p className="text-sm">Discount (50%):</p>
               <p className="text-sm">-₦{formatCurrency(discount)}</p>
             </div>
           )}
