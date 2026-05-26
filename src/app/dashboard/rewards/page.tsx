@@ -76,7 +76,9 @@ const DashboardRewardsPage = () => {
           Track your progress and achievements
         </p>
       </div>
-      <StatCards stats={rewardStats} />
+      <div className="relative">
+        <div className="blur-sm pointer-events-none select-none opacity-60 flex flex-col gap-4 lg:gap-6">
+        <StatCards stats={rewardStats} />
       <div className="flex gap-2">
         <button
           className={`p-1 lg:p-2 px-4 lg:px-6 text-xs lg:text-sm rounded-md transition-colors ${
@@ -162,7 +164,7 @@ const DashboardRewardsPage = () => {
         </div>
       )}
       {filter === "achievements" && (
-        <div className="m-3 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md text-gray-600">
+        <div className="m-3 flex flex-col gap-4 md:gap-6 lg:gap-10 bg-white p-2 lg:p-6 rounded-md text-gray-600 pointer-events-none">
           <div className="flex flex-col gap-3">
             <p className="lg:text-lg">Experiments</p>
 
@@ -321,6 +323,13 @@ const DashboardRewardsPage = () => {
           </div>
         </div>
       )}
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="bg-purple-700 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-lg">
+            Coming Soon
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

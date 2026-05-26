@@ -96,21 +96,28 @@ const DashboardLeaderboardPage = () => {
     <div className="p-4 space-y-4">
       <WelcomeBanner firstName={firstName || ""} />
 
-      <div>
-        <h2 className="font-bold text-lg mb-2">Leaderboard</h2>
+      <div className="relative">
+        <div className="blur-sm pointer-events-none select-none opacity-60">
+          <h2 className="font-bold text-lg mb-2">Leaderboard</h2>
 
-        <FilterButton
-          filters={filters}
-          onFilterChange={setActiveFilter}
-          activeFilter={activeFilter}
-        />
-
-        <div className="mt-4">
-          <ReportTable
-            headings={currentData.headings}
-            data={currentData.data}
-            totalItems={currentData.data.length}
+          <FilterButton
+            filters={filters}
+            onFilterChange={setActiveFilter}
+            activeFilter={activeFilter}
           />
+
+          <div className="mt-4">
+            <ReportTable
+              headings={currentData.headings}
+              data={currentData.data}
+              totalItems={currentData.data.length}
+            />
+          </div>
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="bg-bgBlue text-white text-sm font-semibold px-4 py-2 rounded-full shadow-lg">
+            Coming Soon
+          </span>
         </div>
       </div>
     </div>

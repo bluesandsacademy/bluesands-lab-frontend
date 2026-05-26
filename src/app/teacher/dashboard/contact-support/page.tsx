@@ -12,15 +12,22 @@ const TeacherSupportPage = () => {
                     <p className="text-sm lg:text-base font-semibold">
                       How can we help you today?
                     </p>
-                    <div className="border border-gray-200 rounded-md flex flex-col gap-2 md:gap-3 p-2 md:p-3 lg:p-4">
-                      <div className="flex gap-4">
-                        <BsChatFill className="text-[#303C48] text-xl lg:text-2xl" />
-                        <p className="text-sm lg:text-base font-semibold">Live Chat</p>
+                    <div className="relative">
+                      <div className="border border-gray-200 rounded-md flex flex-col gap-2 md:gap-3 p-2 md:p-3 lg:p-4 blur-sm pointer-events-none select-none opacity-60">
+                        <div className="flex gap-4">
+                          <BsChatFill className="text-[#303C48] text-xl lg:text-2xl" />
+                          <p className="text-sm lg:text-base font-semibold">Live Chat</p>
+                        </div>
+                        <p className="text-xs text-gray-600">
+                          Get Instant help from our support team
+                        </p>
+                        <p className="text-xs text-red-400">Unavailable</p>
                       </div>
-                      <p className="text-xs text-gray-600">
-                        Get Instant help from our support team
-                      </p>
-                      <p className="text-xs text-red-400">Unavailable</p>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="bg-[#303C48] text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md">
+                          Coming Soon
+                        </span>
+                      </div>
                     </div>
                     <a href="tel:+2347034194669">
                       <div className="border border-gray-200 rounded-md flex flex-col gap-2 md:gap-3 p-2 md:p-3 lg:p-4">
