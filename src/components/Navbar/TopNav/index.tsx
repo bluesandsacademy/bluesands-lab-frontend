@@ -1,32 +1,178 @@
 
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
-import { languageOptions } from "@/lib/data";
+import { FormEvent, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+    adminSideNavLinks,
+    languageOptions,
+    profileDropdown,
+    sidebarLinks,
+    sideNavLinks,
+    teacherProfileDropdown,
+    teacherSideNavLinks,
+} from "@/lib/data";
 import { RxCaretDown } from "react-icons/rx";
 import { HiMenu } from "react-icons/hi";
 import UserProfile from "./UserProfile";
+import { useUser } from "@/services/UserContext";
 
 interface TopNavProps {
   onMenuClick?: () => void;
+}
+
+type SearchTarget = {
+    title: string;
+    url: string;
+    keywords?: string[];
+};
+
+function normalize(value = "") {
+    return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function getSearchTargets(role?: string): SearchTarget[] {
+    const normalizedRole = normalize(role);
+
+    if (normalizedRole === "schooladmin") {
+        return [
+            ...sideNavLinks,
+            { title: "Contact Support", url: "/school/dashboard/contact-support", keywords: ["help", "admin support"] },
+        ];
+    }
+
+    if (normalizedRole === "globaladmin") {
+        return [
+            ...adminSideNavLinks,
+            { title: "System Settings", url: "/admin/dashboard/system-settings", keywords: ["settings", "configuration"] },
+            { title: "Customer Support", url: "/admin/dashboard/customer-support", keywords: ["support", "help"] },
+        ];
+    }
+
+    if (normalizedRole === "teacher") {
+        return [
+            ...teacherSideNavLinks,
+            ...teacherProfileDropdown,
+            { title: "Contact Support", url: "/teacher/dashboard/contact-support", keywords: ["help", "admin support"] },
+            { title: "Learning Space", url: "/teacher/dashboard/classes/learning-space", keywords: ["spaces", "assignments"] },
+            { title: "Create Learning Space", url: "/teacher/dashboard/classes/create-space", keywords: ["create space", "new class space"] },
+        ];
+    }
+
+    return [
+        ...sidebarLinks,
+        ...profileDropdown,
+        { title: "Admin Support", url: "/dashboard/support", keywords: ["support", "help"] },
+        { title: "Subscriptions", url: "/dashboard/profile/subscriptions", keywords: ["subscription", "plan"] },
+    ];
 }
 
 export default function TopNav({ onMenuClick }: TopNavProps) {
     const [selectedLanguage, setSelectedLanguage] = useState<string>(languageOptions[0])
     const [openLanguageDropdown, setOpenLanguageDropdown] = useState<boolean>(false);
     const [openSearchDropdown, setOpenSearchDropdown] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>("");
     const pathname = usePathname();
+    const router = useRouter();
+    const { user } = useUser();
     // const breadcrumb = pathname.split("/").filter((val) => val !== "")
     const breadcrumb = pathname .split("/") .filter((val) => val !== "") .slice(0, 2);
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const searchTargets = useMemo(() => getSearchTargets(user?.role), [user?.role]);
+    const searchResults = useMemo(() => {
+        const query = normalize(searchQuery);
+
+        if (!query) {
+            return [];
+        }
+
+        return searchTargets
+            .filter((target) => {
+                const searchableText = normalize([
+                    target.title,
+                    target.url,
+                    ...(target.keywords || []),
+                ].join(" "));
+
+                return searchableText.includes(query);
+            })
+            .sort((first, second) => {
+                const firstTitle = normalize(first.title);
+                const secondTitle = normalize(second.title);
+
+                if (firstTitle.startsWith(query) && !secondTitle.startsWith(query)) return -1;
+                if (!firstTitle.startsWith(query) && secondTitle.startsWith(query)) return 1;
+                return first.title.localeCompare(second.title);
+            })
+            .slice(0, 6);
+    }, [searchQuery, searchTargets]);
+
+    function navigateToSearchTarget(target: SearchTarget) {
+        setSearchQuery("");
+        setOpenSearchDropdown(false);
+        router.push(target.url);
+    }
+
+    function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
+        const [firstResult] = searchResults;
+
+        if (firstResult) {
+            navigateToSearchTarget(firstResult);
+        }
     }
 
     function handleLanguageSelect(language: string) {
         setSelectedLanguage(language);
         setOpenLanguageDropdown(false)
+    }
+
+    function renderSearchForm(formClassName: string, inputClassName: string, inputId: string) {
+        return (
+            <form action="" onSubmit={handleSubmit} className={formClassName}>
+                <img src="/images/icon/magnifying_glass.svg" alt="" />
+                <input
+                    type="search"
+                    id={inputId}
+                    value={searchQuery}
+                    onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setOpenSearchDropdown(true);
+                    }}
+                    onFocus={() => setOpenSearchDropdown(true)}
+                    placeholder="Search Dashboard"
+                    className={inputClassName}
+                    autoComplete="off"
+                />
+            </form>
+        );
+    }
+
+    function renderSearchResults(dropdownClassName: string) {
+        if (!openSearchDropdown || !searchQuery.trim()) return null;
+
+        return (
+            <div className={dropdownClassName}>
+                {searchResults.length > 0 ? (
+                    searchResults.map((result) => (
+                        <button
+                            type="button"
+                            key={result.url}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => navigateToSearchTarget(result)}
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                        >
+                            <span className="block text-sm font-medium text-gray-800">{result.title}</span>
+                            <span className="block text-xs text-gray-400 truncate">{result.url}</span>
+                        </button>
+                    ))
+                ) : (
+                    <div className="px-4 py-3 text-sm text-gray-500">
+                        No dashboard feature found
+                    </div>
+                )}
+            </div>
+        );
     }
 
     return (
@@ -57,35 +203,31 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
 
             <div className="flex items-center gap-x-2 md:gap-x-6 lg:gap-x-10">
                 {/* Search - hidden on mobile, show on tablet+ */}
-                <form action="" onSubmit={handleSubmit} className="hidden lg:flex p-3 border-2 border-gray-400 rounded-lg gap-x-3">
-                    <img src="/images/icon/magnifying_glass.svg" alt="" />
-                    <input 
-                        type="text" 
-                        id="search" 
-                        placeholder="Search Dashboard" 
-                        className="h-full w-[280px] xl:w-[380px] object-contain outline-none" 
-                    />
-                </form>
+                <div className="relative hidden lg:block">
+                    {openSearchDropdown && <div className="fixed inset-0 z-10" onClick={()=> setOpenSearchDropdown(false)}></div>}
+                    {renderSearchForm(
+                        "relative z-20 flex p-3 border-2 border-gray-400 rounded-lg gap-x-3 bg-white",
+                        "h-full w-[280px] xl:w-[380px] object-contain outline-none",
+                        "desktop-dashboard-search"
+                    )}
+                    {renderSearchResults("absolute left-0 right-0 top-14 z-50 overflow-hidden rounded-lg border bg-white shadow-lg")}
+                </div>
 
                 {/* Search icon for mobile */}
-                <div className="relative">
+                <div className="block md:hidden relative">
                     {openSearchDropdown && <div className="fixed inset-0 z-10" onClick={()=> setOpenSearchDropdown(false)}></div>}
-                    {/* <button className="lg:hidden p-2 hover:bg-gray-100 rounded-md" onClick={()=> setOpenSearchDropdown(!openSearchDropdown)}> */}
-                    <button className="lg:hidden p-2 hover:bg-gray-100 rounded-md">
+                    <button className="lg:hidden p-2 hover:bg-gray-100 rounded-md" onClick={()=> setOpenSearchDropdown(!openSearchDropdown)}>
                         <img src="/images/icon/magnifying_glass.svg" alt="Search" className="w-5 h-5" />
                     </button>
                     {
                         openSearchDropdown && (
-                    <div className="absolute bg-white">
-                        <form action="" onSubmit={handleSubmit} className="p-3 border-2 border-gray-400 rounded-lg gap-x-3">
-                            <img src="/images/icon/magnifying_glass.svg" alt="" />
-                            <input 
-                                type="text" 
-                                id="search" 
-                                placeholder="Search Dashboard" 
-                                className="h-full w-[280px] xl:w-[380px] object-contain outline-none" 
-                            />
-                        </form>
+                    <div className="absolute -right-20 top-10 z-50 w-[calc(100vw-1.5rem)] max-w-sm bg-white">
+                        {renderSearchForm(
+                            "relative z-20 flex p-3 border-2 border-gray-400 rounded-lg gap-x-3 bg-white",
+                            "h-full min-w-0 flex-1 object-contain outline-none",
+                            "mobile-dashboard-search"
+                        )}
+                        {renderSearchResults("mt-2 overflow-hidden rounded-lg border bg-white shadow-lg")}
                     </div>
                         )
                     }
