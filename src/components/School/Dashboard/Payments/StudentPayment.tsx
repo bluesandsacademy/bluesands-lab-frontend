@@ -586,7 +586,7 @@ const verifyPayment = async (reference: string) => {
   );
 };
 
-export default SchoolStudentPayment;
+export default SchoolStudentPayment; 
 
 function refreshUser() {
   throw new Error("Function not implemented.");

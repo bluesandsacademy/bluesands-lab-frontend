@@ -103,6 +103,7 @@ export default function RegisterSchoolAccount() {
         );
       }
       console.error("Registration failed", err);
+      toast.error("Registration failed.", err.response.message);
     } finally {
       NProgress.done();
       setIsSubmitting(false);

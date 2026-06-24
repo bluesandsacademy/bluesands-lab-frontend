@@ -67,6 +67,7 @@ export default function RegisterIndividualAccount() {
         );
       }
       console.error("Registration failed", err);
+      toast.error("Registration failed.", err.response.message);
     } finally {
       NProgress.done();
       setIsSubmitting(false);

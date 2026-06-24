@@ -20,7 +20,7 @@ const PaymentGuard = ({ children, paymentRoute }: PaymentGuardProps) => {
   const hasActiveSubscription = (user: any) => {
     return user?.subscription !== null && user?.subscription !== undefined;
   };
-
+ 
   useEffect(() => {
     // Don't do anything until UserContext is initialized
     if (!isInitialized) {
