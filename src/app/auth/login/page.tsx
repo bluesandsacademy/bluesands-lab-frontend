@@ -69,7 +69,7 @@ export default function UserLogin() {
       } else if (err.response?.status === 400) {
         toast.error("Please check your login credentials and try again.");
       } else {
-        toast.error("Login failed. Please try again later.");
+        toast.error("Login failed.", err.response.message);
       }
     } finally {
       NProgress.done();
