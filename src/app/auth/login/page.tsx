@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { login } from "@/services/auth-service";
+import { login, googleAuth } from "@/services/auth-service";
 import { useUser } from "@/services/UserContext";
 import NProgress from "nprogress";
 import { toast } from "react-toastify";
@@ -20,7 +20,7 @@ export default function UserLogin() {
   const [isSubmitting, setIsSubmitting] = useState(false);
     const [rememberPassword, setRememberPassword] = useState<boolean>(false);
   const router = useRouter();
-  const { setUser, setToken, isLoggedIn } = useUser(); //also import isLoggedin
+  const { setSession, isLoggedIn } = useUser();
 
   //Redirect if already logged in
   useEffect(() => {
@@ -33,6 +33,32 @@ export default function UserLogin() {
     setRememberPassword(!rememberPassword);
   }
 
+  const redirectByRole = (role?: string) => {
+    if (role === "schoolAdmin" || role === "SchoolAdmin") return router.push("/school/dashboard");
+    if (role === "globalAdmin" || role === "GlobalAdmin") return router.push("/admin/dashboard");
+    if (role === "teacher" || role === "Teacher") return router.push("/teacher/dashboard");
+    return router.push("/dashboard");
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    NProgress.start();
+    try {
+      const session = await googleAuth(credentialResponse.credential);
+      setSession(session);
+      toast.success(`Welcome back, ${session.user.fullName}!`);
+      redirectByRole(session.user.role);
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 409) {
+        toast.error(err.response.data?.message ?? "An account with this email already exists. Please log in with your password.");
+      } else {
+        toast.error("Google sign-in failed. Please try again.");
+      }
+    } finally {
+      NProgress.done();
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -41,11 +67,9 @@ export default function UserLogin() {
     NProgress.start();
 
     try {
-      const { user, token } = await login(email, password);
+      const { user, token, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt } = await login(email, password);
 
-      // Set user and token in context (this will also save to localStorage)
-      setUser(user);
-      setToken(token);
+      setSession({ user, token, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt });
 
       toast.success(`Welcome back, ${user.fullName}!`);
 
@@ -161,7 +185,10 @@ export default function UserLogin() {
             >
               {isSubmitting ? "Logging in..." : "Login"}
             </button>
-            <GoogleLogin onSuccess={()=> toast.success("Login Successful")}/>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error("Google sign-in failed. Please try again.")}
+            />
             <p className="text-gray-500 text-center text-xs md:text-base">
               Don't have an account?{" "}
               <Link

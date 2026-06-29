@@ -3,9 +3,11 @@ import {
   addClass,
   addSchoolStudent,
   addSchoolTeacher,
-} from "@/services/dashboard-service";
+  bulkUploadStudents,
+  bulkUploadTeachers,
+  BulkUserRecord,
+} from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
-import { error } from "console";
 import React, { useState } from "react";
 import { FaPlus, FaSpinner, FaTimes } from "react-icons/fa";
 import { FiUpload } from "react-icons/fi";
@@ -34,10 +36,35 @@ export const Modal = ({ isOpen, onClose, title, children }: any) => {
   );
 };
 
+const parseCSV = (text: string): BulkUserRecord[] => {
+  const lines = text.trim().split("\n");
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/\s+/g, ""));
+
+  return lines
+    .slice(1)
+    .filter((line) => line.trim())
+    .map((line) => {
+      const values = line.split(",").map((v) => v.trim().replace(/^"|"$/g, ""));
+      const row: Record<string, string> = {};
+      headers.forEach((h, i) => { row[h] = values[i] ?? ""; });
+      return {
+        fullName: row["fullname"] || row["full_name"] || row["name"] || "",
+        email: row["email"] || "",
+        phone: row["phone"] || "",
+        country: row["country"] || "",
+      };
+    })
+    .filter((r) => r.email);
+};
+
 // Bulk Upload Modal
 export const BulkUploadModal = ({ isOpen, onClose, userType }: any) => {
-  const [file, setFile] = useState(null);
+  const { user, token } = useUser();
+  const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDrag = (e: any) => {
     e.preventDefault();
@@ -53,7 +80,6 @@ export const BulkUploadModal = ({ isOpen, onClose, userType }: any) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setFile(e.dataTransfer.files[0]);
     }
@@ -65,10 +91,50 @@ export const BulkUploadModal = ({ isOpen, onClose, userType }: any) => {
     }
   };
 
-  const handleSubmit = () => {
-    if (file) {
-      console.log("Uploading file:", file);
+  const handleDownloadTemplate = () => {
+    const csv = "fullName,email,phone,country\nJohn Doe,john@example.com,+2348001234567,Nigeria";
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${userType.toLowerCase()}_template.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSubmit = async () => {
+    if (!file) return;
+
+    if (userType !== "Teachers" && userType !== "Students") {
+      toast.error(`Bulk upload is not supported for ${userType}.`);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const text = await file.text();
+      const records = parseCSV(text);
+
+      if (records.length === 0) {
+        toast.error("No valid records found. Check that your CSV has the correct headers and at least one data row.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (userType === "Teachers") {
+        await bulkUploadTeachers(records, user?.schoolId, token);
+      } else {
+        await bulkUploadStudents(records, user?.schoolId, token);
+      }
+
+      toast.success(`${records.length} ${userType.toLowerCase()} uploaded successfully.`);
+      setFile(null);
       onClose();
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || "Upload failed.";
+      toast.error(<div><p className="font-semibold">Bulk upload failed</p><p>{message}</p></div>);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -104,24 +170,25 @@ export const BulkUploadModal = ({ isOpen, onClose, userType }: any) => {
             />
           </label>
           {file && (
-            <div className="mt-4 p-3 bg-gray-100 rounded-md">
-              <p className="text-sm text-gray-700">Selected: {file}</p>
+            <div className="mt-4 p-3 bg-gray-100 rounded-md flex items-center justify-between">
+              <p className="text-sm text-gray-700 truncate">{file.name}</p>
+              <button
+                onClick={() => setFile(null)}
+                className="text-gray-400 hover:text-gray-600 ml-2 shrink-0"
+              >
+                <FaTimes />
+              </button>
             </div>
           )}
         </div>
 
         <div className="bg-blue-50 p-4 rounded-md">
-          <p className="text-sm font-medium text-blue-950 mb-2">CSV Format:</p>
-          <p className="text-xs text-gray-600">
-            {userType === "Teachers" &&
-              "name, email, phone, location, experience, class, schedule"}
-            {userType === "Students" && "name, email, class"}
-            {userType === "Classes" &&
-              "class name, subject, description, schedule, capacity"}
-          </p>
+          <p className="text-sm font-medium text-blue-950 mb-1">Required CSV columns:</p>
+          <p className="text-xs text-gray-600 font-mono">fullName, email, phone, country</p>
           <button
             type="button"
-            className="text-xs text-blue-950 hover:underline mt-2"
+            onClick={handleDownloadTemplate}
+            className="text-xs text-blue-950 hover:underline mt-2 block"
           >
             Download sample CSV template
           </button>
@@ -130,16 +197,24 @@ export const BulkUploadModal = ({ isOpen, onClose, userType }: any) => {
         <div className="flex gap-3 justify-end pt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+            disabled={isLoading}
+            className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!file}
-            className="px-4 py-2 text-sm bg-blue-950 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled={!file || isLoading}
+            className="px-4 py-2 text-sm bg-blue-950 text-white rounded-md hover:bg-blue-900 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Upload
+            {isLoading ? (
+              <>
+                <FaSpinner className="animate-spin h-4 w-4" />
+                <span>Uploading...</span>
+              </>
+            ) : (
+              "Upload"
+            )}
           </button>
         </div>
       </div>
