@@ -42,7 +42,7 @@ export default function RootLayout({
           pauseOnHover
         />
         <UserProvider>
-          <GoogleOAuthProvider clientId="">
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? ""}>
           <Providers>
             <AuthGuard> {children} </AuthGuard>
           </Providers>

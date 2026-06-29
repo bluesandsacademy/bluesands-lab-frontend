@@ -1,6 +1,8 @@
-"use client"
+"use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
-import { FaDownload } from "react-icons/fa";
+import { exportEngagement } from "@/services/teacherDashboardService";
+import { useState } from "react";
+import { FaDownload, FaSpinner } from "react-icons/fa";
 import {
   ResponsiveContainer,
   LineChart,
@@ -11,13 +13,13 @@ import {
   Legend,
   Line,
 } from "recharts";
+import { toast } from "react-toastify";
 
 const statsConfig: StatCardData[] = [
   {
     title: "Active Students",
     value: "0",
     icon: "/images/icon/teacher/students.svg",
-    //trendIcon: "/images/icon/trend_up.svg",
     percentageChange: " ",
     timeFrame: "of 450 total",
   },
@@ -25,7 +27,6 @@ const statsConfig: StatCardData[] = [
     title: "Average Time Spent",
     value: "0",
     icon: "/images/icon/teacher/avg-score.svg",
-    // trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "from last month",
   },
@@ -33,7 +34,6 @@ const statsConfig: StatCardData[] = [
     title: "Lab Experiments",
     value: "0",
     icon: "/images/icon/teacher/purple-lab.svg",
-    // trendIcon: "/images/icon/trend_up.svg",
     percentageChange: " ",
     timeFrame: "total attempts this month",
   },
@@ -41,13 +41,14 @@ const statsConfig: StatCardData[] = [
     title: "Lesson Completion",
     value: "0",
     icon: "/images/icon/teacher/orange-quiz.svg",
-    //trendIcon: "/images/icon/trend_up.svg",
     percentageChange: " ",
     timeFrame: "Average completion rate",
   },
 ];
 
 const TeacherStudentEngagePage = () => {
+  const [isExporting, setIsExporting] = useState(false);
+
   const lineChartData = [
     { day: "Mon", time: 0 },
     { day: "Tue", time: 0 },
@@ -57,6 +58,18 @@ const TeacherStudentEngagePage = () => {
     { day: "Sat", time: 0 },
     { day: "Sun", time: 0 },
   ];
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await exportEngagement();
+      toast.success("Engagement report downloaded.");
+    } catch {
+      toast.error("Failed to export engagement report. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-4 p-2 lg:p-4">
@@ -70,17 +83,20 @@ const TeacherStudentEngagePage = () => {
           </p>
         </div>
         <div>
-          <button className="flex items-center gap-1 rounded-md p-2 px-3 text-xs md:text-sm text-white bg-[#303C48]  ">
-            <FaDownload />
-            Export
+          <button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="flex items-center gap-1 rounded-md p-2 px-3 text-xs md:text-sm text-white bg-[#303C48] disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isExporting ? <FaSpinner className="animate-spin" /> : <FaDownload />}
+            {isExporting ? "Exporting..." : "Export"}
           </button>
         </div>
       </div>
 
       <StatCards stats={statsConfig} />
 
-      {/* Line chart */}
-      <div className=" flex flex-col md:flex-row items-center gap-6">
+      <div className="flex flex-col md:flex-row items-center gap-6">
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-semibold mb-4">Daily Time Spent (Hours)</h3>
           <ResponsiveContainer width="100%" height={300}>

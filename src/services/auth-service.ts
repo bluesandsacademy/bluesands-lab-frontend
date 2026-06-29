@@ -1,5 +1,6 @@
+import axios from "axios";
 import apiClient from "./axios-instance";
-import { User } from "./UserContext";
+import { User, Subscription, CurrentTier, SessionPayload } from "./UserContext";
 
 export interface UserObject {
   fullName: string;
@@ -25,38 +26,35 @@ export interface SchoolObject {
   couponCode: string;
 }
 
-// Interface for login response from backend
 export interface LoginResponse {
   token: string;
+  accessTokenExpiresAt: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: string;
   fullName: string;
-  userId: string;
-  phone: string;
-  email: string;
-  gender: string;
-  country: string;
   role: string;
-  dob: string;
+  userId: string;
+  schoolId: string;
+  schoolName: string;
+  schoolCurrency: string;
+  phone: string;
+  country: string;
+  email: string;
   isVerified: boolean;
-  schoolId?: string;
+  promoApplied: boolean;
   avatarUrl?: string;
-  subscription?: any;
-  currentTier?: string | null;
-  promoApplied?: string | null;
+  gender?: string;
+  dob?: string;
+  subscription: Subscription | null;
+  currentTier: CurrentTier | null;
 }
 
-// // Interface for user data used in app
-// export interface User {
-//   userId: string;
-//   fullName: string;
-//   email: string;
-//   phone: string;
-//   gender: string;
-//   country: string;
-//   dob: string;
-//   role?: string;
-//   avatarUrl?: string;
-//   isVerified: boolean;
-// }
+export interface RefreshTokenResponse {
+  token: string;
+  accessTokenExpiresAt: string;
+  refreshToken: string;
+  refreshTokenExpiresAt: string;
+}
 
 export async function registerNewUser(newUser: UserObject) {
   try {
@@ -76,56 +74,125 @@ export async function registerNewSchool(newSchool: SchoolObject) {
   }
 }
 
-export async function login(
-  email: string,
-  password: string,
-): Promise<{ user: User; token: string; isVerified: boolean }> {
+export async function login(email: string, password: string): Promise<SessionPayload & { isVerified: boolean }> {
+  const res = await apiClient.post(
+    "/api/auth/login",
+    { email, password },
+    { withCredentials: true },
+  );
+
+  const data: LoginResponse = res.data;
+
+  const user: User = {
+    userId: data.userId,
+    fullName: data.fullName,
+    email: data.email,
+    phone: data.phone,
+    gender: data.gender ?? "",
+    country: data.country,
+    dob: data.dob ?? "",
+    role: data.role,
+    avatarUrl: data.avatarUrl ?? "",
+    isVerified: data.isVerified,
+    schoolId: data.schoolId,
+    schoolName: data.schoolName,
+    schoolCurrency: data.schoolCurrency,
+    subscription: data.subscription,
+    currentTier: data.currentTier,
+    promoApplied: data.promoApplied,
+  };
+
+  return {
+    user,
+    token: data.token,
+    refreshToken: data.refreshToken,
+    accessTokenExpiresAt: data.accessTokenExpiresAt,
+    refreshTokenExpiresAt: data.refreshTokenExpiresAt,
+    isVerified: data.isVerified,
+  };
+}
+
+// Uses plain axios (not apiClient) so the 401 interceptor does not
+// misinterpret an invalid-Google-token response as an expired session.
+export async function googleAuth(idToken: string): Promise<SessionPayload & { isVerified: boolean }> {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const res = await axios.post<LoginResponse>(`${baseUrl}/api/Auth/google`, { idToken });
+  const data = res.data;
+
+  const user: User = {
+    userId: data.userId,
+    fullName: data.fullName,
+    email: data.email,
+    phone: data.phone,
+    gender: data.gender ?? "",
+    country: data.country,
+    dob: data.dob ?? "",
+    role: data.role,
+    avatarUrl: data.avatarUrl ?? "",
+    isVerified: data.isVerified,
+    schoolId: data.schoolId,
+    schoolName: data.schoolName,
+    schoolCurrency: data.schoolCurrency,
+    subscription: data.subscription,
+    currentTier: data.currentTier,
+    promoApplied: data.promoApplied,
+  };
+
+  return {
+    user,
+    token: data.token,
+    refreshToken: data.refreshToken,
+    accessTokenExpiresAt: data.accessTokenExpiresAt,
+    refreshTokenExpiresAt: data.refreshTokenExpiresAt,
+    isVerified: data.isVerified,
+  };
+}
+
+// NOTE: verify the refresh endpoint path with your backend team
+export async function refreshAccessToken(refreshToken: string): Promise<RefreshTokenResponse> {
+  const res = await apiClient.post("/api/auth/refresh-token", { refreshToken });
+  return res.data;
+}
+
+export interface SupportTicketResponse {
+  id: string;
+  status: string;
+  message: string;
+}
+
+export async function submitSupportTicket(
+  subject: string,
+  message: string,
+): Promise<SupportTicketResponse> {
+  const res = await apiClient.post("/api/support/ticket", { subject, message });
+  return res.data;
+}
+
+export interface UpdateProfileData {
+  fullName?: string;
+  phone?: string;
+  country?: string;
+  gender?: string;
+}
+
+export interface UpdateProfileResponse {
+  id: string;
+  fullName: string;
+  phone: string;
+  country: string;
+  gender: string;
+  email: string;
+}
+
+export async function updateProfile(data: UpdateProfileData): Promise<UpdateProfileResponse> {
   try {
-    const res = await apiClient.post(
-      "/api/auth/login",
-      { email, password },
-      { withCredentials: true },
-    );
-
-    const loginResponse: LoginResponse = res.data;
-
-    // Transform backend response to match UserContext User interface
-    const user: User = {
-      userId: loginResponse.userId,
-      fullName: loginResponse.fullName,
-      email: loginResponse.email,
-      phone: loginResponse.phone,
-      gender: loginResponse.gender,
-      country: loginResponse.country,
-      dob: loginResponse.dob,
-      role: loginResponse.role,
-      avatarUrl: loginResponse.avatarUrl || "",
-      isVerified: loginResponse.isVerified,
-      schoolId: loginResponse.schoolId,
-      subscription: loginResponse.subscription || null,
-      currentTier: loginResponse.currentTier || null,
-      promoApplied: loginResponse.promoApplied || null,
-    };
-
-    return {
-      user,
-      token: loginResponse.token,
-      isVerified: loginResponse.isVerified,
-    };
+    const res = await apiClient.put("/api/Auth/me", data);
+    return res.data;
   } catch (error) {
-    console.error("Login failed", error);
+    console.error("Failed to update profile:", error);
     throw error;
   }
 }
-
-// export async function logout() {
-//   try {
-//     await axios.post("/auth/logout", {}, { withCredentials: true });
-//   } catch (error) {
-//     console.error("Logout failed", error);
-//     // Don't throw error for logout, still clear local state
-//   }
-// }
 
 export async function resendVerification(email: string) {
   try {
@@ -159,9 +226,7 @@ export async function changePassword(
 }
 
 export async function forgotPassword(
-  data: {
-    email: string;
-  },
+  data: { email: string },
   token?: string | null,
 ) {
   try {

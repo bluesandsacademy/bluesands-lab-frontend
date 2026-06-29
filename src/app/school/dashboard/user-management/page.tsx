@@ -12,12 +12,13 @@ import {
 } from "@/components/School/Dashboard/UserMgt/SchoolUserManagementModals";
 import SchoolStudentTable from "@/components/School/Dashboard/UserMgt/StudentTable";
 import SchoolTeacherTable from "@/components/School/Dashboard/UserMgt/TeacherTable";
-import { getSchoolAdminDashboard } from "@/services/dashboard-service";
+import { exportUsers, getSchoolAdminDashboard } from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import React, { useEffect, useState } from "react";
-import { FaPlus } from "react-icons/fa";
+import { FaDownload, FaPlus, FaSpinner } from "react-icons/fa";
 import { FiUpload } from "react-icons/fi";
 import { IoSearch } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 const statsConfig: StatCardData[] = [
   {
@@ -63,6 +64,7 @@ const SchoolUserManagementPage = () => {
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [modalType, setModalType] = useState<string>("");
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     if (!user || !token) return;
@@ -129,6 +131,22 @@ const SchoolUserManagementPage = () => {
     fetchStats();
   }, [user, token]);
 
+  const handleExportUsers = async () => {
+    if (!user?.schoolId) {
+      toast.error("School ID not found. Please try again.");
+      return;
+    }
+    setIsExporting(true);
+    try {
+      await exportUsers(user.schoolId);
+      toast.success("Users list downloaded.");
+    } catch {
+      toast.error("Failed to export users. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Update the button onClick handler (modals)
   const handleAddClick = () => {
     setModalType(activeFilter); // Store which modal to show
@@ -176,6 +194,16 @@ const SchoolUserManagementPage = () => {
           />
         </div>
         <div className="flex items-center gap-2 lg:gap-4">
+          <button
+            onClick={handleExportUsers}
+            disabled={isExporting}
+            className={`flex gap-1 items-center bg-gray-200 text-blue-950 p-2 rounded-md text-xs lg:text-sm disabled:opacity-70 disabled:cursor-not-allowed ${
+              activeFilter === "Roles & Permissions" && "hidden"
+            }`}
+          >
+            {isExporting ? <FaSpinner className="animate-spin" /> : <FaDownload />}
+            {isExporting ? "Exporting..." : "Export"}
+          </button>
           <button
             onClick={() => setIsBulkUploadOpen(true)}
             className={`flex gap-1 items-center bg-gray-200 text-blue-950 p-2 rounded-md text-xs lg:text-sm  ${
