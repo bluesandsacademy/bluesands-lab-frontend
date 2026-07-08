@@ -19,7 +19,12 @@ import DiscussionStep from "./DiscussionStep";
 import RealWorldStep from "./RealworldStep";
 import AssessmentStep from "./AssessmentStep";
 import { QuizResults, QuizSessionEmbedded } from "./QuizCore";
-import { getLearningSpaceById, submitLearningSpace } from "@/services/learningSpaceService";
+import {
+  getLearningSpaceById,
+  createSession,
+  submitPoll,
+  PollPayload,
+} from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
 import { toast } from "react-toastify";
 
@@ -88,9 +93,10 @@ type StepPayload = Record<string, unknown>;
 type FormData = Record<string, StepPayload>;
 
 type StepComponentType = React.ComponentType<{
-  data: LessonStep & { title: string; subtitle: string };
-  onContinue: () => void;
+  data: LessonStep & { title: string; subtitle: string; [key: string]: unknown };
+  onContinue: (payload?: StepPayload) => void;
   onStepComplete: (payload: StepPayload) => void;
+  sessionId?: string;
 }>;
 
 // ── API → Steps mapper ────────────────────────────────────────
@@ -191,13 +197,14 @@ function mapApiToSteps(api: ApiLearningSpace): LessonStep[] {
 
 // ── Step registry ─────────────────────────────────────────────
 
-function PreQuizWrapper({ data, onContinue, onStepComplete }: any) {
-  // Normalize API questions to include id and default missing fields
+function PreQuizWrapper({ data, onContinue, onStepComplete, sessionId }: any) {
+  const [saving, setSaving] = useState(false);
+
   const normalizedQuiz = {
     title: data.quiz.quizTitle ?? "Pre-Quiz",
-    duration: 10, // default duration in minutes
+    duration: 10,
     questions: data.quiz.questions.map((q: any, index: number) => ({
-      id: `q-${index}`,           // generates stable id from index
+      id: `q-${index}`,
       question: q.question,
       options: q.options,
       correctAnswer: q.correctAnswer,
@@ -205,10 +212,48 @@ function PreQuizWrapper({ data, onContinue, onStepComplete }: any) {
     })),
   };
 
-  const handleQuizComplete = (results: QuizResults) => {
+  const handleQuizComplete = async (results: QuizResults) => {
     onStepComplete({ stepId: data.id, quizResults: results });
-    onContinue({ stepId: data.id, quizResults: results }); // ✅ pass payload to onContinue too
+
+    if (sessionId) {
+      setSaving(true);
+      try {
+        const pollPayload: PollPayload = {
+          quizTitle: results.quizTitle,
+          timeSpentSeconds: results.timeSpent,
+          answers: results.questionResults.map((q, i) => ({
+            questionIndex: i,
+            optionIndex: q.options.indexOf(q.userAnswer),
+            isCorrect: q.isCorrect,
+          })),
+          score: results.score,
+          correctAnswers: results.correctAnswers,
+          totalQuestions: results.totalQuestions,
+        };
+        await submitPoll(sessionId, pollPayload);
+      } catch (err: any) {
+        toast.error(
+          err?.response?.data?.message ?? "Failed to save quiz answers. You can still continue.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    }
+
+    onContinue({ stepId: data.id, quizResults: results });
   };
+
+  if (saving) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center gap-3 text-sm text-indigo-500">
+        <svg className="h-6 w-6 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+        </svg>
+        Saving quiz answers…
+      </div>
+    );
+  }
 
   return (
     <QuizSessionEmbedded quiz={normalizedQuiz} onComplete={handleQuizComplete} />
@@ -341,12 +386,11 @@ function LessonContent({
   lessonId?: string;
   onClose?: () => void;
 }) {
-  const { token } = useUser(); // ✅ inside component
+  const { token, user } = useUser();
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -363,40 +407,32 @@ function LessonContent({
         subtitle: data.objective ?? "",
         steps,
       });
+      if (user?.userId) {
+        try {
+          const session = await createSession(user.userId, data.id);
+          setSessionId(session.id);
+        } catch (err) {
+          console.error("Failed to start session:", err);
+          toast.warning("Could not start a session. Progress may not be saved.");
+        }
+      }
     } catch (err) {
       console.error("Failed to load learning space:", err);
       setFetchError("Failed to load this learning space. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [lessonId, token]);
+  }, [lessonId, token, user?.userId]);
 
   useEffect(() => {
     setLesson(null);
     setCurrentStep(0);
     setFormData({});
+    setSessionId(null);
     fetchLesson();
   }, [lessonId]);
 
   const activeSteps = lesson?.steps ?? [];
-
-  //  Accept the last step's payload directly so we don't rely on stale formData state
-  const doSubmit = useCallback(
-    async (finalFormData: FormData) => {
-      if (!lesson) return;
-      setIsSubmitting(true);
-      setSubmitError(null);
-      try {
-        await submitLearningSpace(lessonId ?? lesson.id, finalFormData, token);
-        toast.success("Learning space submitted!");
-      } catch (err: any) {
-        setSubmitError(err.message ?? "Submission failed.");
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [lesson, lessonId, token],
-  );
 
   const handleStepComplete = useCallback(
     (payload: StepPayload) => {
@@ -409,24 +445,14 @@ function LessonContent({
   );
 
   const handleContinue = useCallback(
-    (lastPayload?: StepPayload) => {
+    () => {
       if (!lesson) return;
       const isLastStep = currentStep === activeSteps.length - 1;
-
-      if (isLastStep) {
-        // Merge the final payload immediately — don't wait for setFormData to flush
-        const finalFormData: FormData = lastPayload
-          ? {
-              ...formData,
-              [String(lastPayload.stepId ?? currentStep)]: lastPayload,
-            }
-          : formData;
-        doSubmit(finalFormData);
-      } else {
+      if (!isLastStep) {
         setCurrentStep((s) => s + 1);
       }
     },
-    [lesson, activeSteps.length, currentStep, formData, doSubmit],
+    [lesson, activeSteps.length, currentStep],
   );
 
   const handleBack = useCallback(() => {
@@ -520,25 +546,15 @@ function LessonContent({
             totalSteps: activeSteps.length,
             title: lesson.title,
             subtitle: lesson.subtitle,
+            ...(stepData.type === "assessment" && {
+              postSimData: (formData["experiment"] as any)?.postSimAssessment ?? null,
+            }),
           }}
           onContinue={handleContinue}
           onStepComplete={handleStepComplete}
+          sessionId={sessionId ?? undefined}
         />
       </div>
-
-      {isSubmitting && (
-        <div className="border-t border-gray-100 bg-white px-5 py-3 text-center text-sm text-indigo-500">
-          Submitting your work…
-        </div>
-      )}
-      {submitError && (
-        <div className="border-t border-rose-100 bg-rose-50 px-5 py-3 text-center text-sm text-rose-600">
-          {submitError} —{" "}
-          <button className="underline" onClick={() => doSubmit(formData)}>
-            Retry
-          </button>
-        </div>
-      )}
     </div>
   );
 }

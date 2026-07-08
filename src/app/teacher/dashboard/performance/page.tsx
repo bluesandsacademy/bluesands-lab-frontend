@@ -1,5 +1,15 @@
 "use client";
 
+import { useUser } from "@/services/UserContext";
+import {
+  getTeacherAnalyticsOverview,
+  getTeacherAverageScores,
+  getTeacherClassImprovement,
+  TeacherAnalyticsOverview,
+  AverageScores,
+  ClassImprovement,
+} from "@/services/teacherDashboardService";
+import { useEffect, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -9,152 +19,240 @@ import {
   Tooltip,
   Legend,
   Line,
-  Bar,
   BarChart,
+  Bar,
 } from "recharts";
 
 const TeacherPerformanceMetricsPage = () => {
-  const lineChartData = [
-    { month: "Jan", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Feb", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Mar", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Apr", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "May", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Jun", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Jul", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Aug", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Sep", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Oct", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Nov", average: 0, attendance: 0, lab_completion: 0 },
-    { month: "Dec", average: 0, attendance: 0, lab_completion: 0 },
-  ];
+  const { token } = useUser();
+  const [overview, setOverview] = useState<TeacherAnalyticsOverview | null>(
+    null,
+  );
+  const [avgScores, setAvgScores] = useState<AverageScores["subjects"]>([]);
+  const [improvement, setImprovement] = useState<
+    ClassImprovement["trends"]
+  >([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const barChartData = [
-    { subject: "Math", average: 0, attendance: 0, lab_completion: 0 },
-    { subject: "Physics", average: 0, attendance: 0, lab_completion: 0 },
-    { subject: "Chemistry", average: 0, attendance: 0, lab_completion: 0 },
-    { subject: "Biology", average: 0, attendance: 0, lab_completion: 0 },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [overviewData, scoresData, improvementData] = await Promise.all([
+          getTeacherAnalyticsOverview(token),
+          getTeacherAverageScores(token),
+          getTeacherClassImprovement(token),
+        ]);
+        setOverview(overviewData);
+        setAvgScores(scoresData.subjects);
+        setImprovement(improvementData.trends);
+      } catch (err) {
+        console.error("Failed to fetch performance data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [token]);
+
+  const chartSkeleton = (
+    <div className="animate-pulse bg-gray-100 rounded-lg h-[300px] w-full" />
+  );
 
   return (
     <div className="flex flex-col gap-4 p-2 lg:p-4">
-      {/* Line chart */}
-      <div className=" flex flex-col lg:flex-row lg:items-center gap-3">
+      {/* Charts row */}
+      <div className="flex flex-col lg:flex-row lg:items-start gap-3">
+        {/* Average Scores by Subject — grouped bar */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
-          <h3 className="text-sm font-semibold mb-4">Average Score</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="subject" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="average" fill="#0483E2" />
-              <Bar dataKey="average" fill="#10B981" />
-              <Bar dataKey="average" fill="#263238" />
-            </BarChart>
-          </ResponsiveContainer>
+          <h3 className="text-sm font-semibold mb-4">Average Scores by Subject</h3>
+          {isLoading ? (
+            chartSkeleton
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={avgScores}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="average" name="Avg Score" fill="#0483E2" />
+                <Bar dataKey="attendance" name="Attendance" fill="#10B981" />
+                <Bar
+                  dataKey="lab_completion"
+                  name="Lab Completion"
+                  fill="#263238"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
+        {/* Class Improvement Trends — line chart */}
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-semibold mb-4">
             Class Improvement Trends
           </h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={lineChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="average"
-                stroke="#0483E2"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="attendance"
-                stroke="#10B981"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="lab_completion"
-                stroke="#263238"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            chartSkeleton
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={improvement}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} domain={[0, 100]} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="average"
+                  name="Avg Score"
+                  stroke="#0483E2"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="attendance"
+                  name="Attendance"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="lab_completion"
+                  name="Lab Completion"
+                  stroke="#263238"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
+      {/* Student tables */}
       <div className="flex flex-col w-full lg:flex-row gap-3">
-        {/* Table */}
+        {/* Top Performing */}
         <div className="flex flex-col gap-2 lg:w-[49%]">
           <p className="text-sm font-semibold">Top Performing Students</p>
-          <div
-            className="flex flex-col
-                     overflow-x-scroll"
-          >
-            <table className="bg-white rounded-md">
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white rounded-md text-xs">
               <thead>
-                <tr className="border-b border-b-gray-200 text-xs text-gray-500">
+                <tr className="border-b border-gray-200 text-gray-500">
                   <td className="p-2">Student Name</td>
-                  <td className="p-2">Last Login</td>
-                  <td className="p-2">Best Subject</td>
-                  <td className="p-2">Average Score</td>
+                  <td className="p-2">Class</td>
+                  <td className="p-2">Experiments</td>
+                  <td className="p-2">Avg Score</td>
                 </tr>
               </thead>
               <tbody>
-                <tr className="text-xs border-b border-b-gray-200">
-                  <td className="p-2">John Doe</td>
-                  <td className="p-2">2 hours ago</td>
-                  <td className="p-2">Mathematics</td>
-                  <td className="p-2 text-blue-600">88%</td>
-                </tr>
+                {isLoading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-gray-100 animate-pulse"
+                    >
+                      {Array.from({ length: 4 }).map((__, j) => (
+                        <td key={j} className="p-2">
+                          <div className="h-3 bg-gray-100 rounded w-20" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : overview?.topPerforming.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="p-4 text-center text-gray-400"
+                    >
+                      No data yet.
+                    </td>
+                  </tr>
+                ) : (
+                  overview?.topPerforming.map((s) => (
+                    <tr
+                      key={s.userId}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="p-2 font-medium text-gray-800">
+                        {s.studentName}
+                      </td>
+                      <td className="p-2 text-gray-600">{s.classroomName}</td>
+                      <td className="p-2 text-gray-600">
+                        {s.experimentsCompleted}
+                      </td>
+                      <td className="p-2">
+                        <span className="inline-flex px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
+                          {s.avgScore}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Table */}
+        {/* At Risk */}
         <div className="flex flex-col gap-2 lg:w-[49%]">
-          <p className="text-sm font-semibold text-red-700">At Risk Students</p>
-          <div
-            className="flex flex-col
-                 overflow-x-scroll"
-          >
-            <table className="bg-white rounded-md">
+          <p className="text-sm font-semibold text-red-700">
+            At Risk Students
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white rounded-md text-xs">
               <thead>
-                <tr className="border-b border-b-gray-200 text-xs text-gray-500">
+                <tr className="border-b border-gray-200 text-gray-500">
                   <td className="p-2">Student Name</td>
-                  <td className="p-2">Average Score</td>
-                  <td className="p-2">Last activity</td>
-                  <td className="p-2">Status</td>
+                  <td className="p-2">Class</td>
+                  <td className="p-2">Avg Score</td>
+                  <td className="p-2">Reason</td>
                 </tr>
               </thead>
               <tbody>
-                <tr className="text-xs border-b border-b-gray-200">
-                  <td className="p-2">Jaydee Jamie</td>
-                  <td className="p-2">
-                    <p className="flex w-max p-0.5 px-2 bg-red-200 text-red-600 items-center justify-center rounded-full">
-                      {" "}
-                      31
-                    </p>
-                  </td>
-                  <td className="p-2">3 days ago</td>
-                  <td className="p-2">
-                    <p className="flex w-max p-0.5 px-2 bg-red-200 text-red-600 items-center justify-center rounded-full">
-                      {" "}
-                      Critical
-                    </p>
-                  </td>
-                </tr>
+                {isLoading ? (
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-gray-100 animate-pulse"
+                    >
+                      {Array.from({ length: 4 }).map((__, j) => (
+                        <td key={j} className="p-2">
+                          <div className="h-3 bg-gray-100 rounded w-20" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : overview?.atRisk.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="p-4 text-center text-gray-400"
+                    >
+                      No at-risk students.
+                    </td>
+                  </tr>
+                ) : (
+                  overview?.atRisk.map((s) => (
+                    <tr
+                      key={s.userId}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="p-2 font-medium text-gray-800">
+                        {s.studentName}
+                      </td>
+                      <td className="p-2 text-gray-600">{s.classroomName}</td>
+                      <td className="p-2">
+                        <span className="inline-flex px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">
+                          {s.avgScore}%
+                        </span>
+                      </td>
+                      <td className="p-2 text-gray-500">{s.reason}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

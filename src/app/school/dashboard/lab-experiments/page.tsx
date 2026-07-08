@@ -1,6 +1,6 @@
 "use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
-import { getSchoolAdminExperiments } from "@/services/dashboard-service";
+import { getSchoolAdminExperiments } from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import { useEffect, useState } from "react";
 import {

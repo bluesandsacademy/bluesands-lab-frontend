@@ -1,6 +1,6 @@
 "use client";
 import ReportTable from "@/components/Dashboard/ReportTable";
-import { getSchoolAdminLeaderboard } from "@/services/dashboard-service";
+import { getSchoolAdminLeaderboard } from "@/services/schoolAdminDashboardService";
 import FilterButton from "@/services/FilterButton";
 import { useUser } from "@/services/UserContext";
 import React, { useEffect, useState } from "react";

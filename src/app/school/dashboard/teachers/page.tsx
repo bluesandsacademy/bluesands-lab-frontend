@@ -1,6 +1,6 @@
 "use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
-import { getSchoolAdminTeacherActivity } from "@/services/dashboard-service";
+import { getSchoolAdminTeacherActivity } from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import { useEffect, useState } from "react";
 import {

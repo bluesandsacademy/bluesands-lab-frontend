@@ -149,24 +149,84 @@ export async function assignLearningSpace(
 }
 
 
-export async function submitLearningSpace(
-  lessonId: string,
-  learningSpaceSubmissionData: {}, //incude lesson id and probably studentid
-  // schoolId?: string | null,
-  token?: string | null
-) {
-  try {
-    const res = await apiClient.post(
-      "/api/submissions",
-      {lessonID: lessonId, submission: learningSpaceSubmissionData},
-      {
-        // params: { schoolId },
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      }
-    );
-    return res.data;
-  } catch (error) {
-    console.error("Failed to submit learning space:", error);
-    throw error;
-  }
+export interface SessionCreateResponse {
+  id: string;
+  studentId: string;
+  ilsId: string;
+  status: string;
+}
+
+export async function createSession(
+  studentId: string,
+  ilsId: string,
+): Promise<SessionCreateResponse> {
+  const res = await apiClient.post("/api/session", { studentId, ilsId });
+  return res.data;
+}
+
+export interface PollPayload {
+  quizTitle: string;
+  timeSpentSeconds: number;
+  answers: { questionIndex: number; optionIndex: number; isCorrect: boolean }[];
+  score: number;
+  correctAnswers: number;
+  totalQuestions: number;
+}
+
+export async function submitPoll(sessionId: string, data: PollPayload): Promise<void> {
+  await apiClient.post(`/api/session/${sessionId}/poll`, data);
+}
+
+export async function submitOrientation(
+  sessionId: string,
+  engagementAnswer: string,
+): Promise<void> {
+  await apiClient.post(`/api/session/${sessionId}/orientation`, { engagementAnswer });
+}
+
+export async function submitHypothesis(sessionId: string, text: string): Promise<void> {
+  await apiClient.post(`/api/session/${sessionId}/hypothesis`, { text, inputMethod: "text" });
+}
+
+export async function submitExperiment(
+  sessionId: string,
+  observationText: string,
+  variables: Record<string, unknown> = {},
+): Promise<void> {
+  await apiClient.post(`/api/session/${sessionId}/experiment`, { variables, observationText });
+}
+
+export async function submitReflection(sessionId: string, text: string): Promise<void> {
+  await apiClient.post(`/api/session/${sessionId}/reflection`, { text });
+}
+
+export async function submitRealWorld(sessionId: string, note: string): Promise<void> {
+  await apiClient.post(`/api/session/${sessionId}/realworld`, { note });
+}
+
+export interface PostSimAnswer {
+  questionIndex: number;
+  selectedAnswer: string;
+  isCorrect: boolean;
+}
+
+export interface AssessmentResult {
+  score: number;
+  feedback?: string;
+  badgeAwarded: boolean;
+  completedAt?: string;
+}
+
+export async function submitAssessment(
+  sessionId: string,
+  postSimAnswers: PostSimAnswer[],
+  postSimScore: number,
+  postSimTotal: number,
+): Promise<AssessmentResult> {
+  const res = await apiClient.post(`/api/session/${sessionId}/assessment`, {
+    postSimAnswers,
+    postSimScore,
+    postSimTotal,
+  });
+  return res.data;
 }

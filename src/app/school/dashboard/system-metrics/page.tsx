@@ -1,6 +1,6 @@
 "use client";
 import { StatCardData } from "@/components/Dashboard/StatCards";
-import { getSchoolAdminSystemMetrics } from "@/services/dashboard-service";
+import { getSchoolAdminSystemMetrics } from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import React, { useEffect, useState } from "react";
 import { FaRegClock } from "react-icons/fa";

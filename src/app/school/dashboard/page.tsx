@@ -5,7 +5,7 @@ import SchoolWideTrend from "@/components/School/Dashboard/SchoolWideTrend";
 import {
   getSchoolAdminDashboard,
   getSchoolAdminOverview,
-} from "@/services/dashboard-service";
+} from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import { useEffect, useState } from "react";
 
@@ -90,6 +90,14 @@ const statsConfig: StatCardData[] = [
     percentageChange: "0%",
     timeFrame: "from last month",
   },
+    {
+    title: "Total ILS Created",
+    value: "0",
+    icon: "/images/icon/teacher/vr-headset-stemlabs.png",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "across all classes",
+  },
 ];
 
 const SchoolDashboardPage = () => {
@@ -156,6 +164,14 @@ const SchoolDashboardPage = () => {
             trendIcon: "/images/icon/trend_up.svg",
             percentageChange: "0%",
             timeFrame: "from last month",
+          },
+          {
+            title: statsConfig[6].title,
+            value: `${data.totals.ilsCreated}`,
+            icon: statsConfig[6].icon,
+            trendIcon: statsConfig[6].trendIcon,
+            percentageChange: statsConfig[6].percentageChange,
+            timeFrame: statsConfig[6].timeFrame,
           },
         ];
 

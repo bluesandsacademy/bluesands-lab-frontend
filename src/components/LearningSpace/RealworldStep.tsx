@@ -3,11 +3,14 @@
 import { FiArrowRight, FiUploadCloud } from "react-icons/fi";
 import { BsGlobe } from "react-icons/bs";
 import { useRef, useState } from "react";
-import { FaBriefcase, FaGlobeAfrica, FaImage } from "react-icons/fa";
+import { FaBriefcase, FaGlobeAfrica, FaSpinner } from "react-icons/fa";
+import { submitRealWorld } from "@/services/learningSpaceService";
+import { toast } from "react-toastify";
 
-export default function RealWorldStep({ data, onContinue, onStepComplete }: any) {
+export default function RealWorldStep({ data, onContinue, onStepComplete, sessionId }: any) {
   const [note, setNote] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,16 +18,20 @@ export default function RealWorldStep({ data, onContinue, onStepComplete }: any)
     if (file) setPhoto(URL.createObjectURL(file));
   };
 
-  const handleContinue = () => {
-    // Build this step's payload
-    const payload = {
-      stepId: data.id,
-      note,
-      photo, // blob URL — swap for a real upload URL if you handle file uploads server-side
-    };
-
-    // Pass payload both to the collector and directly to onContinue
-    // so the parent can merge it immediately before submitting
+  const handleContinue = async () => {
+    if (sessionId && note.trim()) {
+      setIsSaving(true);
+      try {
+        await submitRealWorld(sessionId, note.trim());
+      } catch (err: any) {
+        toast.error(
+          err?.response?.data?.message ?? "Failed to save real-world note. You can still continue.",
+        );
+      } finally {
+        setIsSaving(false);
+      }
+    }
+    const payload = { stepId: data.id, note, photo };
     onStepComplete(payload);
     onContinue(payload);
   };
@@ -118,9 +125,10 @@ export default function RealWorldStep({ data, onContinue, onStepComplete }: any)
       <div className="flex justify-end">
         <button
           onClick={handleContinue}
-          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={isSaving}
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Continue <FiArrowRight />
+          {isSaving ? <><FaSpinner className="animate-spin" /> Saving…</> : <>Continue <FiArrowRight /></>}
         </button>
       </div>
     </div>

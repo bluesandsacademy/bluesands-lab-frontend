@@ -118,17 +118,36 @@
 "use client";
 
 import { useState } from "react";
-import { FiPlay, FiArrowRight, FiMic, FiCheckCircle } from "react-icons/fi";
+import { FiArrowRight, FiMic, FiCheckCircle } from "react-icons/fi";
+import { FaSpinner } from "react-icons/fa";
+import { submitOrientation } from "@/services/learningSpaceService";
+import { toast } from "react-toastify";
 
-export default function OrientationStep({ data, onContinue, onStepComplete }: any) {
+export default function OrientationStep({ data, onContinue, onStepComplete, sessionId }: any) {
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmitAnswer = async () => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    if (sessionId) {
+      setIsSaving(true);
+      try {
+        await submitOrientation(sessionId, trimmed);
+      } catch (err: any) {
+        toast.error(
+          err?.response?.data?.message ?? "Failed to save answer. You can still continue.",
+        );
+      } finally {
+        setIsSaving(false);
+      }
+    }
+    setSubmitted(true);
+  };
 
   const handleContinue = () => {
-    const payload = {
-      stepId: data.id,
-      engagementAnswer: text.trim() || null,
-    };
+    const payload = { stepId: data.id, engagementAnswer: text.trim() || null };
     onStepComplete(payload);
     onContinue(payload);
   };
@@ -176,11 +195,11 @@ export default function OrientationStep({ data, onContinue, onStepComplete }: an
           </div>
         ) : (
           <button
-            disabled={!text.trim()}
-            onClick={() => setSubmitted(true)}
-            className="mt-3 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!text.trim() || isSaving}
+            onClick={handleSubmitAnswer}
+            className="mt-3 flex items-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Submit Answer
+            {isSaving ? <><FaSpinner className="animate-spin" /> Saving…</> : "Submit Answer"}
           </button>
         )}
       </div>

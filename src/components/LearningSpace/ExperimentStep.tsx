@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { FiArrowRight, FiCheckCircle } from "react-icons/fi";
 import { BsCheckCircleFill } from "react-icons/bs";
-import { FaFlask } from "react-icons/fa";
+import { FaFlask, FaSpinner } from "react-icons/fa";
 import { getPhetSimulationsById } from "@/services/dashboard-service";
+import { submitExperiment, PostSimAnswer } from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
+import { toast } from "react-toastify";
 
 interface PostSimQuestion {
   question: string;
@@ -13,12 +15,6 @@ interface PostSimQuestion {
   correctAnswer: string;
 }
 
-interface PostSimAssessment {
-  quizTitle: string;
-  description: string;
-  points: string;
-  questions: PostSimQuestion[];
-}
 
 interface PhetSimResponseObject {
   id: string;
@@ -52,13 +48,13 @@ export default function ExperimentStep({
   data,
   onContinue,
   onStepComplete,
+  sessionId,
 }: any) {
   const [observation, setObservation] = useState("");
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [simulationUrl, setSimulationUrl] = useState("");
-  const [simId, setSimId] = useState(data.simulationId);
-  const [loading, setLoading] = useState(false);
   const { token } = useUser();
 
   const questions: PostSimQuestion[] = data?.postSimAssessment?.questions ?? [];
@@ -69,37 +65,52 @@ export default function ExperimentStep({
 
   useEffect(() => {
     async function fetchSimulation() {
-      setLoading(true);
       try {
         const simObject: PhetSimResponseObject = await getPhetSimulationsById(
-          simId,
+          data.simulationId,
           token,
         );
         setSimulationUrl(simObject.runnableResource);
       } catch (err) {
         console.error("Error fetching experiment:", err);
-      } finally {
-        setLoading(false);
       }
     }
     fetchSimulation();
-  }, [simId, token]);
+  }, [data.simulationId, token]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!observation.trim() || !allQuizAnswered) return;
+
+    if (sessionId) {
+      setIsSaving(true);
+      try {
+        await submitExperiment(sessionId, observation.trim());
+      } catch (err: any) {
+        toast.error(
+          err?.response?.data?.message ?? "Failed to save experiment. You can still continue.",
+        );
+      } finally {
+        setIsSaving(false);
+      }
+    }
+
+    const postSimAnswers: PostSimAnswer[] = questions.map(
+      (q: PostSimQuestion, i: number) => ({
+        questionIndex: i,
+        selectedAnswer: quizAnswers[i] ?? "",
+        isCorrect: quizAnswers[i] === q.correctAnswer,
+      }),
+    );
+    const postSimScore = postSimAnswers.filter((a) => a.isCorrect).length;
+
     setSubmitted(true);
-
-    const correctCount = questions.filter(
-      (q: PostSimQuestion, i: number) => quizAnswers[i] === q.correctAnswer,
-    ).length;
-
     onStepComplete?.({
       stepId: data.id,
       observation,
       postSimAssessment: {
-        answers: quizAnswers,
-        score: correctCount,
-        total: questions.length,
+        postSimAnswers,
+        postSimScore,
+        postSimTotal: questions.length,
       },
     });
   };
@@ -197,7 +208,6 @@ export default function ExperimentStep({
         <div className="flex flex-col gap-6">
           {questions.map((q: PostSimQuestion, qi: number) => {
             const selected = quizAnswers[qi];
-            const isCorrect = submitted && selected === q.correctAnswer;
             const isWrong = submitted && selected !== q.correctAnswer;
 
             return (
@@ -259,10 +269,14 @@ export default function ExperimentStep({
         {!submitted ? (
           <button
             onClick={handleSubmit}
-            disabled={!observation.trim() || !allQuizAnswered}
+            disabled={!observation.trim() || !allQuizAnswered || isSaving}
             className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Submit &amp; Continue <FiArrowRight />
+            {isSaving ? (
+              <><FaSpinner className="animate-spin" /> Saving…</>
+            ) : (
+              <>Submit &amp; Continue <FiArrowRight /></>
+            )}
           </button>
         ) : (
           <button
