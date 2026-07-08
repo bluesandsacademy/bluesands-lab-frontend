@@ -1,4 +1,5 @@
 "use client";
+
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import { AddQuizModal } from "@/components/Teacher/QuizAnalytics/AddQuizModal";
 import TeacherQuizAnalytics from "@/components/Teacher/QuizAnalytics/TeacherQuizAnalytics";
@@ -6,63 +7,70 @@ import TeacherQuizSubmissions from "@/components/Teacher/QuizAnalytics/TeacherQu
 import TeacherFilterButton from "@/components/Teacher/TeacherFilterButton";
 import {
   exportGradebook,
+  getTeacherAssignments,
   getTeacherClasses,
+  getTeacherFeedback,
 } from "@/services/teacherDashboardService";
+import { useUser } from "@/services/UserContext";
 import { useEffect, useState } from "react";
 import { FaDownload, FaPlus, FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-const statsConfig: StatCardData[] = [
-  {
-    title: "Quizzes Created",
-    value: "294",
-    icon: "/images/icon/teacher/green-quiz.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: " ",
-    timeFrame: "from last month",
-  },
-  {
-    title: "Assignments Completion",
-    value: "83%",
-    icon: "/images/icon/teacher/bluewhite-check.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-  {
-    title: "Late Submissions",
-    value: "0",
-    icon: "/images/icon/teacher/purple-clipboard-warning.svg",
-    percentageChange: " ",
-    timeFrame: "average late submission rate",
-  },
-  {
-    title: "Feedback Given",
-    value: "0",
-    icon: "/images/icon/teacher/warning-chat.svg",
-    percentageChange: " ",
-    timeFrame: "Total Feedback Given",
-  },
-];
-
 const TeacherQuizzesPage = () => {
+  const { token } = useUser();
   const filters = ["Analytics", "View Submissions"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [classes, setClasses] = useState<{ id: string; name: string }[]>([]);
   const [selectedClassId, setSelectedClassId] = useState("");
+  const [stats, setStats] = useState<StatCardData[]>([
+    { title: "Quizzes Created", value: "0", icon: "/images/icon/teacher/green-quiz.svg" },
+    { title: "Assignments Completion", value: "0%", icon: "/images/icon/teacher/bluewhite-check.svg" },
+    { title: "Late Submissions", value: "—", icon: "/images/icon/teacher/purple-clipboard-warning.svg" },
+    { title: "Feedback Given", value: "0", icon: "/images/icon/teacher/warning-chat.svg" },
+  ]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getTeacherClasses()
-      .then((data) => {
-        setClasses(data);
-        if (data.length > 0) setSelectedClassId(data[0].id);
-      })
-      .catch(() => {
-        // Classes endpoint unavailable — teacher can still use other features
-      });
-  }, []);
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+        const [assignmentsData, feedbackData, classesData] = await Promise.all([
+          getTeacherAssignments(token),
+          getTeacherFeedback(token),
+          getTeacherClasses(token),
+        ]);
+
+        const subs = assignmentsData.submissions;
+        const totalStudents = subs.reduce((s, a) => s + a.totalStudents, 0);
+        const totalSubmitted = subs.reduce((s, a) => s + a.submitted, 0);
+        const completionRate =
+          totalStudents > 0
+            ? Math.round((totalSubmitted / totalStudents) * 100)
+            : 0;
+        const totalFeedback = feedbackData.data.reduce(
+          (s, d) => s + d.feedback,
+          0,
+        );
+
+        setStats([
+          { title: "Quizzes Created", value: `${subs.length}`, icon: "/images/icon/teacher/green-quiz.svg" },
+          { title: "Assignments Completion", value: `${completionRate}%`, icon: "/images/icon/teacher/bluewhite-check.svg" },
+          { title: "Late Submissions", value: "—", icon: "/images/icon/teacher/purple-clipboard-warning.svg", timeFrame: "not yet available" },
+          { title: "Feedback Given", value: `${totalFeedback}`, icon: "/images/icon/teacher/warning-chat.svg" },
+        ]);
+
+        setClasses(classesData);
+        if (classesData.length > 0) setSelectedClassId(classesData[0].id);
+      } catch (err) {
+        console.error("Failed to fetch quiz stats:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [token]);
 
   const handleExportGradebook = async () => {
     if (!selectedClassId) {
@@ -82,10 +90,9 @@ const TeacherQuizzesPage = () => {
 
   return (
     <div className="flex flex-col gap-4 p-2 lg:p-4">
-      <StatCards stats={statsConfig} />
+      <StatCards stats={stats} isLoading={isLoading} />
 
       <div className="flex justify-end items-center gap-2 flex-wrap">
-        {/* Class selector for gradebook export */}
         {classes.length > 0 && (
           <select
             value={selectedClassId}
@@ -111,8 +118,7 @@ const TeacherQuizzesPage = () => {
           onClick={() => setIsAddModalOpen(true)}
           className="flex items-center gap-1 p-1 px-2 lg:p-2 text-xs lg:text-sm text-white bg-[#303C48] rounded-md"
         >
-          <FaPlus />
-          Create Quiz
+          <FaPlus /> Create Quiz
         </button>
       </div>
 
@@ -123,15 +129,16 @@ const TeacherQuizzesPage = () => {
       />
 
       {isAddModalOpen && (
-        <AddQuizModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+        <AddQuizModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+        />
       )}
 
       {activeFilter === "Analytics" ? (
         <TeacherQuizAnalytics />
-      ) : activeFilter === "View Submissions" ? (
-        <TeacherQuizSubmissions />
       ) : (
-        <TeacherQuizAnalytics />
+        <TeacherQuizSubmissions />
       )}
     </div>
   );

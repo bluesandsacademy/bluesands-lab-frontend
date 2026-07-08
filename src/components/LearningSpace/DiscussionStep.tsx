@@ -168,11 +168,15 @@
 
 import { useState } from "react";
 import { FiArrowRight, FiCheckCircle, FiSend, FiThumbsUp } from "react-icons/fi";
+import { FaSpinner } from "react-icons/fa";
 import { BsChatSquareText } from "react-icons/bs";
+import { submitReflection } from "@/services/learningSpaceService";
+import { toast } from "react-toastify";
 
-export default function DiscussionStep({ data, onContinue, onStepComplete }: any) {
+export default function DiscussionStep({ data, onContinue, onStepComplete, sessionId }: any) {
   const [reflection, setReflection] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [newPost, setNewPost] = useState("");
   const [posts, setPosts] = useState<any[]>(
     Array.isArray(data.classDiscussion) ? data.classDiscussion : [],
@@ -245,11 +249,28 @@ export default function DiscussionStep({ data, onContinue, onStepComplete }: any
           </div>
         ) : (
           <button
-            disabled={!reflection.trim()}
-            onClick={() => setSubmitted(true)}
-            className="mt-3 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!reflection.trim() || isSaving}
+            onClick={async () => {
+              const trimmed = reflection.trim();
+              if (!trimmed) return;
+              if (sessionId) {
+                setIsSaving(true);
+                try {
+                  await submitReflection(sessionId, trimmed);
+                } catch (err: any) {
+                  toast.error(
+                    err?.response?.data?.message ??
+                      "Failed to save reflection. You can still continue.",
+                  );
+                } finally {
+                  setIsSaving(false);
+                }
+              }
+              setSubmitted(true);
+            }}
+            className="mt-3 flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Submit Reflection
+            {isSaving ? <><FaSpinner className="animate-spin" /> Saving…</> : "Submit Reflection"}
           </button>
         )}
       </div>

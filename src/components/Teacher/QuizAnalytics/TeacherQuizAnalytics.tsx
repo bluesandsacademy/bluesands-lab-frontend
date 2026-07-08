@@ -1,4 +1,12 @@
-import { data } from "framer-motion/client";
+"use client";
+
+import {
+  getTeacherAssignments,
+  getTeacherFeedback,
+  AssignmentSubmission,
+} from "@/services/teacherDashboardService";
+import { useUser } from "@/services/UserContext";
+import { useEffect, useState } from "react";
 import { RiExportFill } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
 import {
@@ -10,125 +18,179 @@ import {
   Tooltip,
   Legend,
   Bar,
-  Line,
   LineChart,
+  Line,
 } from "recharts";
 
 const TeacherQuizAnalytics = () => {
-  const data = [
-    { month: "Jan", created: 0, submitted: 0 },
-    { month: "Feb", created: 0, submitted: 0 },
-    { month: "Mar", created: 0, submitted: 0 },
-    { month: "Apr", created: 0, submitted: 0 },
-    { month: "May", created: 0, submitted: 0 },
-    { month: "Jun", created: 0, submitted: 0 },
-    { month: "Jul", created: 0, submitted: 0 },
-    { month: "Aug", created: 0, submitted: 0 },
-    { month: "Sep", created: 0, submitted: 0 },
-    { month: "Oct", created: 0, submitted: 0 },
-    { month: "Nov", created: 0, submitted: 0 },
-    { month: "Dec", created: 0, submitted: 0 },
-  ];
+  const { token } = useUser();
+  const [assignmentData, setAssignmentData] = useState<
+    { month: string; created: number; submitted: number }[]
+  >([]);
+  const [feedbackData, setFeedbackData] = useState<
+    { month: string; feedback: number }[]
+  >([]);
+  const [submissions, setSubmissions] = useState<AssignmentSubmission[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const lineChartData = [
-    { month: "Jan", feedback: 0 },
-    { month: "Feb", feedback: 0 },
-    { month: "Mar", feedback: 0 },
-    { month: "Apr", feedback: 0 },
-    { month: "May", feedback: 0 },
-    { month: "Jun", feedback: 0 },
-    { month: "Jul", feedback: 0 },
-    { month: "Aug", feedback: 0 },
-    { month: "Sep", feedback: 0 },
-    { month: "Oct", feedback: 0 },
-    { month: "Nov", feedback: 0 },
-    { month: "Dec", feedback: 0 },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+        const [assignments, feedback] = await Promise.all([
+          getTeacherAssignments(token),
+          getTeacherFeedback(token),
+        ]);
+        setAssignmentData(assignments.data);
+        setSubmissions(assignments.submissions);
+        setFeedbackData(feedback.data);
+      } catch (err) {
+        console.error("Failed to fetch quiz analytics:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [token]);
+
+  const chartSkeleton = (
+    <div className="animate-pulse bg-gray-100 rounded-lg h-[300px] w-full" />
+  );
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        <button className="flex items-center gap-1 p-1 px-2 lg:p-2 text-xs lg:text-sm text-white bg-[#303C48] rounded-md ">
+        <button className="flex items-center gap-1 p-1 px-2 lg:p-2 text-xs lg:text-sm text-white bg-[#303C48] rounded-md">
           <RiExportFill />
           Export
         </button>
       </div>
-      {/* Table Div */}
-      <div className="flex flex-col gap-1">
-        {/* <p className="text-sm font-semibold">Table Title</p> */}
-        <div className="flex flex-col overflow-x-scroll">
-          <table className="bg-white rounded-md">
-            <thead>
-              <tr className="border-b border-b-gray-200 text-xs text-gray-500">
-                <td className="p-2">Title</td>
-                <td className="p-2">Created Date</td>
-                <td className="p-2">Status</td>
-                <td className="p-2">Submissions</td>
-                <td className="p-2">Late Submissions</td>
-                <td className="p-2">Action</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="text-xs border-b border-b-gray-200">
-                <td className="p-2">Math Quiz 101</td>
-                <td className="p-2">DD-MM-YYYY</td>
-                <td className="p-2">
-                  <p className=" text-green-600">Active</p>
+
+      {/* Assignments table */}
+      <div className="overflow-x-auto">
+        <table className="w-full bg-white rounded-md text-xs">
+          <thead>
+            <tr className="border-b border-gray-200 text-gray-500">
+              <td className="p-2">Title</td>
+              <td className="p-2">Type</td>
+              <td className="p-2">Due Date</td>
+              <td className="p-2">Status</td>
+              <td className="p-2">Submissions</td>
+              <td className="p-2">Graded</td>
+              <td className="p-2">Avg Score</td>
+              <td className="p-2">Action</td>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <tr key={i} className="border-b border-gray-100 animate-pulse">
+                  {Array.from({ length: 8 }).map((__, j) => (
+                    <td key={j} className="p-2">
+                      <div className="h-3 bg-gray-100 rounded w-16" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : submissions.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="p-4 text-center text-gray-400">
+                  No assignments yet.
                 </td>
-                <td className="p-2">72%</td>
-                <td className="p-2">7%</td>
-                <td className="p-2">
-                  <button>
-                    <SlOptionsVertical />
-                  </button>
-                </td>
               </tr>
-            </tbody>
-          </table>
-        </div>
+            ) : (
+              submissions.map((a) => (
+                <tr
+                  key={a.assignmentId}
+                  className="border-b border-gray-100 hover:bg-gray-50"
+                >
+                  <td className="p-2 font-medium text-gray-800">{a.title}</td>
+                  <td className="p-2 capitalize">{a.type}</td>
+                  <td className="p-2">
+                    {a.dueAt ? new Date(a.dueAt).toLocaleDateString() : "—"}
+                  </td>
+                  <td className="p-2">
+                    <span
+                      className={`text-xs font-medium ${a.status === "active" ? "text-green-600" : "text-gray-500"}`}
+                    >
+                      {a.status}
+                    </span>
+                  </td>
+                  <td className="p-2">
+                    {a.submitted}/{a.totalStudents}
+                  </td>
+                  <td className="p-2">{a.graded}</td>
+                  <td className="p-2">
+                    <span
+                      className={`px-2 py-0.5 rounded-full font-medium ${
+                        a.avgScore >= 70
+                          ? "bg-green-100 text-green-700"
+                          : a.avgScore >= 50
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-600"
+                      }`}
+                    >
+                      {a.avgScore}%
+                    </span>
+                  </td>
+                  <td className="p-2">
+                    <button>
+                      <SlOptionsVertical />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* Charts Div */}
+      {/* Charts */}
       <div className="flex flex-col lg:flex-row gap-2">
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
-          <p className="text-sm font-semibold text-gray-600">
+          <p className="text-sm font-semibold text-gray-600 mb-4">
             Assignments Created vs Submitted
           </p>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart width={600} height={400} data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="created" stackId="a" fill="#006FCC">
-                {/* <LabelList dataKey="late" position="bottom" /> */}
-              </Bar>
-              <Bar dataKey="submitted" stackId="a" fill="#00B69B">
-                {/* <LabelList dataKey="present" position="top" /> */}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            chartSkeleton
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={assignmentData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="created" name="Created" fill="#006FCC" />
+                <Bar dataKey="submitted" name="Submitted" fill="#00B69B" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="flex-1 bg-white p-4 rounded-lg shadow">
           <h3 className="text-sm font-semibold mb-4">Feedback Timeline</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={lineChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="feedback"
-                stroke="#10B981"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            chartSkeleton
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={feedbackData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="feedback"
+                  name="Feedback"
+                  stroke="#10B981"
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

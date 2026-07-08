@@ -341,11 +341,11 @@ export const teacherSideNavLinks: SidebarLinks[] = [
     url: "/teacher/dashboard/students",
     icon: "/images/icon/studentgrad.svg",
   },
-  {
-    title: "Experiment Mgt",
-    url: "/teacher/dashboard/experiments",
-    icon: "/images/icon/beaker.svg",
-  },
+  // {
+  //   title: "Experiment Mgt",
+  //   url: "/teacher/dashboard/experiments",
+  //   icon: "/images/icon/beaker.svg",
+  // },
   {
     title: "Performance Metrics",
     url: "/teacher/dashboard/performance",
@@ -473,7 +473,9 @@ export const teacherProfileDropdown: ProfileDropdown[] = [
   },
 ];
 
-export const languageOptions = ["English", "Hausa", "Igbo", "Yoruba", "Pidgin"];
+// export const languageOptions = ["English", "Hausa", "Igbo", "Yoruba", "Pidgin"];
+export const languageOptions = ["English"];
+
 export interface Stat {
   title: string;
   percentage: string;
@@ -618,6 +620,14 @@ export const AdminLearningMetricStats: StatCardData[] = [
     trendIcon: "/images/icon/trend_up.svg",
     percentageChange: "0%",
     timeFrame: "this year",
+  },
+   {
+    title: "Total ILS Created",
+    value: "12",
+    icon: "/images/icon/teacher/vr-headset-stemlabs.png",
+    trendIcon: "/images/icon/trend_up.svg",
+    percentageChange: "0%",
+    timeFrame: "overall",
   },
 ];
 
