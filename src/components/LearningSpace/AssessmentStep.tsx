@@ -4,21 +4,18 @@ import { useState } from "react";
 import { FiCheckCircle } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 import { GiTrophy } from "react-icons/gi";
-import { submitAssessment, PostSimAnswer } from "@/services/learningSpaceService";
+import { submitAssessment, PostSimAnswer, AssessmentResult } from "@/services/learningSpaceService";
 import { toast } from "react-toastify";
 
 export default function AssessmentStep({ data, onStepComplete, sessionId }: any) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [done, setDone] = useState(false);
-  const [result, setResult] = useState<{
-    score?: number;
-    maxScore?: number;
-    badgeAwarded?: string;
-  } | null>(null);
+  const [result, setResult] = useState<AssessmentResult | null>(null);
+  const [maxScore, setMaxScore] = useState(0);
 
   const progressPercent =
-    result?.score != null && result?.maxScore
-      ? Math.round((result.score / result.maxScore) * 100)
+    result?.score != null && maxScore > 0
+      ? Math.round((result.score / maxScore) * 100)
       : 0;
 
   const completionItems = [
@@ -42,12 +39,14 @@ export default function AssessmentStep({ data, onStepComplete, sessionId }: any)
           postSimScore?: number;
           postSimTotal?: number;
         } | null;
+        const total = postSimData?.postSimTotal ?? 0;
         const res = await submitAssessment(
           sessionId,
           postSimData?.postSimAnswers ?? [],
           postSimData?.postSimScore ?? 0,
-          postSimData?.postSimTotal ?? 0,
+          total,
         );
+        setMaxScore(total);
         setResult(res);
         if (res.badgeAwarded) toast.success("Badge awarded!");
       }
@@ -84,7 +83,7 @@ export default function AssessmentStep({ data, onStepComplete, sessionId }: any)
             <div className="mt-2 text-center">
               <p className="text-4xl font-bold">
                 {result.score}
-                <span className="text-xl font-normal text-indigo-300">/{result.maxScore}</span>
+                <span className="text-xl font-normal text-indigo-300">/{maxScore}</span>
               </p>
               <div className="mt-3 h-2 w-48 overflow-hidden rounded-full bg-white/20">
                 <div
