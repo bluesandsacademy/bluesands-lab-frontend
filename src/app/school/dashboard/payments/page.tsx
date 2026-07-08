@@ -3,7 +3,7 @@ import SchoolBillingHistory from "@/components/School/Dashboard/Payments/Billing
 import SchoolPaymentOverview from "@/components/School/Dashboard/Payments/Overview";
 import SchoolStudentPayment from "@/components/School/Dashboard/Payments/StudentPayment";
 import SchoolFilterButton from "@/components/School/Dashboard/SchoolFilterButton";
-import { getSchoolAdminBilling } from "@/services/dashboard-service";
+import { getSchoolAdminBilling } from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import React, { useEffect, useState } from "react";
 
