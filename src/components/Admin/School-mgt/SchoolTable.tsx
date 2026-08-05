@@ -1,13 +1,8 @@
 "use client";
 import type { BillingSubscription } from "@/services/globalAdminDashboardService";
 import { useEffect, useMemo, useState } from "react";
-import {
-  FaChevronLeft,
-  FaChevronRight,
-  FaSort,
-  FaSortDown,
-  FaSortUp,
-} from "react-icons/fa";
+import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
+import TablePagination from "../TablePagination";
 
 type SortKey =
   | "schoolName"
@@ -106,37 +101,12 @@ const SchoolTable = ({
 
   const paginated = sorted.slice((page - 1) * pageSize, page * pageSize);
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setPage(newPage);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   const toggleSort = (key: SortKey) =>
     setSort((current) =>
       current.key === key
         ? { key, direction: current.direction === "asc" ? "desc" : "asc" }
         : { key, direction: "asc" },
     );
-
-  const getPageNumbers = () => {
-    const pages: number[] = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) pages.push(i);
-      return pages;
-    }
-
-    let startPage = Math.max(1, page - 2);
-    let endPage = Math.min(totalPages, page + 2);
-    if (page <= 3) endPage = maxPagesToShow;
-    else if (page >= totalPages - 2) startPage = totalPages - maxPagesToShow + 1;
-
-    for (let i = startPage; i <= endPage; i++) pages.push(i);
-    return pages;
-  };
 
   const SortIcon = ({ column }: { column: SortKey }) => {
     if (sort.key !== column) return <FaSort className="text-gray-300" />;
@@ -202,86 +172,15 @@ const SchoolTable = ({
         </tbody>
       </table>
 
-      {/* Pagination Controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 mt-6">
-        <div className="text-sm text-gray-600">
-          Showing {total === 0 ? 0 : (page - 1) * pageSize + 1} to{" "}
-          {Math.min(page * pageSize, total)} of {total} results
-        </div>
-
-        <div className="flex items-center gap-2">
-          <label htmlFor="pageSize" className="text-sm text-gray-600">
-            Show:
-          </label>
-          <select
-            id="pageSize"
-            value={pageSize}
-            onChange={(e) => setPageSize(Number(e.target.value))}
-            className="p-2 text-sm rounded-md border border-gray-200"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => handlePageChange(page - 1)}
-            disabled={page === 1}
-            className="p-2 rounded-md border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FaChevronLeft />
-          </button>
-
-          {page > 3 && totalPages > 5 && (
-            <>
-              <button
-                onClick={() => handlePageChange(1)}
-                className="px-3 py-1 rounded-md border border-gray-200 hover:bg-gray-100"
-              >
-                1
-              </button>
-              <span className="px-2">...</span>
-            </>
-          )}
-
-          {getPageNumbers().map((pageNum) => (
-            <button
-              key={pageNum}
-              onClick={() => handlePageChange(pageNum)}
-              className={`px-3 py-1 rounded-md border ${
-                pageNum === page
-                  ? "bg-[#303C48] text-white border-[#303C48]"
-                  : "border-gray-200 hover:bg-gray-100"
-              }`}
-            >
-              {pageNum}
-            </button>
-          ))}
-
-          {page < totalPages - 2 && totalPages > 5 && (
-            <>
-              <span className="px-2">...</span>
-              <button
-                onClick={() => handlePageChange(totalPages)}
-                className="px-3 py-1 rounded-md border border-gray-200 hover:bg-gray-100"
-              >
-                {totalPages}
-              </button>
-            </>
-          )}
-
-          <button
-            onClick={() => handlePageChange(page + 1)}
-            disabled={page === totalPages}
-            className="p-2 rounded-md border border-gray-200 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <FaChevronRight />
-          </button>
-        </div>
-      </div>
+      <TablePagination
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+        isLoading={isLoading}
+        label="schools"
+      />
     </div>
   );
 };

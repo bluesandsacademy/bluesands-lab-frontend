@@ -26,7 +26,7 @@ interface LearningSpaceResponse {
   title: string;
   objective: string;
   grade: string;
-  duration: 30;
+  duration: number;
   simulationId: string;
   status: string;
   createdBy: string;
