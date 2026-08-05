@@ -11,12 +11,27 @@ export interface GlobalDashboardOverview {
 }
 
 export interface GlobalDashboardTotals {
+  totalUsers: number;
+  activeUsers30d: number;
   totalSchools: number;
-  totalTeachers: number;
-  totalStudents: number;
-  totalIls: number;
-  totalExperiments: number;
+  totalExperimentAttempts: number;
   totalQuizAttempts: number;
+  totalLabTimeMinutes: number;
+  totalRevenueNGN: number;
+  totalTeachers: number;
+  /** Singular in the API payload — not a typo here. */
+  totalStudent: number;
+  activeSubscriptions: number;
+  totalPayments: number;
+  totalStemCourses: number;
+  /** Not a percentage — comes back as a small decimal (e.g. 1.66). */
+  totalQuizScores: number;
+  totalSubscribedUsers: number;
+  maleUsers: number;
+  femaleUsers: number;
+  offlineUsers: number;
+  totalIls: number;
+  generatedAtUtc: string;
 }
 
 export interface GrowthPoint {
@@ -406,6 +421,46 @@ export async function getGlobalBillingSubscriptions(
     params: { page, pageSize },
   });
   return res.data;
+}
+
+/**
+ * Walk every page of a paginated endpoint. Bounded so a bad `total` from the
+ * server can't spin forever; callers get whatever was collected.
+ */
+async function fetchAllPages<T>(
+  fetchPage: (page: number, pageSize: number) => Promise<Paged<T>>,
+  pageSize = 200,
+  maxPages = 25,
+): Promise<T[]> {
+  const first = await fetchPage(1, pageSize);
+  const items = [...(first.items ?? [])];
+  const pages =
+    typeof first.total === "number" && Number.isFinite(first.total)
+      ? Math.min(Math.ceil(first.total / pageSize), maxPages)
+      : 1;
+
+  for (let page = 2; page <= pages; page++) {
+    const next = await fetchPage(page, pageSize);
+    if (!next.items?.length) break;
+    items.push(...next.items);
+  }
+  return items;
+}
+
+export async function getAllGlobalBillingPayments(
+  token?: string | null,
+): Promise<BillingPayment[]> {
+  return fetchAllPages((page, pageSize) =>
+    getGlobalBillingPayments({ page, pageSize }, token),
+  );
+}
+
+export async function getAllGlobalBillingSubscriptions(
+  token?: string | null,
+): Promise<BillingSubscription[]> {
+  return fetchAllPages((page, pageSize) =>
+    getGlobalBillingSubscriptions({ page, pageSize }, token),
+  );
 }
 
 export async function getGlobalBillingRevenue(

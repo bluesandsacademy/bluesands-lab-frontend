@@ -1,16 +1,14 @@
 "use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import {
-  getGlobalBillingPayments,
-  getGlobalBillingRevenue,
+  getAllGlobalBillingPayments,
   getGlobalDashboardGeoUsage,
   getGlobalDashboardGrowth,
   getGlobalDashboardInsights,
   getGlobalDashboardTotals,
   getGlobalSupportOverview,
-  getGlobalUsers,
   type BillingPayment,
-  type BillingRevenue,
+  type GeoUsageRow,
   type GlobalDashboardGeoUsage,
   type GlobalDashboardGrowth,
   type GlobalDashboardInsights,
@@ -76,8 +74,14 @@ const formatNaira = (amount?: number | null) =>
 const formatCount = (value?: number | null) =>
   isNumber(value) ? value.toLocaleString("en-NG") : PLACEHOLDER;
 
-const formatPercent = (value?: number | null) =>
-  isNumber(value) ? `${value}%` : PLACEHOLDER;
+const formatMinutes = (value?: number | null) =>
+  isNumber(value) ? `${value.toLocaleString("en-NG")} mins` : PLACEHOLDER;
+
+/** totalQuizScores is a small decimal, so rounding to an integer would read as 2. */
+const formatDecimal = (value?: number | null) =>
+  isNumber(value)
+    ? value.toLocaleString("en-NG", { maximumFractionDigits: 2 })
+    : PLACEHOLDER;
 
 /** Growth points arrive as either "2026-01" or a full ISO timestamp. */
 const formatGrowthLabel = (t: string) => {
@@ -85,20 +89,6 @@ const formatGrowthLabel = (t: string) => {
   if (Number.isNaN(parsed.getTime())) return t;
   return `${MONTHS[parsed.getMonth()]} ${String(parsed.getFullYear()).slice(2)}`;
 };
-
-/** The payments list is paginated; pull every page so revenue totals are complete. */
-async function fetchAllPayments(token: string): Promise<BillingPayment[]> {
-  const pageSize = 200;
-  const first = await getGlobalBillingPayments({ page: 1, pageSize }, token);
-  const items = [...(first.items ?? [])];
-  const pages = isNumber(first.total) ? Math.ceil(first.total / pageSize) : 1;
-
-  for (let page = 2; page <= pages; page++) {
-    const next = await getGlobalBillingPayments({ page, pageSize }, token);
-    items.push(...(next.items ?? []));
-  }
-  return items;
-}
 
 /** Sum paid payments per calendar month, oldest first, capped to the last 12. */
 function toMonthlyRevenue(payments: BillingPayment[]) {
@@ -152,12 +142,10 @@ const Page = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [totals, setTotals] = useState<GlobalDashboardTotals | null>(null);
-  const [revenue, setRevenue] = useState<BillingRevenue | null>(null);
   const [insights, setInsights] = useState<GlobalDashboardInsights | null>(null);
   const [growth, setGrowth] = useState<GlobalDashboardGrowth | null>(null);
   const [geo, setGeo] = useState<GlobalDashboardGeoUsage | null>(null);
   const [support, setSupport] = useState<SupportOverview | null>(null);
-  const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [payments, setPayments] = useState<BillingPayment[]>([]);
 
   useEffect(() => {
@@ -168,50 +156,37 @@ const Page = () => {
       setError(null);
 
       // Settled rather than all-or-nothing: one failing panel shouldn't blank the page.
-      const [
-        totalsRes,
-        revenueRes,
-        insightsRes,
-        growthRes,
-        geoRes,
-        supportRes,
-        usersRes,
-        paymentsRes,
-      ] = await Promise.allSettled([
-        getGlobalDashboardTotals(authToken),
-        getGlobalBillingRevenue(authToken),
-        getGlobalDashboardInsights(authToken),
-        getGlobalDashboardGrowth(authToken),
-        getGlobalDashboardGeoUsage(authToken),
-        getGlobalSupportOverview(authToken),
-        getGlobalUsers({ page: 1, pageSize: 1 }, authToken),
-        fetchAllPayments(authToken),
-      ]);
+      const [totalsRes, insightsRes, growthRes, geoRes, supportRes, paymentsRes] =
+        await Promise.allSettled([
+          getGlobalDashboardTotals(authToken),
+          getGlobalDashboardInsights(authToken),
+          getGlobalDashboardGrowth(authToken),
+          getGlobalDashboardGeoUsage(authToken),
+          getGlobalSupportOverview(authToken),
+          getAllGlobalBillingPayments(authToken),
+        ]);
 
       if (totalsRes.status === "fulfilled") setTotals(totalsRes.value);
-      if (revenueRes.status === "fulfilled") setRevenue(revenueRes.value);
       if (insightsRes.status === "fulfilled") setInsights(insightsRes.value);
       if (growthRes.status === "fulfilled") setGrowth(growthRes.value);
       if (geoRes.status === "fulfilled") setGeo(geoRes.value);
       if (supportRes.status === "fulfilled") setSupport(supportRes.value);
-      if (usersRes.status === "fulfilled") setTotalUsers(usersRes.value.total);
       if (paymentsRes.status === "fulfilled") setPayments(paymentsRes.value);
 
-      const failed = [
+      const requests = [
         totalsRes,
-        revenueRes,
         insightsRes,
         growthRes,
         geoRes,
         supportRes,
-        usersRes,
         paymentsRes,
-      ].filter((r) => r.status === "rejected");
+      ];
+      const failed = requests.filter((r) => r.status === "rejected");
 
       if (failed.length) {
         console.error("Global admin dashboard: some requests failed", failed);
         setError(
-          failed.length === 8
+          failed.length === requests.length
             ? "Could not load dashboard data. Please try again."
             : "Some dashboard metrics could not be loaded.",
         );
@@ -227,7 +202,7 @@ const Page = () => {
     () => [
       {
         title: "Total Platform Users",
-        value: formatCount(totalUsers),
+        value: formatCount(totals?.totalUsers),
         icon: "/images/icon/total_users.svg",
       },
       {
@@ -236,25 +211,30 @@ const Page = () => {
         icon: "/images/icon/total_schools.svg",
       },
       {
-        title: "Total Virtual Lab Experiments",
-        value: formatCount(totals?.totalExperiments),
-        icon: "/images/icon/microscope.svg",
+        title: "Total STEM Courses",
+        value: formatCount(totals?.totalStemCourses),
+        icon: "/images/icon/calendar.svg",
       },
       {
         title: "Total Payments",
-        value: formatNaira(revenue?.totalPaidNGN),
+        value: formatNaira(totals?.totalRevenueNGN),
         icon: "/images/icon/total_payments.svg",
       },
     ],
-    [totalUsers, totals, revenue],
+    [totals],
   );
 
   const learningStats: StatCardData[] = useMemo(
     () => [
       {
-        title: "Total ILS Created",
-        value: formatCount(totals?.totalIls),
-        icon: "/images/icon/teacher/vr-headset-stemlabs.png",
+        title: "Total Lab Practice Time",
+        value: formatMinutes(totals?.totalLabTimeMinutes),
+        icon: "/images/icon/beaker_01.svg",
+      },
+      {
+        title: "Total Experiment Attempts",
+        value: formatCount(totals?.totalExperimentAttempts),
+        icon: "/images/icon/microscope.svg",
       },
       {
         title: "Total Quiz Attempts",
@@ -262,17 +242,48 @@ const Page = () => {
         icon: "/images/icon/clipboard.svg",
       },
       {
-        title: "Average Quiz Score",
-        value: formatPercent(insights?.avgQuizScorePercent),
-        icon: "/images/icon/beaker_01.svg",
+        title: "Total Quiz Scores",
+        value: formatDecimal(totals?.totalQuizScores),
+        icon: "/images/icon/studentgrad.svg",
+      },
+      {
+        title: "Total ILS Created",
+        value: formatCount(totals?.totalIls),
+        icon: "/images/icon/teacher/vr-headset-stemlabs.png",
+      },
+    ],
+    [totals],
+  );
+
+  const userOverviewStats: StatCardData[] = useMemo(
+    () => [
+      {
+        title: "Subscribed Users",
+        value: formatCount(totals?.totalSubscribedUsers),
+        icon: "/images/svg/subscribed.svg",
       },
       {
         title: "Active Users (30d)",
-        value: formatCount(insights?.totalActiveUsers30d),
-        icon: "/images/svg/subscribed.svg",
+        value: formatCount(totals?.activeUsers30d),
+        icon: "/images/icon/user-bold.svg",
+      },
+      {
+        title: "Offline Users",
+        value: formatCount(totals?.offlineUsers),
+        icon: "/images/svg/offline.svg",
+      },
+      {
+        title: "Male Users",
+        value: formatCount(totals?.maleUsers),
+        icon: "/images/svg/male.svg",
+      },
+      {
+        title: "Female Users",
+        value: formatCount(totals?.femaleUsers),
+        icon: "/images/svg/female.svg",
       },
     ],
-    [totals, insights],
+    [totals],
   );
 
   const platformStats: StatCardData[] = useMemo(
@@ -284,21 +295,21 @@ const Page = () => {
       },
       {
         title: "Total Students",
-        value: formatCount(totals?.totalStudents),
+        value: formatCount(totals?.totalStudent),
         icon: "/images/icon/student_blue.svg",
       },
       {
         title: "Active Subscriptions",
-        value: formatCount(revenue?.subscriptionsActive),
+        value: formatCount(totals?.activeSubscriptions),
         icon: "/images/svg/subscribed.svg",
       },
       {
         title: "Payments Recorded",
-        value: formatCount(revenue?.paymentsPaid),
+        value: formatCount(totals?.totalPayments),
         icon: "/images/icon/card_payment.svg",
       },
     ],
-    [totals, revenue],
+    [totals],
   );
 
   const supportStats: StatCardData[] = useMemo(
@@ -355,10 +366,34 @@ const Page = () => {
     [insights],
   );
 
-  const geoRows = useMemo(
-    () => (geo?.rows ?? []).filter((row) => row && (row.users > 0 || row.schools > 0)),
-    [geo],
-  );
+  // Several raw country values normalize to the same name ("NG" and "Nigeria"),
+  // so merge them — otherwise the list shows one country twice with split counts.
+  const geoRows = useMemo(() => {
+    const merged = new Map<string, GeoUsageRow>();
+
+    (geo?.rows ?? []).forEach((row) => {
+      if (!row?.country) return;
+      const existing = merged.get(row.country);
+      if (existing) {
+        existing.schools += row.schools ?? 0;
+        existing.users += row.users ?? 0;
+        existing.experiments += row.experiments ?? 0;
+        existing.quizAttempts += row.quizAttempts ?? 0;
+      } else {
+        merged.set(row.country, {
+          country: row.country,
+          schools: row.schools ?? 0,
+          users: row.users ?? 0,
+          experiments: row.experiments ?? 0,
+          quizAttempts: row.quizAttempts ?? 0,
+        });
+      }
+    });
+
+    return [...merged.values()]
+      .filter((row) => row.users > 0 || row.schools > 0)
+      .sort((a, b) => b.users - a.users);
+  }, [geo]);
 
   return (
     <div className="p-2 md:p-3 lg:p-4 flex flex-col gap-3 lg:gap-5">
@@ -375,6 +410,10 @@ const Page = () => {
       <div className="flex flex-col gap-1">
         <p className="text-xs">Learning metrics</p>
         <StatCards stats={learningStats} isLoading={isLoading} />
+      </div>
+      <div className="flex flex-col gap-1">
+        <p className="text-xs">User Status Overview</p>
+        <StatCards stats={userOverviewStats} isLoading={isLoading} />
       </div>
       <div className="flex flex-col gap-1">
         <p className="text-xs">Users &amp; billing</p>
