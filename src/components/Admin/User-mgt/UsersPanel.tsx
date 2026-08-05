@@ -5,9 +5,10 @@ import {
 } from "@/services/globalAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import { useCallback, useEffect, useState } from "react";
+import TablePagination from "../TablePagination";
 import UserTable from "./UserTable";
 
-const PAGE_SIZE = 20;
+const DEFAULT_PAGE_SIZE = 20;
 
 /** Dropdown label → the `role` query value the API filters on. */
 export const ROLE_FILTERS: { label: string; value?: string }[] = [
@@ -33,6 +34,7 @@ const UsersPanel = ({ search, role }: UsersPanelProps) => {
 
   const [debouncedSearch, setDebouncedSearch] = useState(search.trim());
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [users, setUsers] = useState<GlobalUser[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +48,7 @@ const UsersPanel = ({ search, role }: UsersPanelProps) => {
   // A narrowed result set has fewer pages; page 7 of the old query is meaningless.
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, role]);
+  }, [debouncedSearch, role, pageSize]);
 
   const fetchUsers = useCallback(async () => {
     if (!user || !token) return;
@@ -57,7 +59,7 @@ const UsersPanel = ({ search, role }: UsersPanelProps) => {
       const result = await getGlobalUsers(
         {
           page,
-          pageSize: PAGE_SIZE,
+          pageSize,
           ...(debouncedSearch && { q: debouncedSearch }),
           ...(role && { role }),
         },
@@ -73,24 +75,14 @@ const UsersPanel = ({ search, role }: UsersPanelProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, token, page, debouncedSearch, role]);
+  }, [user, token, page, pageSize, debouncedSearch, role]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const rangeStart = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const rangeEnd = Math.min(page * PAGE_SIZE, total);
-
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs text-gray-500">
-        {isLoading
-          ? "Loading…"
-          : `Showing ${rangeStart}–${rangeEnd} of ${total.toLocaleString("en-NG")} users`}
-      </p>
-
       {error && (
         <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
           {error}
@@ -99,25 +91,15 @@ const UsersPanel = ({ search, role }: UsersPanelProps) => {
 
       <UserTable users={users} isLoading={isLoading} onUserChanged={fetchUsers} />
 
-      <div className="flex items-center justify-between gap-2 text-xs">
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page <= 1 || isLoading}
-          className="rounded-md border border-gray-300 px-3 py-2 disabled:opacity-40"
-        >
-          Previous
-        </button>
-        <p className="text-gray-500">
-          Page {page} of {totalPages}
-        </p>
-        <button
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={page >= totalPages || isLoading}
-          className="rounded-md border border-gray-300 px-3 py-2 disabled:opacity-40"
-        >
-          Next
-        </button>
-      </div>
+      <TablePagination
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+        isLoading={isLoading}
+        label="users"
+      />
     </div>
   );
 };

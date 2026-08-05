@@ -189,6 +189,15 @@ export interface SupportMessage {
   schoolId?: string;
 }
 
+export interface TicketComment {
+  id: string;
+  userId?: string;
+  userName?: string;
+  body: string;
+  isPrivate: boolean;
+  dateCreated?: string;
+}
+
 export interface GlobalTicket {
   id: string;
   schoolId?: string;
@@ -202,6 +211,8 @@ export interface GlobalTicket {
   tagsCsv?: string;
   dateCreated?: string;
   dateUpdated?: string;
+  /** Only the detail endpoint is expected to populate this. */
+  comments?: TicketComment[];
 }
 
 export interface TicketListParams extends PageParams {

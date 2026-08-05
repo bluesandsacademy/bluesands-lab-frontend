@@ -43,13 +43,36 @@ export async function getLearningSpaceById(id: string, token?: string | null) {
 }
 
 
-export async function getLearningSpaces(token?: string | null) {
+export interface LearningSpaceTag {
+  id: string;
+  label: string;
+  subject: string;
+}
+
+/** Shape returned by GET /api/ils — duration is in hours, often fractional. */
+export interface LearningSpaceSummary {
+  id: string;
+  title: string;
+  objective: string;
+  grade: string;
+  duration: number;
+  simulationId: string;
+  status: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  tags: LearningSpaceTag[];
+}
+
+export async function getLearningSpaces(
+  token?: string | null,
+): Promise<LearningSpaceSummary[]> {
   const config = {
     withCredentials: true,
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   };
   const res = await apiClient.get(`/api/ils`, config);
-  return res.data;
+  return Array.isArray(res.data) ? res.data : [];
 }
 
 export async function getLearningSpacesByClassId(classId: string | null, token?: string | null) {
@@ -109,13 +132,11 @@ export async function publishLearningSpace(
   token?: string | null
 ) {
   try {
-    const res = await apiClient.post(
-      `/api/ils/${id}/publish`,
-      {
-       // params: { id },
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      }
-    );
+    // The header object belongs in the config arg — passing it as the second
+    // argument sent it as the request body instead.
+    const res = await apiClient.post(`/api/ils/${id}/publish`, null, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
     return res.data;
   } catch (error) {
     console.error("Failed to publish learning space:", error);
