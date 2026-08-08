@@ -5,9 +5,16 @@ import { BsGlobe } from "react-icons/bs";
 import { useRef, useState } from "react";
 import { FaBriefcase, FaGlobeAfrica, FaSpinner } from "react-icons/fa";
 import { submitRealWorld } from "@/services/learningSpaceService";
+import { saveErrorMessage, withSession } from "./sessionHelpers";
 import { toast } from "react-toastify";
 
-export default function RealWorldStep({ data, onContinue, onStepComplete, sessionId }: any) {
+export default function RealWorldStep({
+  data,
+  onContinue,
+  onStepComplete,
+  sessionId,
+  ensureSession,
+}: any) {
   const [note, setNote] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -19,14 +26,20 @@ export default function RealWorldStep({ data, onContinue, onStepComplete, sessio
   };
 
   const handleContinue = async () => {
-    if (sessionId && note.trim()) {
+    const trimmed = note.trim();
+    if (trimmed) {
       setIsSaving(true);
       try {
-        await submitRealWorld(sessionId, note.trim());
-      } catch (err: any) {
-        toast.error(
-          err?.response?.data?.message ?? "Failed to save real-world note. You can still continue.",
+        await withSession(sessionId, ensureSession, (id) =>
+          submitRealWorld(id, trimmed),
         );
+      } catch (err) {
+        toast.error(
+          saveErrorMessage(err, "Failed to save real-world note. Please try again."),
+        );
+        setIsSaving(false);
+        // Don't advance — the note would be lost on the next step.
+        return;
       } finally {
         setIsSaving(false);
       }

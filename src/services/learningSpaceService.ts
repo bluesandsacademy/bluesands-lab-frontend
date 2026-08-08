@@ -170,19 +170,35 @@ export async function assignLearningSpace(
 }
 
 
-export interface SessionCreateResponse {
+/** Raw POST /api/session body: { "sessionId": "...", "step": 1 } */
+interface SessionCreateResponse {
+  sessionId?: string;
+  /** Older/alternate shape — tolerated so a rename can't silently break saves. */
+  id?: string;
+  step?: number;
+}
+
+export interface LearningSession {
   id: string;
-  studentId: string;
-  ilsId: string;
-  status: string;
+  /** 1-based step the server has this student on; 1 for a fresh session. */
+  step: number;
 }
 
 export async function createSession(
   studentId: string,
   ilsId: string,
-): Promise<SessionCreateResponse> {
+): Promise<LearningSession> {
   const res = await apiClient.post("/api/session", { studentId, ilsId });
-  return res.data;
+  const data: SessionCreateResponse = res.data ?? {};
+  const id = data.sessionId ?? data.id;
+
+  // A 200 with no id is a failure for our purposes — surface it rather than
+  // handing back an undefined id that would silently disable every save.
+  if (!id) {
+    throw new Error("Session response did not include a session id");
+  }
+
+  return { id, step: typeof data.step === "number" ? data.step : 1 };
 }
 
 export interface PollPayload {

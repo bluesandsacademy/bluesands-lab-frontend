@@ -5,13 +5,24 @@ import { FiCheckCircle } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 import { GiTrophy } from "react-icons/gi";
 import { submitAssessment, PostSimAnswer, AssessmentResult } from "@/services/learningSpaceService";
+import {
+  readAlreadySubmitted,
+  saveErrorMessage,
+  withSession,
+} from "./sessionHelpers";
 import { toast } from "react-toastify";
 
-export default function AssessmentStep({ data, onStepComplete, sessionId }: any) {
+export default function AssessmentStep({
+  data,
+  onStepComplete,
+  sessionId,
+  ensureSession,
+}: any) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [result, setResult] = useState<AssessmentResult | null>(null);
   const [maxScore, setMaxScore] = useState(0);
+  const [wasAutoSubmitted, setWasAutoSubmitted] = useState(false);
 
   const progressPercent =
     result?.score != null && maxScore > 0
@@ -31,31 +42,52 @@ export default function AssessmentStep({ data, onStepComplete, sessionId }: any)
   ].filter(Boolean);
 
   const handleSubmit = async () => {
+    const postSimData = data.postSimData as {
+      postSimAnswers?: PostSimAnswer[];
+      postSimScore?: number;
+      postSimTotal?: number;
+    } | null;
+    const total = postSimData?.postSimTotal ?? 0;
+
     setIsSubmitting(true);
     try {
-      if (sessionId) {
-        const postSimData = data.postSimData as {
-          postSimAnswers?: PostSimAnswer[];
-          postSimScore?: number;
-          postSimTotal?: number;
-        } | null;
-        const total = postSimData?.postSimTotal ?? 0;
-        const res = await submitAssessment(
-          sessionId,
+      const res = await withSession(sessionId, ensureSession, (id) =>
+        submitAssessment(
+          id,
           postSimData?.postSimAnswers ?? [],
           postSimData?.postSimScore ?? 0,
           total,
-        );
-        setMaxScore(total);
-        setResult(res);
-        if (res.badgeAwarded) toast.success("Badge awarded!");
-      }
+        ),
+      );
+      setMaxScore(total);
+      setResult(res);
+      if (res.badgeAwarded) toast.success("Badge awarded!");
+
+      // The lesson is only complete once the server has recorded it.
       setDone(true);
       onStepComplete?.({ stepId: data.id, completedAt: new Date().toISOString() });
-    } catch (err: any) {
-      toast.error(
-        err?.response?.data?.message ?? "Failed to submit. Please try again.",
-      );
+    } catch (err) {
+      // A 409 means this session was already scored — the body holds the real
+      // result, so show it rather than reporting a failure.
+      const existing = readAlreadySubmitted(err);
+      if (existing) {
+        setMaxScore(total);
+        setResult({
+          score: existing.score,
+          feedback: existing.feedback,
+          badgeAwarded: existing.badgeAwarded,
+          completedAt: existing.completedAt,
+        });
+        setWasAutoSubmitted(!!existing.autoSubmitted);
+        setDone(true);
+        onStepComplete?.({
+          stepId: data.id,
+          completedAt: existing.completedAt ?? new Date().toISOString(),
+        });
+        toast.info("This attempt was already submitted — showing your result.");
+        return;
+      }
+      toast.error(saveErrorMessage(err, "Failed to submit. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -95,6 +127,26 @@ export default function AssessmentStep({ data, onStepComplete, sessionId }: any)
           )}
         </div>
       </div>
+
+      {wasAutoSubmitted && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-800">
+            This attempt was submitted automatically
+          </p>
+          <p className="mt-1 text-xs text-amber-700">
+            The session&apos;s time limit was reached, so the assessment was
+            closed and scored before you pressed submit. Ask your teacher to
+            reopen it if you need another attempt.
+          </p>
+        </div>
+      )}
+
+      {done && result?.feedback && (
+        <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+          <p className="mb-1 text-sm font-semibold text-gray-800">Feedback</p>
+          <p className="text-sm text-gray-600">{result.feedback}</p>
+        </div>
+      )}
 
       {/* Completion summary */}
       {completionItems.length > 0 && (
