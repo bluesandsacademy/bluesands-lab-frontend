@@ -168,9 +168,9 @@ const UserTable = ({ users, isLoading, onUserChanged }: UserTableProps) => {
         </table>
       </div>
 
-      <p className="text-[11px] text-gray-400">
+      {/* <p className="text-[11px] text-gray-400">
         Sorting applies to the users on this page.
-      </p>
+      </p> */}
 
       {activeUser && (
         <UserActionsModal

@@ -6,6 +6,7 @@ import { BsCheckCircleFill } from "react-icons/bs";
 import { FaFlask, FaSpinner } from "react-icons/fa";
 import { getPhetSimulationsById } from "@/services/dashboard-service";
 import { submitExperiment, PostSimAnswer } from "@/services/learningSpaceService";
+import { saveErrorMessage, withSession } from "./sessionHelpers";
 import { useUser } from "@/services/UserContext";
 import { toast } from "react-toastify";
 
@@ -49,6 +50,7 @@ export default function ExperimentStep({
   onContinue,
   onStepComplete,
   sessionId,
+  ensureSession,
 }: any) {
   const [observation, setObservation] = useState("");
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
@@ -81,17 +83,20 @@ export default function ExperimentStep({
   const handleSubmit = async () => {
     if (!observation.trim() || !allQuizAnswered) return;
 
-    if (sessionId) {
-      setIsSaving(true);
-      try {
-        await submitExperiment(sessionId, observation.trim());
-      } catch (err: any) {
-        toast.error(
-          err?.response?.data?.message ?? "Failed to save experiment. You can still continue.",
-        );
-      } finally {
-        setIsSaving(false);
-      }
+    setIsSaving(true);
+    try {
+      await withSession(sessionId, ensureSession, (id) =>
+        submitExperiment(id, observation.trim()),
+      );
+    } catch (err) {
+      toast.error(
+        saveErrorMessage(err, "Failed to save experiment. Please try again."),
+      );
+      setIsSaving(false);
+      // Keep the student on the step so the observation isn't lost.
+      return;
+    } finally {
+      setIsSaving(false);
     }
 
     const postSimAnswers: PostSimAnswer[] = questions.map(

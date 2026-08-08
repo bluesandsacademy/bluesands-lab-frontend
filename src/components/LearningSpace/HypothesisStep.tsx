@@ -5,37 +5,55 @@ import { FiMic, FiCheckCircle, FiArrowRight } from "react-icons/fi";
 import { FaSpinner } from "react-icons/fa";
 import { BsLightbulb } from "react-icons/bs";
 import { submitHypothesis } from "@/services/learningSpaceService";
+import { saveErrorMessage, withSession } from "./sessionHelpers";
 import { toast } from "react-toastify";
 
-export default function HypothesisStep({ data, onContinue, onStepComplete, sessionId }: any) {
+export default function HypothesisStep({
+  data,
+  onContinue,
+  onStepComplete,
+  sessionId,
+  ensureSession,
+}: any) {
   const [text, setText] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<boolean> => {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed) return false;
 
-    if (sessionId) {
-      setIsSaving(true);
-      try {
-        await submitHypothesis(sessionId, trimmed);
-      } catch (err: any) {
-        toast.error(
-          err?.response?.data?.message ?? "Failed to save hypothesis. You can still continue.",
-        );
-      } finally {
-        setIsSaving(false);
-      }
+    setIsSaving(true);
+    try {
+      await withSession(sessionId, ensureSession, (id) =>
+        submitHypothesis(id, trimmed),
+      );
+      // Only confirm once the hypothesis actually reached the server.
+      setSubmitted(true);
+      return true;
+    } catch (err) {
+      toast.error(
+        saveErrorMessage(err, "Failed to save hypothesis. Please try again."),
+      );
+      return false;
+    } finally {
+      setIsSaving(false);
     }
-    setSubmitted(true);
   };
 
-  const handleContinue = () => {
+  // Continuing with an unsaved hypothesis used to drop it silently, so Continue
+  // saves first and only advances if that succeeded.
+  const handleContinue = async () => {
+    if (!submitted) {
+      const saved = await handleSubmit();
+      if (!saved) return;
+    }
     const payload = { stepId: data.id, hypothesis: text.trim() || null };
     onStepComplete(payload);
     onContinue(payload);
   };
+
+  const canContinue = submitted || !!text.trim();
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -93,12 +111,22 @@ export default function HypothesisStep({ data, onContinue, onStepComplete, sessi
         )}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-3">
+        {!canContinue && (
+          <p className="text-xs text-gray-400">
+            Write your hypothesis to continue
+          </p>
+        )}
         <button
           onClick={handleContinue}
-          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          disabled={!canContinue || isSaving}
+          className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Continue <FiArrowRight />
+          {isSaving ? (
+            <><FaSpinner className="animate-spin" /> Saving…</>
+          ) : (
+            <>{submitted ? "Continue" : "Submit & Continue"} <FiArrowRight /></>
+          )}
         </button>
       </div>
     </div>

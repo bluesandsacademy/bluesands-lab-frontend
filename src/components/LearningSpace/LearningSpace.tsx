@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { FiArrowLeft, FiCheckCircle, FiX } from "react-icons/fi";
 import { MdOutlineExplore } from "react-icons/md";
 import {
@@ -26,6 +26,12 @@ import {
   PollPayload,
 } from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
+import {
+  readStoredUserId,
+  saveErrorMessage,
+  withSession,
+  type EnsureSession,
+} from "./sessionHelpers";
 import { toast } from "react-toastify";
 
 // ── Types ─────────────────────────────────────────────────────
@@ -97,6 +103,7 @@ type StepComponentType = React.ComponentType<{
   onContinue: (payload?: StepPayload) => void;
   onStepComplete: (payload: StepPayload) => void;
   sessionId?: string;
+  ensureSession?: EnsureSession;
 }>;
 
 // ── API → Steps mapper ────────────────────────────────────────
@@ -197,7 +204,13 @@ function mapApiToSteps(api: ApiLearningSpace): LessonStep[] {
 
 // ── Step registry ─────────────────────────────────────────────
 
-function PreQuizWrapper({ data, onContinue, onStepComplete, sessionId }: any) {
+function PreQuizWrapper({
+  data,
+  onContinue,
+  onStepComplete,
+  sessionId,
+  ensureSession,
+}: any) {
   const [saving, setSaving] = useState(false);
 
   const normalizedQuiz = {
@@ -215,29 +228,29 @@ function PreQuizWrapper({ data, onContinue, onStepComplete, sessionId }: any) {
   const handleQuizComplete = async (results: QuizResults) => {
     onStepComplete({ stepId: data.id, quizResults: results });
 
-    if (sessionId) {
-      setSaving(true);
-      try {
-        const pollPayload: PollPayload = {
-          quizTitle: results.quizTitle,
-          timeSpentSeconds: results.timeSpent,
-          answers: results.questionResults.map((q, i) => ({
-            questionIndex: i,
-            optionIndex: q.options.indexOf(q.userAnswer),
-            isCorrect: q.isCorrect,
-          })),
-          score: results.score,
-          correctAnswers: results.correctAnswers,
-          totalQuestions: results.totalQuestions,
-        };
-        await submitPoll(sessionId, pollPayload);
-      } catch (err: any) {
-        toast.error(
-          err?.response?.data?.message ?? "Failed to save quiz answers. You can still continue.",
-        );
-      } finally {
-        setSaving(false);
-      }
+    setSaving(true);
+    try {
+      const pollPayload: PollPayload = {
+        quizTitle: results.quizTitle,
+        timeSpentSeconds: results.timeSpent,
+        answers: results.questionResults.map((q, i) => ({
+          questionIndex: i,
+          optionIndex: q.options.indexOf(q.userAnswer),
+          isCorrect: q.isCorrect,
+        })),
+        score: results.score,
+        correctAnswers: results.correctAnswers,
+        totalQuestions: results.totalQuestions,
+      };
+      await withSession(sessionId, ensureSession, (id) =>
+        submitPoll(id, pollPayload),
+      );
+    } catch (err) {
+      toast.error(
+        saveErrorMessage(err, "Failed to save quiz answers. You can still continue."),
+      );
+    } finally {
+      setSaving(false);
     }
 
     onContinue({ stepId: data.id, quizResults: results });
@@ -394,6 +407,21 @@ function LessonContent({
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Held in refs as well as state so `ensureSession` can dedupe concurrent
+  // callers without waiting for a re-render.
+  const sessionIdRef = useRef<string | null>(null);
+  const sessionPromiseRef = useRef<Promise<string | null> | null>(null);
+  const hasResumedRef = useRef(false);
+
+  // 1-based step the server last recorded for this student on this ILS.
+  const [serverStep, setServerStep] = useState<number | null>(null);
+  const [resumedFromStep, setResumedFromStep] = useState<number | null>(null);
+  const [isRestarting, setIsRestarting] = useState(false);
+  const [restartNotice, setRestartNotice] = useState<string | null>(null);
+
+  // Context can lag behind a page load, so fall back to the persisted user.
+  const studentId = user?.userId ?? readStoredUserId();
+
   const fetchLesson = useCallback(async () => {
     if (!lessonId) return;
     setFetchError(null);
@@ -407,30 +435,124 @@ function LessonContent({
         subtitle: data.objective ?? "",
         steps,
       });
-      if (user?.userId) {
-        try {
-          const session = await createSession(user.userId, data.id);
-          setSessionId(session.id);
-        } catch (err) {
-          console.error("Failed to start session:", err);
-          toast.warning("Could not start a session. Progress may not be saved.");
-        }
-      }
     } catch (err) {
       console.error("Failed to load learning space:", err);
       setFetchError("Failed to load this learning space. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [lessonId, token, user?.userId]);
+  }, [lessonId, token]);
+
+  /**
+   * Returns the session id, creating one if needed. Retries on a later step if
+   * an earlier attempt failed, so one bad request no longer disables saving for
+   * the rest of the lesson.
+   */
+  const ensureSession = useCallback(async (): Promise<string | null> => {
+    if (sessionIdRef.current) return sessionIdRef.current;
+    if (sessionPromiseRef.current) return sessionPromiseRef.current;
+
+    const ilsId = lesson?.id ?? lessonId;
+    if (!studentId || !ilsId) {
+      console.error("Cannot start a learning session — missing ids", {
+        studentId,
+        ilsId,
+      });
+      return null;
+    }
+
+    const pending = createSession(studentId, ilsId)
+      .then((session) => {
+        sessionIdRef.current = session.id;
+        setSessionId(session.id);
+        setServerStep(session.step);
+        return session.id;
+      })
+      .catch((err) => {
+        console.error("Failed to start session:", err);
+        sessionPromiseRef.current = null; // let the next step try again
+        return null;
+      });
+
+    sessionPromiseRef.current = pending;
+    return pending;
+  }, [studentId, lesson?.id, lessonId]);
 
   useEffect(() => {
     setLesson(null);
     setCurrentStep(0);
     setFormData({});
     setSessionId(null);
+    setServerStep(null);
+    setResumedFromStep(null);
+    sessionIdRef.current = null;
+    sessionPromiseRef.current = null;
+    hasResumedRef.current = false;
     fetchLesson();
-  }, [lessonId]);
+  }, [lessonId, fetchLesson]);
+
+  // The server tracks how far the student got, so a re-opened ILS picks up
+  // where it left off instead of restarting at step 1.
+  useEffect(() => {
+    if (hasResumedRef.current || serverStep === null || !lesson) return;
+
+    const lastIndex = lesson.steps.length - 1;
+    const target = Math.min(Math.max(serverStep - 1, 0), Math.max(lastIndex, 0));
+    hasResumedRef.current = true;
+
+    if (target > 0) {
+      setCurrentStep(target);
+      setResumedFromStep(target);
+    }
+  }, [serverStep, lesson]);
+
+  /**
+   * Ask the server for a fresh attempt. If it hands back the same session the
+   * previous attempt is still open — say so plainly rather than implying a
+   * clean slate the student doesn't actually have.
+   */
+  const handleStartOver = useCallback(async () => {
+    const previousId = sessionIdRef.current;
+
+    setIsRestarting(true);
+    setRestartNotice(null);
+    // Stop the resume effect from jumping forward again on the new step value.
+    hasResumedRef.current = true;
+    sessionIdRef.current = null;
+    sessionPromiseRef.current = null;
+
+    const newId = await ensureSession();
+    setIsRestarting(false);
+
+    setCurrentStep(0);
+    setFormData({});
+    setResumedFromStep(null);
+
+    if (!newId) {
+      setRestartNotice(
+        "Could not start a new attempt. Your answers may not be saved.",
+      );
+      return;
+    }
+    if (previousId && newId === previousId) {
+      setRestartNotice(
+        "Your previous attempt is still open, so this is a review of it — your recorded assessment score won't change.",
+      );
+    }
+  }, [ensureSession]);
+
+  // Open the session as soon as the lesson resolves. Runs on its own effect so
+  // a late-arriving user id still triggers it.
+  useEffect(() => {
+    if (!lesson?.id) return;
+    ensureSession().then((id) => {
+      if (!id) {
+        toast.warning(
+          "Could not start a session — your progress may not be saved.",
+        );
+      }
+    });
+  }, [lesson?.id, ensureSession]);
 
   const activeSteps = lesson?.steps ?? [];
 
@@ -538,6 +660,28 @@ function LessonContent({
       />
       <StepBar steps={activeSteps} currentIndex={currentStep} />
 
+      {resumedFromStep !== null && (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-100 bg-amber-50 px-5 py-2.5">
+          <p className="text-xs text-amber-800">
+            You&apos;ve attempted this learning space before — resuming at step{" "}
+            {resumedFromStep + 1} of {activeSteps.length}.
+          </p>
+          <button
+            onClick={handleStartOver}
+            disabled={isRestarting}
+            className="rounded-lg border border-amber-300 px-3 py-1 text-xs font-medium text-amber-800 transition hover:bg-amber-100 disabled:opacity-50"
+          >
+            {isRestarting ? "Starting…" : "Start over"}
+          </button>
+        </div>
+      )}
+
+      {restartNotice && (
+        <div className="border-b border-sky-100 bg-sky-50 px-5 py-2.5">
+          <p className="text-xs text-sky-800">{restartNotice}</p>
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto">
         <StepComponent
           data={{
@@ -553,6 +697,7 @@ function LessonContent({
           onContinue={handleContinue}
           onStepComplete={handleStepComplete}
           sessionId={sessionId ?? undefined}
+          ensureSession={ensureSession}
         />
       </div>
     </div>
