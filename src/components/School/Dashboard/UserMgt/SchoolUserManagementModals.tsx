@@ -354,29 +354,47 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
-    phone: "09000123456",
+    gender: "",
+    phone: "",
     country: "Nigeria",
-    // assignClass: "",
   });
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const canSubmit =
+    !!formData.fullName.trim() &&
+    !!formData.gender &&
+    !!formData.phone.trim() &&
+    !!formData.country.trim();
+
   const handleSubmit = async () => {
-    console.log("Adding student:", formData);
+    if (!canSubmit) return;
     try {
       setIsLoading(true);
-      const res = await addSchoolStudent(formData, user?.schoolId, token);
-      console.log(res);
+      // The endpoint takes no query parameters — the school comes from the token.
+      await addSchoolStudent(
+        {
+          fullName: formData.fullName.trim(),
+          gender: formData.gender,
+          phone: formData.phone.trim(),
+          country: formData.country.trim(),
+        },
+        token,
+      );
       setIsLoading(false);
       onClose();
       toast.success("Student added successfully");
     } catch (error: any) {
       console.error("Error adding student:", error);
       setIsLoading(false);
-      toast.error(<div><p className="font-semibold">Failed to add Student</p><p>${error.message}</p></div>)
+      toast.error(
+        <div>
+          <p className="font-semibold">Failed to add Student</p>
+          <p>{error?.response?.data?.message ?? error?.message}</p>
+        </div>,
+      );
     }
   };
 
@@ -399,34 +417,48 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email Address <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
-            placeholder="student@example.com"
-          />
-        </div>
-
-        {/* <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Assign Class <span className="text-red-500">*</span>
+            Gender <span className="text-red-500">*</span>
           </label>
           <select
-            name="assignClass"
-            value={formData.assignClass}
+            name="gender"
+            value={formData.gender}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
           >
-            <option value="">Select a class</option>
-            <option value="class1">Class 1</option>
-            <option value="class2">Class 2</option>
-            <option value="class3">Class 3</option>
+            <option value="">Select gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
           </select>
-        </div> */}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Phone <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
+            placeholder="09000123456"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Country <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="country"
+            value={formData.country}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
+            placeholder="Nigeria"
+          />
+        </div>
 
         <div className="flex gap-3 justify-end pt-4 border-t">
           <button
@@ -437,13 +469,13 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoading || !canSubmit}
             className={`px-4 py-2 text-sm rounded-md flex items-center justify-center gap-2
                         ${
-                          isLoading
-                            ? "bg-blue-800 cursor-not-allowed"
+                          isLoading || !canSubmit
+                            ? "bg-blue-800 cursor-not-allowed opacity-60"
                             : "bg-blue-950 hover:bg-blue-900"
-                        } 
+                        }
                         text-white transition duration-200`}
           >
             {isLoading ? (

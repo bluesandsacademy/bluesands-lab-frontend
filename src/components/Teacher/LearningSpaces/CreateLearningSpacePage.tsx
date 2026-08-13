@@ -862,6 +862,7 @@ export const CreateLearningSpacePage = ({
     earthSpace: "",
     gradeLevel: "",
     search: "",
+    pageSize: 200,
   });
 
   // ── Array input states ─────────────────────────────────────────────────────
