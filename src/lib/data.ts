@@ -298,11 +298,11 @@ export const sideNavLinks: SidebarLinks[] = [
     url: "/school/dashboard/teachers",
     icon: "/images/icon/mdi_teacher.svg",
   },
-  {
-    title: "System Metrics",
-    url: "/school/dashboard/system-metrics",
-    icon: "/images/icon/system.svg",
-  },
+  // {
+  //   title: "System Metrics",
+  //   url: "/school/dashboard/system-metrics",
+  //   icon: "/images/icon/system.svg",
+  // },
   {
     title: "Report & Analytics",
     url: "/school/dashboard/report",

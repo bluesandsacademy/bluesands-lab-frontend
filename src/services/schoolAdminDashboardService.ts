@@ -10,13 +10,62 @@ export async function getSchoolAdminDashboard(token?: string | null) {
   return res.data;
 }
 
-export async function getSchoolAdminOverview(token?: string | null) {
+export interface SchoolAdminOverview {
+  schoolId: string;
+  schoolName: string;
+  totalStudents: number;
+  totalTeachers: number;
+  activeClasses: number;
+  experimentsRunThisTerm: number;
+  experimentsRunAllTime: number;
+  /** Percentage, 0–100. */
+  avgStudentCompletionRate: number;
+  /** Percentage, 0–100. */
+  avgStudentScore: number;
+  weeklyActiveUsers: number;
+  monthlyActiveUsers: number;
+  totalIlsCreated: number;
+}
+
+export async function getSchoolAdminOverview(
+  token?: string | null,
+): Promise<SchoolAdminOverview> {
   const config = {
     withCredentials: true,
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   };
   const res = await apiClient.get("/api/school-admin/v2/overview", config);
   return res.data;
+}
+
+export interface TrendPoint {
+  /** ISO timestamp for the bucket. */
+  ts: string;
+  value: number;
+}
+
+export interface SchoolAdminTrends {
+  activeUsers: TrendPoint[];
+  experimentsRun: TrendPoint[];
+  avgScores: TrendPoint[];
+}
+
+export async function getSchoolAdminTrends(
+  token?: string | null,
+): Promise<SchoolAdminTrends> {
+  const config = {
+    withCredentials: true,
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  };
+  const res = await apiClient.get("/api/school-admin/v2/trends", config);
+  const data = res.data ?? {};
+  return {
+    activeUsers: Array.isArray(data.activeUsers) ? data.activeUsers : [],
+    experimentsRun: Array.isArray(data.experimentsRun)
+      ? data.experimentsRun
+      : [],
+    avgScores: Array.isArray(data.avgScores) ? data.avgScores : [],
+  };
 }
 
 export async function getSchoolAdminExperiments(token?: string | null) {
@@ -107,33 +156,26 @@ export async function exportUsers(schoolId: string): Promise<void> {
   triggerDownload(res.data, "users.csv");
 }
 
+export interface StudentUpsertRecord {
+  gender: string;
+  fullName: string;
+  phone: string;
+  country: string;
+}
+
+/**
+ * POST /api/schools/users/students/upsert takes no query parameters — the
+ * school is derived from the caller's token — and no longer accepts an email.
+ */
 export async function addSchoolStudent(
-  studentData: {
-    email: string;
-    fullName: string;
-    phone: string;
-    country: string;
-  },
-  schoolId?: string | null,
+  studentData: StudentUpsertRecord,
   token?: string | null
 ) {
-  // const config = {
-  //   withCredentials: true,
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     ...(token && { Authorization: `Bearer ${token}` }),
-  //   },
-  //   params: {
-  //     schoolId,
-  //   },
-  // };
-
   try {
     const res = await apiClient.post(
       "/api/schools/users/students/upsert",
       studentData,
       {
-        params: { schoolId },
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       }
     );
