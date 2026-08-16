@@ -1,21 +1,13 @@
 import { Modal } from "@/components/School/Dashboard/UserMgt/SchoolUserManagementModals";
 import { assignExperiment, getClasses } from "@/services/dashboard-service";
 import { assignLearningSpace } from "@/services/learningSpaceService";
+import type { SchoolClass } from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
 import { useEffect, useState } from "react";
 import { FaSpinner, FaPlus, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-interface ClassResponse {
-  id: string;
-  name: string;
-  subject: string;
-  myRole: string;
-  students: number;
-  createdAt: string;
-  inviteCode: string;
-  inviteCodeExpiresAt: string;
-}
+type ClassResponse = SchoolClass;
 
 export const AssignLearningSpaceModal = ({
   isOpen,

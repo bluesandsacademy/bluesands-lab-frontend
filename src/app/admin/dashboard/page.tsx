@@ -1,18 +1,19 @@
 "use client";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import {
-  getAllGlobalBillingPayments,
   getGlobalDashboardGeoUsage,
-  getGlobalDashboardGrowth,
   getGlobalDashboardInsights,
+  getGlobalDashboardPromptTotals,
   getGlobalDashboardTotals,
   getGlobalSupportOverview,
-  type BillingPayment,
+  getRevenueGrowth,
+  getUserGrowth,
+  type DashboardSeries,
   type GeoUsageRow,
   type GlobalDashboardGeoUsage,
-  type GlobalDashboardGrowth,
   type GlobalDashboardInsights,
   type GlobalDashboardTotals,
+  type PromptTotals,
   type SupportOverview,
 } from "@/services/globalAdminDashboardService";
 import { useUser } from "@/services/UserContext";
@@ -44,21 +45,6 @@ const COLORS = [
   "#a3a3a3",
 ];
 
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
 const PLACEHOLDER = "—";
 
 const isNumber = (value: unknown): value is number =>
@@ -83,33 +69,26 @@ const formatDecimal = (value?: number | null) =>
     ? value.toLocaleString("en-NG", { maximumFractionDigits: 2 })
     : PLACEHOLDER;
 
-/** Growth points arrive as either "2026-01" or a full ISO timestamp. */
-const formatGrowthLabel = (t: string) => {
-  const parsed = new Date(t);
-  if (Number.isNaN(parsed.getTime())) return t;
-  return `${MONTHS[parsed.getMonth()]} ${String(parsed.getFullYear()).slice(2)}`;
-};
+const formatPercent = (value?: number | null) =>
+  isNumber(value)
+    ? `${value.toLocaleString("en-NG", { maximumFractionDigits: 1 })}%`
+    : PLACEHOLDER;
 
-/** Sum paid payments per calendar month, oldest first, capped to the last 12. */
-function toMonthlyRevenue(payments: BillingPayment[]) {
-  const buckets = new Map<string, number>();
+/** DEMO: prefer the prompt-totals value, falling back to the older endpoint. */
+const pick = (...values: (number | null | undefined)[]) =>
+  values.find(isNumber);
 
-  payments
-    .filter((p) => p?.status?.toLowerCase() === "paid" && isNumber(p.total))
-    .forEach((p) => {
-      const date = new Date(p.dateCreated);
-      if (Number.isNaN(date.getTime())) return;
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      buckets.set(key, (buckets.get(key) ?? 0) + p.total);
-    });
-
-  return [...buckets.entries()]
-    .sort(([a], [b]) => a.localeCompare(b))
-    .slice(-12)
-    .map(([key, revenue]) => {
-      const [year, month] = key.split("-");
-      return { month: `${MONTHS[Number(month) - 1]} ${year.slice(2)}`, revenue };
-    });
+/**
+ * The chart endpoints ship a ready-made `label`; fall back to the timestamp
+ * only if one is missing.
+ */
+function toChartData(series: DashboardSeries | null) {
+  return (series?.dataPoints ?? [])
+    .filter((point) => point && isNumber(point.value))
+    .map((point) => ({
+      name: point.label || new Date(point.timestamp).toLocaleDateString("en-NG"),
+      value: point.value,
+    }));
 }
 
 const ChartCard = ({
@@ -142,11 +121,15 @@ const Page = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [totals, setTotals] = useState<GlobalDashboardTotals | null>(null);
+  // DEMO: prompt-totals takes precedence over /dashboard/totals for the cards.
+  const [promptTotals, setPromptTotals] = useState<PromptTotals | null>(null);
   const [insights, setInsights] = useState<GlobalDashboardInsights | null>(null);
-  const [growth, setGrowth] = useState<GlobalDashboardGrowth | null>(null);
+  const [userGrowth, setUserGrowth] = useState<DashboardSeries | null>(null);
+  const [revenueGrowth, setRevenueGrowth] = useState<DashboardSeries | null>(
+    null,
+  );
   const [geo, setGeo] = useState<GlobalDashboardGeoUsage | null>(null);
   const [support, setSupport] = useState<SupportOverview | null>(null);
-  const [payments, setPayments] = useState<BillingPayment[]>([]);
 
   useEffect(() => {
     if (!user || !token) return;
@@ -156,30 +139,43 @@ const Page = () => {
       setError(null);
 
       // Settled rather than all-or-nothing: one failing panel shouldn't blank the page.
-      const [totalsRes, insightsRes, growthRes, geoRes, supportRes, paymentsRes] =
-        await Promise.allSettled([
-          getGlobalDashboardTotals(authToken),
-          getGlobalDashboardInsights(authToken),
-          getGlobalDashboardGrowth(authToken),
-          getGlobalDashboardGeoUsage(authToken),
-          getGlobalSupportOverview(authToken),
-          getAllGlobalBillingPayments(authToken),
-        ]);
+      const [
+        totalsRes,
+        promptTotalsRes,
+        insightsRes,
+        userGrowthRes,
+        revenueGrowthRes,
+        geoRes,
+        supportRes,
+      ] = await Promise.allSettled([
+        getGlobalDashboardTotals(authToken),
+        getGlobalDashboardPromptTotals(authToken),
+        getGlobalDashboardInsights(authToken),
+        getUserGrowth(authToken),
+        getRevenueGrowth(authToken),
+        getGlobalDashboardGeoUsage(authToken),
+        getGlobalSupportOverview(authToken),
+      ]);
 
       if (totalsRes.status === "fulfilled") setTotals(totalsRes.value);
+      if (promptTotalsRes.status === "fulfilled")
+        setPromptTotals(promptTotalsRes.value);
       if (insightsRes.status === "fulfilled") setInsights(insightsRes.value);
-      if (growthRes.status === "fulfilled") setGrowth(growthRes.value);
+      if (userGrowthRes.status === "fulfilled")
+        setUserGrowth(userGrowthRes.value);
+      if (revenueGrowthRes.status === "fulfilled")
+        setRevenueGrowth(revenueGrowthRes.value);
       if (geoRes.status === "fulfilled") setGeo(geoRes.value);
       if (supportRes.status === "fulfilled") setSupport(supportRes.value);
-      if (paymentsRes.status === "fulfilled") setPayments(paymentsRes.value);
 
       const requests = [
         totalsRes,
+        promptTotalsRes,
         insightsRes,
-        growthRes,
+        userGrowthRes,
+        revenueGrowthRes,
         geoRes,
         supportRes,
-        paymentsRes,
       ];
       const failed = requests.filter((r) => r.status === "rejected");
 
@@ -202,88 +198,117 @@ const Page = () => {
     () => [
       {
         title: "Total Platform Users",
-        value: formatCount(totals?.totalUsers),
+        value: formatCount(
+          pick(promptTotals?.totalPlatformUsers, totals?.totalUsers),
+        ),
         icon: "/images/icon/total_users.svg",
       },
       {
         title: "Total Schools Registered",
-        value: formatCount(totals?.totalSchools),
+        value: formatCount(
+          pick(promptTotals?.totalSchoolsRegistered, totals?.totalSchools),
+        ),
         icon: "/images/icon/total_schools.svg",
       },
       {
         title: "Total STEM Courses",
-        value: formatCount(totals?.totalStemCourses),
+        value: formatCount(
+          pick(promptTotals?.totalStemCourses, totals?.totalStemCourses),
+        ),
         icon: "/images/icon/calendar.svg",
       },
       {
         title: "Total Payments",
-        value: formatNaira(totals?.totalRevenueNGN),
+        value: formatNaira(
+          pick(promptTotals?.totalPayments, totals?.totalRevenueNGN),
+        ),
         icon: "/images/icon/total_payments.svg",
       },
     ],
-    [totals],
+    [promptTotals, totals],
   );
 
   const learningStats: StatCardData[] = useMemo(
     () => [
       {
         title: "Total Lab Practice Time",
-        value: formatMinutes(totals?.totalLabTimeMinutes),
+        value: formatMinutes(
+          pick(promptTotals?.totalLabPractice, totals?.totalLabTimeMinutes),
+        ),
         icon: "/images/icon/beaker_01.svg",
       },
       {
         title: "Total Experiment Attempts",
-        value: formatCount(totals?.totalExperimentAttempts),
+        value: formatCount(
+          pick(
+            promptTotals?.totalExperimentAttempts,
+            totals?.totalExperimentAttempts,
+          ),
+        ),
         icon: "/images/icon/microscope.svg",
       },
       {
         title: "Total Quiz Attempts",
-        value: formatCount(totals?.totalQuizAttempts),
+        value: formatCount(
+          pick(promptTotals?.totalQuizAttempts, totals?.totalQuizAttempts),
+        ),
         icon: "/images/icon/clipboard.svg",
       },
       {
         title: "Total Quiz Scores",
-        value: formatDecimal(totals?.totalQuizScores),
+        // prompt-totals reports a percentage; the older endpoint a raw decimal.
+        value: isNumber(promptTotals?.totalQuizScorePercent)
+          ? formatPercent(promptTotals.totalQuizScorePercent)
+          : formatDecimal(totals?.totalQuizScores),
         icon: "/images/icon/studentgrad.svg",
       },
       {
         title: "Total ILS Created",
-        value: formatCount(totals?.totalIls),
+        value: formatCount(
+          pick(promptTotals?.totalILScreated, totals?.totalIls),
+        ),
         icon: "/images/icon/teacher/vr-headset-stemlabs.png",
       },
     ],
-    [totals],
+    [promptTotals, totals],
   );
 
   const userOverviewStats: StatCardData[] = useMemo(
     () => [
       {
         title: "Subscribed Users",
-        value: formatCount(totals?.totalSubscribedUsers),
+        value: formatCount(
+          pick(promptTotals?.subscribedUsers, totals?.totalSubscribedUsers),
+        ),
         icon: "/images/svg/subscribed.svg",
       },
       {
         title: "Active Users (30d)",
-        value: formatCount(totals?.activeUsers30d),
+        value: formatCount(
+          pick(promptTotals?.activeUsers, totals?.activeUsers30d),
+        ),
         icon: "/images/icon/user-bold.svg",
       },
       {
+        // Not in prompt-totals; still sourced from /dashboard/totals.
         title: "Offline Users",
         value: formatCount(totals?.offlineUsers),
         icon: "/images/svg/offline.svg",
       },
       {
         title: "Male Users",
-        value: formatCount(totals?.maleUsers),
+        value: formatCount(pick(promptTotals?.maleUsers, totals?.maleUsers)),
         icon: "/images/svg/male.svg",
       },
       {
         title: "Female Users",
-        value: formatCount(totals?.femaleUsers),
+        value: formatCount(
+          pick(promptTotals?.femaleUsers, totals?.femaleUsers),
+        ),
         icon: "/images/svg/female.svg",
       },
     ],
-    [totals],
+    [promptTotals, totals],
   );
 
   const platformStats: StatCardData[] = useMemo(
@@ -300,16 +325,20 @@ const Page = () => {
       },
       {
         title: "Active Subscriptions",
-        value: formatCount(totals?.activeSubscriptions),
+        value: formatCount(
+          pick(promptTotals?.activeSubscriptions, totals?.activeSubscriptions),
+        ),
         icon: "/images/svg/subscribed.svg",
       },
       {
         title: "Payments Recorded",
-        value: formatCount(totals?.totalPayments),
+        value: formatCount(
+          pick(promptTotals?.paymentRecorded, totals?.totalPayments),
+        ),
         icon: "/images/icon/card_payment.svg",
       },
     ],
-    [totals],
+    [promptTotals, totals],
   );
 
   const supportStats: StatCardData[] = useMemo(
@@ -333,16 +362,7 @@ const Page = () => {
     [support],
   );
 
-  const growthData = useMemo(
-    () =>
-      (growth?.points ?? [])
-        .filter((point) => point && isNumber(point.v))
-        .map((point) => ({
-          label: formatGrowthLabel(point.t),
-          value: point.v,
-        })),
-    [growth],
-  );
+  const growthData = useMemo(() => toChartData(userGrowth), [userGrowth]);
 
   // Subject rows are returned with zero-count entries; those add nothing to a donut.
   const subjectData = useMemo(
@@ -353,7 +373,10 @@ const Page = () => {
     [insights],
   );
 
-  const revenueData = useMemo(() => toMonthlyRevenue(payments), [payments]);
+  const revenueData = useMemo(
+    () => toChartData(revenueGrowth),
+    [revenueGrowth],
+  );
 
   const peakUsageData = useMemo(
     () =>
@@ -368,6 +391,8 @@ const Page = () => {
 
   // Several raw country values normalize to the same name ("NG" and "Nigeria"),
   // so merge them — otherwise the list shows one country twice with split counts.
+  // Currently unused: the User Demographics block below is commented out for
+  // the demo. Kept so restoring it is a single uncomment.
   const geoRows = useMemo(() => {
     const merged = new Map<string, GeoUsageRow>();
 
@@ -427,19 +452,19 @@ const Page = () => {
       {/* Growth and subject distribution */}
       <div className="flex flex-col lg:flex-row gap-4">
         <ChartCard
-          title={growth?.metric ? `Growth — ${growth.metric}` : "Growth"}
+          title={userGrowth?.title || "User Growth"}
           isEmpty={!growthData.length}
         >
           <LineChart data={growthData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
             <Legend />
             <Line
               type="monotone"
               dataKey="value"
-              name={growth?.metric || "value"}
+              name={userGrowth?.metricName || "users"}
               stroke="#3b82f6"
               strokeWidth={2}
               dot={{ r: 4 }}
@@ -477,14 +502,21 @@ const Page = () => {
 
       {/* Revenue and peak usage */}
       <div className="flex flex-col lg:flex-row gap-4">
-        <ChartCard title="Revenue Growth" isEmpty={!revenueData.length}>
+        <ChartCard
+          title={revenueGrowth?.title || "Revenue Growth"}
+          isEmpty={!revenueData.length}
+        >
           <BarChart data={revenueData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip formatter={(value: number) => formatNaira(value)} />
             <Legend />
-            <Bar dataKey="revenue" name="Revenue (NGN)" fill="#3b82f6" />
+            <Bar
+              dataKey="value"
+              name={revenueGrowth?.metricName || "Revenue (NGN)"}
+              fill="#3b82f6"
+            />
           </BarChart>
         </ChartCard>
 
@@ -499,8 +531,8 @@ const Page = () => {
         </ChartCard>
       </div>
 
-      {/* User Demographics */}
-      <div className="flex flex-col gap-3 p-4 bg-white rounded-lg shadow">
+      {/* User Demographics — hidden for the demo */}
+      {/* <div className="flex flex-col gap-3 p-4 bg-white rounded-lg shadow">
         <p className="text-sm font-semibold">User Demographics</p>
         {geoRows.length ? (
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -519,7 +551,7 @@ const Page = () => {
         ) : (
           <p className="text-xs text-gray-400">No regional usage recorded yet</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
