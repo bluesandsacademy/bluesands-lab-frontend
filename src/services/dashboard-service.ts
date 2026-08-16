@@ -1,4 +1,5 @@
 import axios, { apiClient } from "@/services/axios-instance";
+import type { SchoolClass } from "./schoolAdminDashboardService";
 
 // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -167,11 +168,15 @@ export async function assignExperiment(
   }
 }
 
-export async function getClasses(token?: string | null) {
+/** Same endpoint as `getSchoolClasses`, without the schoolId query — a teacher's
+ *  school is derived from their token. */
+export async function getClasses(
+  token?: string | null,
+): Promise<SchoolClass[]> {
   const config = {
     withCredentials: true,
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   };
   const res = await apiClient.get("/api/classes/school", config);
-  return res.data;
+  return Array.isArray(res.data) ? res.data : [];
 }

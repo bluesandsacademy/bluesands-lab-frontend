@@ -10,126 +10,125 @@ import {
   AddTeacherModal,
   BulkUploadModal,
 } from "@/components/School/Dashboard/UserMgt/SchoolUserManagementModals";
+import {
+  ClassEnrolmentModal,
+  UserActionMenu,
+  type EnrolmentMode,
+} from "@/components/School/Dashboard/UserMgt/ClassEnrolmentModals";
 import SchoolStudentTable from "@/components/School/Dashboard/UserMgt/StudentTable";
 import SchoolTeacherTable from "@/components/School/Dashboard/UserMgt/TeacherTable";
-import { exportUsers, getSchoolAdminDashboard } from "@/services/schoolAdminDashboardService";
+import {
+  exportUsers,
+  getSchoolClasses,
+  getSchoolStudents,
+  getSchoolTeachers,
+  type SchoolClass,
+  type SchoolUser,
+} from "@/services/schoolAdminDashboardService";
 import { useUser } from "@/services/UserContext";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FaDownload, FaPlus, FaSpinner } from "react-icons/fa";
 import { FiUpload } from "react-icons/fi";
 import { IoSearch } from "react-icons/io5";
 import { toast } from "react-toastify";
 
-const statsConfig: StatCardData[] = [
-  {
-    title: "Active Students",
-    value: "0",
-    icon: "/images/icon/student_dark.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-  {
-    title: "Active Teachers",
-    value: "0",
-    icon: "/images/icon/active_teacher.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-  {
-    title: "New Registrations",
-    value: "0",
-    icon: "/images/icon/clipboard.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-  {
-    title: "New Teachers",
-    value: "0",
-    icon: "/images/icon/card_teacher.svg",
-    trendIcon: "/images/icon/trend_up.svg",
-    percentageChange: "0%",
-    timeFrame: "from last month",
-  },
-];
+/** Counts registrations in the trailing 30 days. */
+const countRecent = (users: SchoolUser[]) => {
+  const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  return users.filter((user) => {
+    const created = new Date(user.dateCreated).getTime();
+    return !Number.isNaN(created) && created >= cutoff;
+  }).length;
+};
 
 const SchoolUserManagementPage = () => {
-  const filters = ["Teachers", "Students", "Classes", "Roles & Permissions"];
+  const filters = ["Teachers", "Students", "Classes"];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const [loading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState<StatCardData[]>([]);
   const { user, token } = useUser();
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [modalType, setModalType] = useState<string>("");
   const [isExporting, setIsExporting] = useState(false);
 
-  useEffect(() => {
+  const [teachers, setTeachers] = useState<SchoolUser[]>([]);
+  const [students, setStudents] = useState<SchoolUser[]>([]);
+  const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  // Two-step flow: the row menu picks a mode, then the class picker opens.
+  const [menuUser, setMenuUser] = useState<SchoolUser | null>(null);
+  const [enrolment, setEnrolment] = useState<{
+    user: SchoolUser;
+    mode: EnrolmentMode;
+  } | null>(null);
+
+  const fetchUsers = useCallback(async () => {
     if (!user || !token) return;
 
-    async function fetchStats() {
-      setIsLoading(true);
-      try {
-        const data = await getSchoolAdminDashboard(token);
+    setIsLoading(true);
+    setError(null);
 
-        const statsData: StatCardData[] = [
-          {
-            title: statsConfig[0].title,
-            value: `${data.activity7d.activeUsers}`,
-            icon: statsConfig[0].icon,
-            trendIcon: statsConfig[0].trendIcon,
-            percentageChange: statsConfig[0].percentageChange,
-            timeFrame: statsConfig[0].timeFrame,
-          },
-          {
-            title: statsConfig[1].title,
-            value: `${data.counts.teachers}`,
-            icon: statsConfig[1].icon,
-            trendIcon: statsConfig[1].trendIcon,
-            percentageChange: statsConfig[1].percentageChange,
-            timeFrame: statsConfig[1].timeFrame,
-          },
-          {
-            title: statsConfig[2].title,
-            value: "0", // Waiting for backend data
-            icon: statsConfig[2].icon,
-            trendIcon: statsConfig[2].trendIcon,
-            percentageChange: statsConfig[2].percentageChange,
-            timeFrame: statsConfig[2].timeFrame,
-          },
-          {
-            title: statsConfig[3].title,
-            value: "0", //waiting for backend data
-            icon: statsConfig[3].icon,
-            trendIcon: statsConfig[3].trendIcon,
-            percentageChange: statsConfig[3].percentageChange,
-            timeFrame: statsConfig[3].timeFrame,
-          },
-        ];
+    // Settled so one failing list doesn't blank the other tabs.
+    const [teachersRes, studentsRes, classesRes] = await Promise.allSettled([
+      getSchoolTeachers(user.schoolId, token),
+      getSchoolStudents(user.schoolId, token),
+      getSchoolClasses(user.schoolId, token),
+    ]);
 
-        setStats(statsData);
-      } catch (err) {
-        console.error("Error fetching stats:", err);
+    if (teachersRes.status === "fulfilled") setTeachers(teachersRes.value);
+    if (studentsRes.status === "fulfilled") setStudents(studentsRes.value);
+    if (classesRes.status === "fulfilled") setClasses(classesRes.value);
 
-        const fallbackStats: StatCardData[] = statsConfig.map((stat) => ({
-          title: stat.title,
-          value: "0",
-          icon: stat.icon,
-          trendIcon: stat.trendIcon,
-          percentageChange: stat.percentageChange,
-          timeFrame: stat.timeFrame,
-        }));
-
-        setStats(fallbackStats);
-      } finally {
-        setIsLoading(false);
-      }
+    const requests = [teachersRes, studentsRes, classesRes];
+    const failed = requests.filter((r) => r.status === "rejected");
+    if (failed.length) {
+      console.error("School user management: some requests failed", failed);
+      setError(
+        failed.length === requests.length
+          ? "Could not load users and classes. Please try again."
+          : "Some data could not be loaded.",
+      );
     }
 
-    fetchStats();
+    setIsLoading(false);
   }, [user, token]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  // Clearing the search between tabs avoids an empty table with no obvious cause.
+  useEffect(() => {
+    setSearch("");
+  }, [activeFilter]);
+
+  const stats: StatCardData[] = useMemo(
+    () => [
+      {
+        title: "Total Students",
+        value: students.length.toLocaleString("en-NG"),
+        icon: "/images/icon/student_dark.svg",
+      },
+      {
+        title: "Total Teachers",
+        value: teachers.length.toLocaleString("en-NG"),
+        icon: "/images/icon/active_teacher.svg",
+      },
+      {
+        title: "New Students (30d)",
+        value: countRecent(students).toLocaleString("en-NG"),
+        icon: "/images/icon/clipboard.svg",
+      },
+      {
+        title: "New Teachers (30d)",
+        value: countRecent(teachers).toLocaleString("en-NG"),
+        icon: "/images/icon/card_teacher.svg",
+      },
+    ],
+    [students, teachers],
+  );
 
   const handleExportUsers = async () => {
     if (!user?.schoolId) {
@@ -156,11 +155,20 @@ const SchoolUserManagementPage = () => {
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
     setModalType(""); // Clear modal type
+    // The modal closes on a successful add, so pull the new user into the list.
+    fetchUsers();
   };
 
   return (
     <div className="flex flex-col gap-6 mt-4 lg:mt-6 p-2 lg:p-4">
-      <StatCards stats={stats} />
+      <StatCards stats={stats} isLoading={loading} />
+
+      {error && (
+        <div className="rounded-md bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      )}
+
       <SchoolFilterButton
         filters={filters}
         onFilterChange={setActiveFilter}
@@ -181,7 +189,10 @@ const SchoolUserManagementPage = () => {
           <IoSearch className="text-gray-400 text-lg" />
           <input
             type="text"
-            className="bg-gray-100 p-2 outline-none"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            disabled={activeFilter === "Roles & Permissions"}
+            className="bg-gray-100 p-2 outline-none disabled:cursor-not-allowed"
             placeholder={
               activeFilter === "Teachers"
                 ? "Search Teachers"
@@ -230,20 +241,39 @@ const SchoolUserManagementPage = () => {
         </div>
       </div>
       {activeFilter === "Teachers" ? (
-        <SchoolTeacherTable />
+        <SchoolTeacherTable
+          teachers={teachers}
+          isLoading={loading}
+          search={search}
+          onOpenActions={setMenuUser}
+        />
       ) : activeFilter === "Students" ? (
-        <SchoolStudentTable />
+        <SchoolStudentTable
+          students={students}
+          isLoading={loading}
+          search={search}
+          onOpenActions={setMenuUser}
+        />
       ) : activeFilter === "Classes" ? (
-        <SchoolClassTable />
-      ) : activeFilter === "Roles & Permissions" ? (
-        <SchoolRolesContainer />
-      ) : (
+        <SchoolClassTable
+          classes={classes}
+          isLoading={loading}
+          search={search}
+        />
+      ) 
+      // : activeFilter === "Roles & Permissions" ? (
+      //   <SchoolRolesContainer />
+      // )
+       : (
         ""
       )}
 
       <BulkUploadModal
         isOpen={isBulkUploadOpen}
-        onClose={() => setIsBulkUploadOpen(false)}
+        onClose={() => {
+          setIsBulkUploadOpen(false);
+          fetchUsers();
+        }}
         userType={activeFilter}
       />
 
@@ -261,6 +291,30 @@ const SchoolUserManagementPage = () => {
 
       {modalType === "Roles & Permissions" && (
         <AddRoleModal isOpen={isAddModalOpen} onClose={handleCloseModal} />
+      )}
+
+      {menuUser && (
+        <UserActionMenu
+          user={menuUser}
+          onClose={() => setMenuUser(null)}
+          onSelect={(mode) => {
+            setEnrolment({ user: menuUser, mode });
+            setMenuUser(null);
+          }}
+        />
+      )}
+
+      {enrolment && (
+        <ClassEnrolmentModal
+          user={enrolment.user}
+          mode={enrolment.mode}
+          // The active tab determines which role the enrolment is created with.
+          role={activeFilter === "Teachers" ? "Teacher" : "Student"}
+          classes={classes}
+          isLoadingClasses={loading}
+          onClose={() => setEnrolment(null)}
+          onSuccess={fetchUsers}
+        />
       )}
     </div>
   );

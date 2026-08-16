@@ -131,6 +131,97 @@ export async function getSchoolAdminLeaderboard(token?: string | null) {
   return res.data;
 }
 
+export interface SchoolUser {
+  id: string;
+  fullName: string;
+  email: string;
+  /** Absent for users added without one. */
+  phone?: string;
+  country: string;
+  dateCreated: string;
+  isEmailVerified: boolean;
+}
+
+async function getSchoolUsers(
+  path: string,
+  schoolId?: string | null,
+  token?: string | null,
+): Promise<SchoolUser[]> {
+  const res = await apiClient.get(path, {
+    withCredentials: true,
+    ...(schoolId && { params: { schoolId } }),
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  });
+  return Array.isArray(res.data) ? res.data : [];
+}
+
+export async function getSchoolTeachers(
+  schoolId?: string | null,
+  token?: string | null,
+): Promise<SchoolUser[]> {
+  return getSchoolUsers("/api/schools/users/teachers", schoolId, token);
+}
+
+export async function getSchoolStudents(
+  schoolId?: string | null,
+  token?: string | null,
+): Promise<SchoolUser[]> {
+  return getSchoolUsers("/api/schools/users/students", schoolId, token);
+}
+
+export interface SchoolClass {
+  id: string;
+  name: string;
+  subject: string;
+  /** The caller's own role in this class, not the class teacher's name. */
+  myRole: string;
+  students: number;
+  createdAt: string;
+  /** Returned for teachers; absent from the school-admin listing. */
+  inviteCode?: string;
+  inviteCodeExpiresAt?: string;
+}
+
+export async function getSchoolClasses(
+  schoolId?: string | null,
+  token?: string | null,
+): Promise<SchoolClass[]> {
+  const res = await apiClient.get("/api/classes/school", {
+    withCredentials: true,
+    ...(schoolId && { params: { schoolId } }),
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  });
+  return Array.isArray(res.data) ? res.data : [];
+}
+
+export type ClassEnrolmentRole = "Student" | "Teacher";
+
+/** POST /api/classes/enroll?classId= — adds a user to a class by email. */
+export async function enrollInClass(
+  classId: string,
+  body: { email: string; role: ClassEnrolmentRole },
+  token?: string | null,
+) {
+  const res = await apiClient.post("/api/classes/enroll", body, {
+    params: { classId },
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  });
+  return res.data;
+}
+
+/** PUT /api/classes/enroll?oldClassId= — moves a user between classes. */
+export async function changeClassEnrolment(
+  oldClassId: string,
+  body: { email: string; newClassId: string; role: ClassEnrolmentRole },
+  token?: string | null,
+) {
+  const res = await apiClient.put("/api/classes/enroll", body, {
+    params: { oldClassId },
+    ...(token && { headers: { Authorization: `Bearer ${token}` } }),
+  });
+  return res.data;
+}
+
 const triggerDownload = (blob: Blob, filename: string) => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

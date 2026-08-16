@@ -45,6 +45,53 @@ export interface GlobalDashboardGrowth {
   points: GrowthPoint[];
 }
 
+/** Flat totals used to populate the overview cards. */
+export interface PromptTotals {
+  totalPlatformUsers: number;
+  totalSchoolsRegistered: number;
+  totalStemCourses: number;
+  /** Money amount, in NGN. */
+  totalPayments: number;
+  totalLabPractice: number;
+  totalExperimentAttempts: number;
+  totalQuizAttempts: number;
+  totalQuizScorePercent: number;
+  totalILScreated: number;
+  subscribedUsers: number;
+  activeUsers: number;
+  maleUsers: number;
+  activeSubscriptions: number;
+  /** Count of payments, not an amount. */
+  paymentRecorded: number;
+  femaleUsers: number;
+  generatedAtUtc: string;
+}
+
+export async function getGlobalDashboardPromptTotals(
+  token?: string | null,
+): Promise<PromptTotals> {
+  const res = await apiClient.get(
+    "/api/globaladmin/v1/dashboard/prompt-totals",
+    authConfig(token),
+  );
+  // Documented as text/plain but shaped like JSON — tolerate both.
+  return typeof res.data === "string" ? JSON.parse(res.data) : res.data;
+}
+
+export interface DashboardSeriesPoint {
+  timestamp: string;
+  value: number;
+  /** Pre-formatted axis label, e.g. "Jan 26". */
+  label: string;
+}
+
+/** Shared envelope for the dashboard chart endpoints. */
+export interface DashboardSeries {
+  title: string;
+  metricName: string;
+  dataPoints: DashboardSeriesPoint[];
+}
+
 export interface GeoUsageRow {
   country: string;
   schools: number;
@@ -361,6 +408,31 @@ export async function getGlobalDashboardGrowth(
     authConfig(token),
   );
   return res.data;
+}
+
+async function getDashboardSeries(
+  path: string,
+  token?: string | null,
+): Promise<DashboardSeries> {
+  const res = await apiClient.get(path, authConfig(token));
+  const data = res.data ?? {};
+  return {
+    title: data.title ?? "",
+    metricName: data.metricName ?? "",
+    dataPoints: Array.isArray(data.dataPoints) ? data.dataPoints : [],
+  };
+}
+
+export async function getRevenueGrowth(
+  token?: string | null,
+): Promise<DashboardSeries> {
+  return getDashboardSeries("/api/dashboard/revenue-growth", token);
+}
+
+export async function getUserGrowth(
+  token?: string | null,
+): Promise<DashboardSeries> {
+  return getDashboardSeries("/api/dashboard/growth-users", token);
 }
 
 export async function getGlobalDashboardGeoUsage(
