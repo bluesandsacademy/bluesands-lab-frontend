@@ -142,6 +142,38 @@ export interface SchoolUser {
   isEmailVerified: boolean;
 }
 
+/**
+ * Reads a list payload defensively. Endpoints here are sometimes served as
+ * `text/plain`, in which case axios hands back an unparsed string rather than
+ * an array — silently returning [] for that made a working 200 look empty.
+ * Anything unrecognised is logged with the actual payload instead of swallowed.
+ */
+export function readArrayPayload<T>(data: unknown, context: string): T[] {
+  let payload = data;
+
+  if (typeof payload === "string") {
+    const text = payload.trim();
+    if (!text) return [];
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      console.error(`${context}: response was a non-JSON string`, data);
+      return [];
+    }
+  }
+
+  if (Array.isArray(payload)) return payload as T[];
+
+  // Tolerate a wrapped list rather than dropping it on the floor.
+  const wrapped = ["items", "results", "data"]
+    .map((key) => (payload as Record<string, unknown>)?.[key])
+    .find(Array.isArray);
+  if (wrapped) return wrapped as T[];
+
+  console.error(`${context}: unexpected response shape`, payload);
+  return [];
+}
+
 async function getSchoolUsers(
   path: string,
   schoolId?: string | null,
@@ -152,7 +184,7 @@ async function getSchoolUsers(
     ...(schoolId && { params: { schoolId } }),
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   });
-  return Array.isArray(res.data) ? res.data : [];
+  return readArrayPayload<SchoolUser>(res.data, `GET ${path}`);
 }
 
 export async function getSchoolTeachers(
@@ -191,7 +223,7 @@ export async function getSchoolClasses(
     ...(schoolId && { params: { schoolId } }),
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   });
-  return Array.isArray(res.data) ? res.data : [];
+  return readArrayPayload<SchoolClass>(res.data, "GET /api/classes/school");
 }
 
 export type ClassEnrolmentRole = "Student" | "Teacher";
@@ -247,19 +279,23 @@ export async function exportUsers(schoolId: string): Promise<void> {
   triggerDownload(res.data, "users.csv");
 }
 
-export interface StudentUpsertRecord {
+/** Both upsert endpoints take the same body. */
+export interface SchoolUserUpsertRecord {
   gender: string;
   fullName: string;
   phone: string;
   country: string;
 }
 
+/** @deprecated Use {@link SchoolUserUpsertRecord}. */
+export type StudentUpsertRecord = SchoolUserUpsertRecord;
+
 /**
  * POST /api/schools/users/students/upsert takes no query parameters — the
  * school is derived from the caller's token — and no longer accepts an email.
  */
 export async function addSchoolStudent(
-  studentData: StudentUpsertRecord,
+  studentData: SchoolUserUpsertRecord,
   token?: string | null
 ) {
   try {
@@ -277,14 +313,12 @@ export async function addSchoolStudent(
   }
 }
 
+/**
+ * POST /api/schools/users/teachers/upsert takes no query parameters — the
+ * school is derived from the caller's token — and no longer accepts an email.
+ */
 export async function addSchoolTeacher(
-  teacherData: {
-    email: string;
-    fullName: string;
-    phone: string;
-    country: string;
-  },
-  schoolId?: string | null,
+  teacherData: SchoolUserUpsertRecord,
   token?: string | null
 ) {
   try {
@@ -292,7 +326,6 @@ export async function addSchoolTeacher(
       "/api/schools/users/teachers/upsert",
       teacherData,
       {
-        params: { schoolId },
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       }
     );
