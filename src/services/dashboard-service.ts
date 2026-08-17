@@ -1,5 +1,8 @@
 import axios, { apiClient } from "@/services/axios-instance";
-import type { SchoolClass } from "./schoolAdminDashboardService";
+import {
+  readArrayPayload,
+  type SchoolClass,
+} from "./schoolAdminDashboardService";
 
 // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -178,5 +181,5 @@ export async function getClasses(
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),
   };
   const res = await apiClient.get("/api/classes/school", config);
-  return Array.isArray(res.data) ? res.data : [];
+  return readArrayPayload<SchoolClass>(res.data, "GET /api/classes/school");
 }

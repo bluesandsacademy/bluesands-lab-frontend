@@ -229,28 +229,47 @@ export const AddTeacherModal = ({ isOpen, onClose }: any) => {
 
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
+    gender: "",
     phone: "",
-    country: "",
+    country: "Nigeria",
   });
 
   const handleChange = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const canSubmit =
+    !!formData.fullName.trim() &&
+    !!formData.gender &&
+    !!formData.phone.trim() &&
+    !!formData.country.trim();
+
   const handleSubmit = async () => {
-    console.log("Adding teacher:", formData);
+    if (!canSubmit) return;
     try {
       setIsLoading(true);
-      const res = await addSchoolTeacher(formData, user?.schoolId, token);
-      console.log(res);
+      // The endpoint takes no query parameters — the school comes from the token.
+      await addSchoolTeacher(
+        {
+          fullName: formData.fullName.trim(),
+          gender: formData.gender,
+          phone: formData.phone.trim(),
+          country: formData.country.trim(),
+        },
+        token,
+      );
       setIsLoading(false);
       onClose();
       toast.success("Teacher added successfully");
     } catch (error: any) {
       console.error("Error adding teacher:", error);
       setIsLoading(false);
-      toast.error(<div><p className="font-semibold">Failed to add teacher</p><p>${error.message}</p></div>)
+      toast.error(
+        <div>
+          <p className="font-semibold">Failed to add teacher</p>
+          <p>{error?.response?.data?.message ?? error?.message}</p>
+        </div>,
+      );
     }
   };
 
@@ -274,16 +293,19 @@ export const AddTeacherModal = ({ isOpen, onClose }: any) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address <span className="text-red-500">*</span>
+              Gender <span className="text-red-500">*</span>
             </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
+            <select
+              name="gender"
+              value={formData.gender}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
-              placeholder="teacher@example.com"
-            />
+            >
+              <option value="">Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
           <div>
@@ -302,7 +324,7 @@ export const AddTeacherModal = ({ isOpen, onClose }: any) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Country
+              Country <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -310,7 +332,7 @@ export const AddTeacherModal = ({ isOpen, onClose }: any) => {
               value={formData.country}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
-              placeholder="City, State"
+              placeholder="Nigeria"
             />
           </div>
         </div>
@@ -324,13 +346,13 @@ export const AddTeacherModal = ({ isOpen, onClose }: any) => {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoading || !canSubmit}
             className={`px-4 py-2 text-sm rounded-md flex items-center justify-center gap-2
                         ${
-                          isLoading
-                            ? "bg-blue-800 cursor-not-allowed"
+                          isLoading || !canSubmit
+                            ? "bg-blue-800 cursor-not-allowed opacity-60"
                             : "bg-blue-950 hover:bg-blue-900"
-                        } 
+                        }
                         text-white transition duration-200`}
           >
             {isLoading ? (
@@ -494,10 +516,13 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
 };
 
 // Add Class Modal
+/** Every class is created under one subject so the data stays consistent. */
+const DEFAULT_CLASS_SUBJECT = "General";
+
 export const AddClassModal = ({ isOpen, onClose }: any) => {
   const [formData, setFormData] = useState({
     name: "",
-    subject: "",
+    subject: DEFAULT_CLASS_SUBJECT,
     // description: "",
     // schedule: "",
     // capacity: "",
@@ -509,20 +534,25 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
   };
 
   const handleSubmit = async () => {
-    console.log("Adding class:", formData);
+    if (!formData.name.trim()) return;
     try {
       setIsLoading(true);
-      const res = await addClass(formData);
-      console.log(res);
+      await addClass({ ...formData, name: formData.name.trim() });
       setIsLoading(false);
       onClose();
       toast.success("Class added successfully");
     } catch (error: any) {
       console.error("Error adding Class:", error);
       setIsLoading(false);
-      toast.error(<div><p className="font-semibold">Failed to add Class</p><p>${error.message}</p></div>)
+      // Previously fell through to onClose(), closing the modal and discarding
+      // the entered name even when the request failed.
+      toast.error(
+        <div>
+          <p className="font-semibold">Failed to add Class</p>
+          <p>{error?.response?.data?.message ?? error?.message}</p>
+        </div>,
+      );
     }
-    onClose();
   };
 
   return (
@@ -545,16 +575,20 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Subject <span className="text-red-500">*</span>
+              Subject
             </label>
             <input
               type="text"
               name="subject"
               value={formData.subject}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-950"
-              placeholder="e.g., Biology"
+              readOnly
+              disabled
+              aria-readonly="true"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed focus:outline-none"
             />
+            <p className="mt-1 text-xs text-gray-400">
+              All classes are created under &quot;{DEFAULT_CLASS_SUBJECT}&quot;.
+            </p>
           </div>
         </div>
 
@@ -612,13 +646,13 @@ export const AddClassModal = ({ isOpen, onClose }: any) => {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoading || !formData.name.trim()}
             className={`px-4 py-2 text-sm rounded-md flex items-center justify-center gap-2
                         ${
-                          isLoading
-                            ? "bg-blue-800 cursor-not-allowed"
+                          isLoading || !formData.name.trim()
+                            ? "bg-blue-800 cursor-not-allowed opacity-60"
                             : "bg-blue-950 hover:bg-blue-900"
-                        } 
+                        }
                         text-white transition duration-200`}
           >
             {isLoading ? (
