@@ -74,15 +74,10 @@ export async function registerNewSchool(newSchool: SchoolObject) {
   }
 }
 
-export async function login(email: string, password: string): Promise<SessionPayload & { isVerified: boolean }> {
-  const res = await apiClient.post(
-    "/api/auth/login",
-    { email, password },
-    { withCredentials: true },
-  );
+export type AuthSession = SessionPayload & { isVerified: boolean };
 
-  const data: LoginResponse = res.data;
-
+/** Every auth endpoint returns the same envelope, so map it in one place. */
+function toSession(data: LoginResponse): AuthSession {
   const user: User = {
     userId: data.userId,
     fullName: data.fullName,
@@ -112,40 +107,38 @@ export async function login(email: string, password: string): Promise<SessionPay
   };
 }
 
+export async function login(
+  email: string,
+  password: string,
+): Promise<AuthSession> {
+  const res = await apiClient.post(
+    "/api/auth/login",
+    { email, password },
+    { withCredentials: true },
+  );
+
+  return toSession(res.data as LoginResponse);
+}
+
 // Uses plain axios (not apiClient) so the 401 interceptor does not
 // misinterpret an invalid-Google-token response as an expired session.
-export async function googleAuth(idToken: string): Promise<SessionPayload & { isVerified: boolean }> {
+async function postGoogleToken(
+  path: string,
+  idToken: string,
+): Promise<AuthSession> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const res = await axios.post<LoginResponse>(`${baseUrl}/api/Auth/google`, { idToken });
-  const data = res.data;
+  const res = await axios.post<LoginResponse>(`${baseUrl}${path}`, { idToken });
+  return toSession(res.data);
+}
 
-  const user: User = {
-    userId: data.userId,
-    fullName: data.fullName,
-    email: data.email,
-    phone: data.phone,
-    gender: data.gender ?? "",
-    country: data.country,
-    dob: data.dob ?? "",
-    role: data.role,
-    avatarUrl: data.avatarUrl ?? "",
-    isVerified: data.isVerified,
-    schoolId: data.schoolId,
-    schoolName: data.schoolName,
-    schoolCurrency: data.schoolCurrency,
-    subscription: data.subscription,
-    currentTier: data.currentTier,
-    promoApplied: data.promoApplied,
-  };
+/** Creates an account from a Google credential. */
+export async function googleSignup(idToken: string): Promise<AuthSession> {
+  return postGoogleToken("/api/Auth/google", idToken);
+}
 
-  return {
-    user,
-    token: data.token,
-    refreshToken: data.refreshToken,
-    accessTokenExpiresAt: data.accessTokenExpiresAt,
-    refreshTokenExpiresAt: data.refreshTokenExpiresAt,
-    isVerified: data.isVerified,
-  };
+/** Signs in an existing account with a Google credential. */
+export async function googleSignin(idToken: string): Promise<AuthSession> {
+  return postGoogleToken("/api/Auth/google-signin", idToken);
 }
 
 // NOTE: verify the refresh endpoint path with your backend team

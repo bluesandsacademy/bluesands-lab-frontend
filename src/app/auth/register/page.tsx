@@ -1,6 +1,6 @@
 "use client";
 
-import { googleAuth } from "@/services/auth-service";
+import { googleSignup } from "@/services/auth-service";
 import { useUser } from "@/services/UserContext";
 import { GoogleLogin } from "@react-oauth/google";
 import Link from "next/link";
@@ -20,7 +20,7 @@ export default function RegisterUser() {
   const handleGoogleSuccess = async (credentialResponse: any) => {
     NProgress.start();
     try {
-      const session = await googleAuth(credentialResponse.credential);
+      const session = await googleSignup(credentialResponse.credential);
       setSession(session);
       toast.success(`Welcome, ${session.user.fullName}!`);
       const role = session.user.role;
