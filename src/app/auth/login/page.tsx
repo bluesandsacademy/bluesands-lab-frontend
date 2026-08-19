@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { login, googleAuth } from "@/services/auth-service";
+import { login, googleSignin } from "@/services/auth-service";
 import { useUser } from "@/services/UserContext";
 import NProgress from "nprogress";
 import { toast } from "react-toastify";
@@ -43,13 +43,19 @@ export default function UserLogin() {
   const handleGoogleSuccess = async (credentialResponse: any) => {
     NProgress.start();
     try {
-      const session = await googleAuth(credentialResponse.credential);
+      const session = await googleSignin(credentialResponse.credential);
       setSession(session);
       toast.success(`Welcome back, ${session.user.fullName}!`);
       redirectByRole(session.user.role);
     } catch (err: any) {
       const status = err?.response?.status;
-      if (status === 409) {
+      if (status === 404) {
+        // Signing in with a Google account that was never registered.
+        toast.error(
+          err.response?.data?.message ??
+            "No account found for this Google account. Please sign up first.",
+        );
+      } else if (status === 409) {
         toast.error(err.response.data?.message ?? "An account with this email already exists. Please log in with your password.");
       } else {
         toast.error("Google sign-in failed. Please try again.");
