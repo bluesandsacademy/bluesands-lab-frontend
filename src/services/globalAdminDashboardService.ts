@@ -60,6 +60,7 @@ export interface PromptTotals {
   subscribedUsers: number;
   activeUsers: number;
   maleUsers: number;
+  offlineUsers: number;
   activeSubscriptions: number;
   /** Count of payments, not an amount. */
   paymentRecorded: number;

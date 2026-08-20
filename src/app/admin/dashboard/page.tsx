@@ -289,10 +289,18 @@ const Page = () => {
         ),
         icon: "/images/icon/user-bold.svg",
       },
+      // {
+      //   // Not in prompt-totals; still sourced from /dashboard/totals.
+      //   title: "Offline Users",
+      //   value: formatCount(totals?.offlineUsers),
+      //   icon: "/images/svg/offline.svg",
+      // },
       {
         // Not in prompt-totals; still sourced from /dashboard/totals.
         title: "Offline Users",
-        value: formatCount(totals?.offlineUsers),
+        value: formatCount(
+          pick(promptTotals?.offlineUsers, totals?.offlineUsers),
+        ),
         icon: "/images/svg/offline.svg",
       },
       {
