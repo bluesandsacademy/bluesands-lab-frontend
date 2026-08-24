@@ -134,46 +134,46 @@ export default function DashboardExperimentsPage() {
   };
 
   const expStats: StatCardData[] = [
-    {
-      title: "Average Grade",
-      value: "0%",
-      icon: "/images/icon/grad.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Number of Experiments",
-      value: `${total}`,
-      icon: "/images/icon/test-tube.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Number of Attempts",
-      value: "0",
-      icon: "/images/icon/clipboard.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Pre-Experiment Assessments",
-      value: "0",
-      icon: "/images/icon/beaker_01.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Post-Experiment Assessments",
-      value: "0",
-      icon: "/images/icon/microscope.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
+    // {
+    //   title: "Average Grade",
+    //   value: "0%",
+    //   icon: "/images/icon/grad.svg",
+    //   trendIcon: "/images/icon/trend_up.svg",
+    //   percentageChange: "0%",
+    //   timeFrame: "from last month",
+    // },
+    // {
+    //   title: "Number of Experiments",
+    //   value: `${total}`,
+    //   icon: "/images/icon/test-tube.svg",
+    //   trendIcon: "/images/icon/trend_up.svg",
+    //   percentageChange: "0%",
+    //   timeFrame: "from last month",
+    // },
+    // {
+    //   title: "Number of Attempts",
+    //   value: "0",
+    //   icon: "/images/icon/clipboard.svg",
+    //   trendIcon: "/images/icon/trend_up.svg",
+    //   percentageChange: "0%",
+    //   timeFrame: "from last month",
+    // },
+    // {
+    //   title: "Pre-Experiment Assessments",
+    //   value: "0",
+    //   icon: "/images/icon/beaker_01.svg",
+    //   trendIcon: "/images/icon/trend_up.svg",
+    //   percentageChange: "0%",
+    //   timeFrame: "from last month",
+    // },
+    // {
+    //   title: "Post-Experiment Assessments",
+    //   value: "0",
+    //   icon: "/images/icon/microscope.svg",
+    //   trendIcon: "/images/icon/trend_up.svg",
+    //   percentageChange: "0%",
+    //   timeFrame: "from last month",
+    // },
   ];
 
   return (

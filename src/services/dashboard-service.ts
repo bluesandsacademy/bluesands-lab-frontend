@@ -18,7 +18,22 @@ export async function getDashboard(token?: string) {
 
 // I N D I V I D U A L  U S E R / S T U D E N T //
 
-export async function getStudentOverview(token?: string | null) {
+export interface StudentOverview {
+  completedExperiments: number;
+  inProgressExperiments: number;
+  avgQuizScorePercent: number;
+  badgesCount: number;
+  /** Lab time over the trailing 7 days, in minutes. */
+  minutesInLab7d: number;
+  rankClass: number;
+  rankSchool: number;
+  greeting: string;
+  recommendations: string[];
+}
+
+export async function getStudentOverview(
+  token?: string | null,
+): Promise<StudentOverview> {
   const config = {
     withCredentials: true,
     ...(token && { headers: { Authorization: `Bearer ${token}` } }),

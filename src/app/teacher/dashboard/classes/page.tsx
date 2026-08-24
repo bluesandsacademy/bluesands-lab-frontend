@@ -7,6 +7,7 @@ import {
   getTeacherAnalyticsOverview,
   getTeacherAssignments,
   getTeacherClasses,
+  getTeacherDashboard,
   AssignmentSubmission,
 } from "@/services/teacherDashboardService";
 import { useUser } from "@/services/UserContext";
@@ -23,6 +24,18 @@ interface ClassOption {
   name: string;
 }
 
+const isNumber = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value);
+
+// A failed request must not render as "0" — that reads as a real metric.
+const formatCount = (value?: number) =>
+  isNumber(value) ? value.toLocaleString("en-NG") : "—";
+
+const formatPercent = (value?: number) =>
+  isNumber(value)
+    ? `${value.toLocaleString("en-NG", { maximumFractionDigits: 1 })}%`
+    : "—";
+
 const TeacherClassManagementPage = () => {
   const { token } = useUser();
   const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
@@ -36,36 +49,74 @@ const TeacherClassManagementPage = () => {
     { title: "Active Assignments", value: "0", icon: "/images/icon/teacher/orange-quiz.svg", percentageChange: " ", timeFrame: "all classes" },
   ]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { startTour } = UseAppTour();
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchData() {
+    if (!token) return;
+
+    async function fetchData(authToken: string) {
       setIsLoading(true);
-      try {
-        const [overview, assignmentsData, classesData] = await Promise.all([
-          getTeacherAnalyticsOverview(token),
-          getTeacherAssignments(token),
-          getTeacherClasses(token),
+      setError(null);
+
+      // Settled, not all-or-nothing: this page calls two endpoints the teacher
+      // dashboard doesn't, and with Promise.all a failure in either left every
+      // stat card sitting at its initial "0".
+      const [dashboardRes, overviewRes, assignmentsRes, classesRes] =
+        await Promise.allSettled([
+          getTeacherDashboard(authToken),
+          getTeacherAnalyticsOverview(authToken),
+          getTeacherAssignments(authToken),
+          getTeacherClasses(authToken),
         ]);
 
-        setStatsConfig([
-          { title: "Total Students", value: `${overview.totalStudents}`, icon: "/images/icon/teacher/students.svg", percentageChange: " ", timeFrame: "across all classes" },
-          { title: "Active Students", value: `${overview.activeStudentsThisWeek}`, icon: "/images/icon/teacher/active-students.svg", percentageChange: " ", timeFrame: "out of total enrolled" },
-          { title: "Average Performance", value: `${overview.avgClassScore}%`, icon: "/images/icon/teacher/avg-score.svg", percentageChange: " ", timeFrame: "across all classes" },
-          { title: "Active Assignments", value: `${overview.totalAssignments}`, icon: "/images/icon/teacher/orange-quiz.svg", percentageChange: " ", timeFrame: "all classes" },
-        ]);
+      const dashboard =
+        dashboardRes.status === "fulfilled" ? dashboardRes.value : null;
+      const overview =
+        overviewRes.status === "fulfilled" ? overviewRes.value : null;
 
-        setAssignments(assignmentsData.submissions);
+      // Sourced from the same endpoints as the teacher dashboard's cards so
+      // the two pages can't show different numbers for the same metric.
+      setStatsConfig([
+        { title: "Total Students", value: formatCount(overview?.totalStudents), icon: "/images/icon/teacher/students.svg", percentageChange: " ", timeFrame: "across all classes" },
+        { title: "Active Students", value: formatCount(overview?.activeStudentsThisWeek), icon: "/images/icon/teacher/active-students.svg", percentageChange: " ", timeFrame: "out of total enrolled" },
+        { title: "Average Performance", value: formatPercent(overview?.avgClassScore), icon: "/images/icon/teacher/avg-score.svg", percentageChange: " ", timeFrame: "across all classes" },
+        { title: "Active Assignments", value: formatCount(dashboard?.totalIlsCreated), icon: "/images/icon/teacher/orange-quiz.svg", percentageChange: " ", timeFrame: "across all classes" },
+      ]);
+
+      if (assignmentsRes.status === "fulfilled") {
+        setAssignments(assignmentsRes.value?.submissions ?? []);
+      }
+
+      if (classesRes.status === "fulfilled") {
+        const classesData = classesRes.value ?? [];
         setClasses(classesData);
         if (classesData.length > 0) setSelectedClassId(classesData[0].id);
-      } catch (err) {
-        console.error("Failed to fetch class data:", err);
-      } finally {
-        setIsLoading(false);
       }
+
+      // Name the failing request so a blank card is diagnosable.
+      const failures = [
+        ["GET /api/dashboard/teacher", dashboardRes],
+        ["GET /api/teacher-analytics/v1/overview", overviewRes],
+        ["GET /api/teacher-analytics/v1/assignments", assignmentsRes],
+        ["GET /api/classes", classesRes],
+      ].filter(([, r]) => (r as PromiseSettledResult<unknown>).status === "rejected");
+
+      if (failures.length) {
+        failures.forEach(([label, r]) =>
+          console.error(
+            `Teacher classes page — ${label} failed`,
+            (r as PromiseRejectedResult).reason,
+          ),
+        );
+        setError("Some class data could not be loaded.");
+      }
+
+      setIsLoading(false);
     }
-    fetchData();
+
+    fetchData(token);
   }, [token]);
 
   const selectedClass = classes.find((c) => c.id === selectedClassId);
@@ -128,6 +179,12 @@ const TeacherClassManagementPage = () => {
             )}
           </div>
         </div>
+
+        {error && (
+          <div className="rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+            {error}
+          </div>
+        )}
 
         <div className="teacher-class-metrics">
           <StatCards stats={statsConfig} isLoading={isLoading} />

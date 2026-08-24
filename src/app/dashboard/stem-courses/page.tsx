@@ -5,12 +5,16 @@ import WelcomeBanner from "@/components/Dashboard/WelcomeBanner";
 import LearningSpace from "@/components/LearningSpace/LearningSpace";
 import SpaceCard, { SpaceData } from "@/components/LearningSpace/SpaceCard";
 import {
+  getStudentOverview,
+  type StudentOverview,
+} from "@/services/dashboard-service";
+import {
   getLearningSpaces,
   getLearningSpacesByClassId,
 } from "@/services/learningSpaceService";
 import { useUser } from "@/services/UserContext";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BiSolidEraser } from "react-icons/bi";
 import { FaChevronRight, FaSpinner } from "react-icons/fa";
 import { IoMdStar } from "react-icons/io";
@@ -52,6 +56,27 @@ interface Lesson {
   [key: string]: unknown; // allow extra fields from JSON/API
 }
 
+const isNumber = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value);
+
+const formatCount = (value?: number) =>
+  isNumber(value) ? value.toLocaleString("en-NG") : "—";
+
+const formatPercent = (value?: number) =>
+  isNumber(value)
+    ? `${value.toLocaleString("en-NG", { maximumFractionDigits: 1 })}%`
+    : "—";
+
+/**
+ * `minutesInLab7d` is in minutes, so show minutes until there's a full hour —
+ * "0.3 hrs" reads worse than "20 mins" for short sessions.
+ */
+const formatLabTime = (minutes?: number) => {
+  if (!isNumber(minutes)) return "—";
+  if (minutes < 60) return `${minutes.toLocaleString("en-NG")} mins`;
+  return `${(minutes / 60).toLocaleString("en-NG", { maximumFractionDigits: 1 })} hrs`;
+};
+
 const DashboardStemCoursesPage = () => {
   const { user } = useUser();
   const firstName = user?.fullName?.split(" ")[0];
@@ -59,46 +84,39 @@ const DashboardStemCoursesPage = () => {
     "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptates suscipit molestiae quos hic quod maiores, nihil nemo similique expedita provident neque possimus ea corrupti deserunt, accusantium quo soluta illum amet facere? Corrupti sunt consequuntur facilis, ab fuga, culpa id, fugiat quis aut nulla ratione eius? Fuga numquam magni quidem unde.";
   const truncatedDesc = description.split(" ").slice(0, 15).join(" ") + "...";
 
-  const courseStats: StatCardData[] = [
-    {
-      title: "Stem Courses",
-      value: "0",
-      icon: "/images/icon/grad.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Course Experiments",
-      value: "0",
-      icon: "/images/icon/beaker_01.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Hours Spent",
-      value: "0",
-      icon: "/images/icon/stopwatch.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-    {
-      title: "Average Grade",
-      value: "0",
-      icon: "/images/icon/chart.svg",
-      trendIcon: "/images/icon/trend_up.svg",
-      percentageChange: "0%",
-      timeFrame: "from last month",
-    },
-  ];
-
   const { token } = useUser();
   const [isShowingPop, setIsShowingPop] = useState<boolean>(false);
   const [lesson, setLesson] = useState<Lesson | null>();
   const [loading, setLoading] = useState(false);
   const [activeSpaceId, setActiveSpaceId] = useState<string | null>(null);
+  const [overview, setOverview] = useState<StudentOverview | null>(null);
+
+  const courseStats: StatCardData[] = useMemo(
+    () => [
+      // {
+      //   title: "Stem Courses",
+      //   value: "0",
+      //   icon: "/images/icon/grad.svg",
+      // },
+      {
+        title: "Completed Experiments",
+        value: formatCount(overview?.completedExperiments),
+        icon: "/images/icon/beaker_01.svg",
+      },
+      {
+        title: "Hours Spent",
+        value: formatLabTime(overview?.minutesInLab7d),
+        icon: "/images/icon/stopwatch.svg",
+        timeFrame: "in the last 7 days",
+      },
+      {
+        title: "Average Score",
+        value: formatPercent(overview?.avgQuizScorePercent),
+        icon: "/images/icon/chart.svg",
+      },
+    ],
+    [overview],
+  );
 
   const [learningSpacesData, setLearningSpacesData] = useState<SpaceData[]>([]);
   useEffect(() => {
@@ -132,18 +150,30 @@ const DashboardStemCoursesPage = () => {
   // }, [lessonId]);
 
   useEffect(() => {
-    async function fetchSpaces() {
+    async function fetchData() {
       setLoading(true);
-      try {
-        const data = await getLearningSpaces(token);
-        setLearningSpacesData(data || []);
-      } catch (err) {
-        console.error("Error fetching experiments:", err);
-      } finally {
-        setLoading(false);
+
+      // Settled so a failing overview doesn't also blank the learning spaces.
+      const [spacesRes, overviewRes] = await Promise.allSettled([
+        getLearningSpaces(token),
+        getStudentOverview(token),
+      ]);
+
+      if (spacesRes.status === "fulfilled") {
+        setLearningSpacesData(spacesRes.value || []);
+      } else {
+        console.error("Error fetching learning spaces:", spacesRes.reason);
       }
+
+      if (overviewRes.status === "fulfilled") {
+        setOverview(overviewRes.value);
+      } else {
+        console.error("Error fetching student overview:", overviewRes.reason);
+      }
+
+      setLoading(false);
     }
-    fetchSpaces();
+    fetchData();
   }, [token]);
 
   if (!lesson) {
@@ -162,7 +192,7 @@ const DashboardStemCoursesPage = () => {
   return (
     <div className="m-1">
       <WelcomeBanner firstName={firstName ? firstName : ""} />
-      <StatCards stats={courseStats} />
+      <StatCards stats={courseStats} isLoading={loading} />
       <div className="m-4 mt-6 lg:mt-12 flex flex-col gap-5">
         <p className="font-semibold lg:text-lg">Available Learning Spaces</p>
         {/* <button onClick={()=> console.log(learningSpacesData)}> show data</button> */}
