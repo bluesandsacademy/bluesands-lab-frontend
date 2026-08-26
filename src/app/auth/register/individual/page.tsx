@@ -262,7 +262,7 @@ export default function RegisterIndividualAccount() {
             label="Confirm Password"
             required
           />
-          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
+          {/* <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="couponCode"
               className="font-medium text-gray-700 text-sm md:text-md"
@@ -276,7 +276,7 @@ export default function RegisterIndividualAccount() {
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
             />
-          </div>
+          </div> */}
           
           <div className="w-full flex flex-col gap-y-3">
             <button
