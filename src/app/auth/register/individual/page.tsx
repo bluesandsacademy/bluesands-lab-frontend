@@ -6,6 +6,7 @@ import { countries, genderOptions } from "@/lib/data";
 import { UserObject, registerNewUser } from "@/services/auth-service";
 import { toast } from "react-toastify";
 import PasswordInput from "@/components/PasswordInput";
+import { useRouter } from "next/navigation";
 
 export default function RegisterIndividualAccount() {
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function RegisterIndividualAccount() {
   const [couponCode, setCouponCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter()
 
   const payload: UserObject = {
     fullName,
@@ -54,10 +56,14 @@ export default function RegisterIndividualAccount() {
 
     try {
       await registerNewUser(payload);
-      setShowModal(true);
+      // setShowModal(true);
       toast.success(
-        "User created successfully. Check your email for verification link"
+        "User created successfully. Proceed to login"
       );
+      router.push("/auth/login")
+      // toast.success(
+      //   "User created successfully. Check your email for verification link"
+      // );
     } catch (err: any) {
       if (err.response?.status === 409) {
         toast.warning("User already exists. Try logging in instead.");
