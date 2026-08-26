@@ -298,7 +298,7 @@ export default function RegisterSchoolAccount() {
             label="Confirm Password"
             required
           />
-          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
+          {/* <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="subdomain"
               className="font-medium text-gray-700 text-sm md:text-md"
@@ -329,8 +329,8 @@ export default function RegisterSchoolAccount() {
               Maximum {MAX_DOMAIN_LENGTH} characters. Only letters, numbers, and
               hyphens allowed.
             </p>
-          </div>
-          <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
+          </div> */}
+          {/* <div className="flex flex-col w-full gap-y-1 md:gap-y-4">
             <label
               htmlFor="couponCode"
               className="font-medium text-gray-700 text-sm md:text-md"
@@ -344,7 +344,7 @@ export default function RegisterSchoolAccount() {
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
             />
-          </div>
+          </div> */}
           {/* <div className="w-full flex gap-x-3 items-center">
             <input
               type="checkbox"
