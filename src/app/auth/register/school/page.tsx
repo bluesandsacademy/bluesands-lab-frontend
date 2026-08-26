@@ -6,6 +6,7 @@ import { countries, workPositions } from "@/lib/data";
 import { registerNewSchool, SchoolObject } from "@/services/auth-service";
 import { toast } from "react-toastify";
 import PasswordInput from "@/components/PasswordInput";
+import { useRouter } from "next/navigation";
 
 export default function RegisterSchoolAccount() {
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function RegisterSchoolAccount() {
   // const [rememberPassword, setRememberPassword] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter()
 
   const DOMAIN_SUFFIX = ".bluesandstemlabs.com";
   const MAX_DOMAIN_LENGTH = 20; // Maximum length for the domain prefix
@@ -90,10 +92,14 @@ export default function RegisterSchoolAccount() {
 
     try {
       await registerNewSchool(payload);
-      setShowModal(true)
+      // setShowModal(true)
       toast.success(
-        "User created successfully. Check your mail for verification link"
+        "User created successfully. Proceed to login"
       );
+      router.push("/auth/login")
+      // toast.success(
+      //   "User created successfully. Check your mail for verification link"
+      // );
     } catch (err: any) {
       if (err.response?.status === 409) {
         toast.warning("User already exists. Try logging in instead.");
