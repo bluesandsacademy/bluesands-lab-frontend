@@ -388,7 +388,7 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
   const canSubmit =
     !!formData.fullName.trim() &&
     !!formData.gender &&
-    !!formData.phone.trim() &&
+    // !!formData.phone.trim() &&
     !!formData.country.trim();
 
   const handleSubmit = async () => {
@@ -456,7 +456,8 @@ export const AddStudentModal = ({ isOpen, onClose }: any) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Phone <span className="text-red-500">*</span>
+            {/* Phone <span className="text-red-500">*</span> */}
+            Phone
           </label>
           <input
             type="tel"
