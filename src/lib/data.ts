@@ -404,16 +404,16 @@ export const adminSideNavLinks: SidebarLinks[] = [
     url: "/admin/dashboard/payments",
     icon: "/images/icon/card_payment.svg",
   },
-  {
-    title: "Report & Analytics",
-    url: "/admin/dashboard/report",
-    icon: "/images/icon/report.svg",
-  },
-  {
-    title: "Leaderboard",
-    url: "/admin/dashboard/leaderboard",
-    icon: "/images/icon/ic_outline-leaderboard.svg",
-  },
+  // {
+  //   title: "Report & Analytics",
+  //   url: "/admin/dashboard/report",
+  //   icon: "/images/icon/report.svg",
+  // },
+  // {
+  //   title: "Leaderboard",
+  //   url: "/admin/dashboard/leaderboard",
+  //   icon: "/images/icon/ic_outline-leaderboard.svg",
+  // },
 ];
 
 export type Profile = {
