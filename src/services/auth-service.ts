@@ -111,17 +111,18 @@ export async function login(
   email: string,
   password: string,
 ): Promise<AuthSession> {
-  const res = await apiClient.post(
-    "/api/auth/login",
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const res = await axios.post<LoginResponse>(
+    `${baseUrl}/api/auth/login`,
     { email, password },
     { withCredentials: true },
   );
 
-  return toSession(res.data as LoginResponse);
+  return toSession(res.data);
 }
 
 // Uses plain axios (not apiClient) so the 401 interceptor does not
-// misinterpret an invalid-Google-token response as an expired session.
+// misinterpret an invalid login credential response as an expired session.
 async function postGoogleToken(
   path: string,
   idToken: string,
