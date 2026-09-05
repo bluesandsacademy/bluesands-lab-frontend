@@ -8,11 +8,11 @@ import UsersPanel, {
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import {
   getAllGlobalBillingPayments,
-  getAllGlobalBillingSubscriptions,
+  getAllGlobalUsers,
   getGlobalBillingRevenue,
   type BillingPayment,
   type BillingRevenue,
-  type BillingSubscription,
+  type GlobalUser,
 } from "@/services/globalAdminDashboardService";
 import FilterButton from "@/services/FilterButton";
 import { useUser } from "@/services/UserContext";
@@ -38,7 +38,7 @@ const AdminSchoolManagementpage = () => {
   const [paymentStatus, setPaymentStatus] = useState(PAYMENT_STATUS_FILTERS[0]);
   const [roleFilter, setRoleFilter] = useState(ROLE_FILTERS[0].label);
 
-  const [subscriptions, setSubscriptions] = useState<BillingSubscription[]>([]);
+  const [schoolAdmins, setSchoolAdmins] = useState<GlobalUser[]>([]);
   const [payments, setPayments] = useState<BillingPayment[]>([]);
   const [revenue, setRevenue] = useState<BillingRevenue | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,23 +51,25 @@ const AdminSchoolManagementpage = () => {
       setIsLoading(true);
       setError(null);
 
-      const [subsRes, paymentsRes, revenueRes] = await Promise.allSettled([
-        getAllGlobalBillingSubscriptions(authToken),
-        getAllGlobalBillingPayments(authToken),
-        getGlobalBillingRevenue(authToken),
-      ]);
+      const [schoolAdminsRes, paymentsRes, revenueRes] =
+        await Promise.allSettled([
+          getAllGlobalUsers({ role: "SchoolAdmin" }, authToken),
+          getAllGlobalBillingPayments(authToken),
+          getGlobalBillingRevenue(authToken),
+        ]);
 
-      if (subsRes.status === "fulfilled") setSubscriptions(subsRes.value);
+      if (schoolAdminsRes.status === "fulfilled") {
+        setSchoolAdmins(schoolAdminsRes.value);
+      }
       if (paymentsRes.status === "fulfilled") setPayments(paymentsRes.value);
       if (revenueRes.status === "fulfilled") setRevenue(revenueRes.value);
 
-      const failed = [subsRes, paymentsRes, revenueRes].filter(
-        (r) => r.status === "rejected",
-      );
+      const requests = [schoolAdminsRes, paymentsRes, revenueRes];
+      const failed = requests.filter((r) => r.status === "rejected");
       if (failed.length) {
         console.error("School management: some requests failed", failed);
         setError(
-          failed.length === 3
+          failed.length === requests.length
             ? "Could not load school and billing data. Please try again."
             : "Some data could not be loaded.",
         );
@@ -201,7 +203,7 @@ const AdminSchoolManagementpage = () => {
 
       {activeFilter === "Schools" ? (
         <SchoolTable
-          subscriptions={subscriptions}
+          users={schoolAdmins}
           isLoading={isLoading}
           search={search}
           statusFilter={schoolStatus}

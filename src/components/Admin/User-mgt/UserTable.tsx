@@ -23,8 +23,8 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "roleName", label: "Role" },
   { key: "schoolName", label: "School" },
   { key: "isActive", label: "Status" },
-  { key: "dateCreated", label: "Created" },
-  { key: "lastLogin", label: "Last Login" },
+  // { key: "dateCreated", label: "Created" },
+  // { key: "lastLogin", label: "Last Login" },
 ];
 
 const formatDate = (value?: string) => {
@@ -150,8 +150,8 @@ const UserTable = ({ users, isLoading, onUserChanged }: UserTableProps) => {
                       )}
                     </div>
                   </td>
-                  <td className="p-2">{formatDate(user.dateCreated)}</td>
-                  <td className="p-2">{formatDate(user.lastLogin)}</td>
+                  {/* <td className="p-2">{formatDate(user.dateCreated)}</td>
+                  <td className="p-2">{formatDate(user.lastLogin)}</td> */}
                   <td className="p-2">
                     <button
                       onClick={() => setActiveUser(user)}
