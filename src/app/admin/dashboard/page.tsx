@@ -3,7 +3,6 @@ import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import {
   getGlobalDashboardGeoUsage,
   getGlobalDashboardInsights,
-  getGlobalDashboardPromptTotals,
   getGlobalDashboardTotals,
   getGlobalSupportOverview,
   getRevenueGrowth,
@@ -13,7 +12,6 @@ import {
   type GlobalDashboardGeoUsage,
   type GlobalDashboardInsights,
   type GlobalDashboardTotals,
-  type PromptTotals,
   type SupportOverview,
 } from "@/services/globalAdminDashboardService";
 import { useUser } from "@/services/UserContext";
@@ -69,15 +67,6 @@ const formatDecimal = (value?: number | null) =>
     ? value.toLocaleString("en-NG", { maximumFractionDigits: 2 })
     : PLACEHOLDER;
 
-const formatPercent = (value?: number | null) =>
-  isNumber(value)
-    ? `${value.toLocaleString("en-NG", { maximumFractionDigits: 1 })}%`
-    : PLACEHOLDER;
-
-/** DEMO: prefer the prompt-totals value, falling back to the older endpoint. */
-const pick = (...values: (number | null | undefined)[]) =>
-  values.find(isNumber);
-
 /**
  * The chart endpoints ship a ready-made `label`; fall back to the timestamp
  * only if one is missing.
@@ -121,8 +110,6 @@ const Page = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [totals, setTotals] = useState<GlobalDashboardTotals | null>(null);
-  // DEMO: prompt-totals takes precedence over /dashboard/totals for the cards.
-  const [promptTotals, setPromptTotals] = useState<PromptTotals | null>(null);
   const [insights, setInsights] = useState<GlobalDashboardInsights | null>(null);
   const [userGrowth, setUserGrowth] = useState<DashboardSeries | null>(null);
   const [revenueGrowth, setRevenueGrowth] = useState<DashboardSeries | null>(
@@ -141,7 +128,6 @@ const Page = () => {
       // Settled rather than all-or-nothing: one failing panel shouldn't blank the page.
       const [
         totalsRes,
-        promptTotalsRes,
         insightsRes,
         userGrowthRes,
         revenueGrowthRes,
@@ -149,7 +135,6 @@ const Page = () => {
         supportRes,
       ] = await Promise.allSettled([
         getGlobalDashboardTotals(authToken),
-        getGlobalDashboardPromptTotals(authToken),
         getGlobalDashboardInsights(authToken),
         getUserGrowth(authToken),
         getRevenueGrowth(authToken),
@@ -158,8 +143,6 @@ const Page = () => {
       ]);
 
       if (totalsRes.status === "fulfilled") setTotals(totalsRes.value);
-      if (promptTotalsRes.status === "fulfilled")
-        setPromptTotals(promptTotalsRes.value);
       if (insightsRes.status === "fulfilled") setInsights(insightsRes.value);
       if (userGrowthRes.status === "fulfilled")
         setUserGrowth(userGrowthRes.value);
@@ -170,7 +153,6 @@ const Page = () => {
 
       const requests = [
         totalsRes,
-        promptTotalsRes,
         insightsRes,
         userGrowthRes,
         revenueGrowthRes,
@@ -198,125 +180,88 @@ const Page = () => {
     () => [
       {
         title: "Total Platform Users",
-        value: formatCount(
-          pick(promptTotals?.totalPlatformUsers, totals?.totalUsers),
-        ),
+        value: formatCount(totals?.totalUsers),
         icon: "/images/icon/total_users.svg",
       },
       {
         title: "Total Schools Registered",
-        value: formatCount(
-          pick(promptTotals?.totalSchoolsRegistered, totals?.totalSchools),
-        ),
+        value: formatCount(totals?.totalSchools),
         icon: "/images/icon/total_schools.svg",
       },
       {
         title: "Total STEM Courses",
-        value: formatCount(
-          pick(promptTotals?.totalStemCourses, totals?.totalStemCourses),
-        ),
+        value: formatCount(totals?.totalStemCourses),
         icon: "/images/icon/calendar.svg",
       },
       {
         title: "Total Payments",
-        value: formatNaira(
-          pick(promptTotals?.totalPayments, totals?.totalRevenueNGN),
-        ),
+        value: formatNaira(totals?.totalRevenueNGN),
         icon: "/images/icon/total_payments.svg",
       },
     ],
-    [promptTotals, totals],
+    [totals],
   );
 
   const learningStats: StatCardData[] = useMemo(
     () => [
       {
         title: "Total Lab Practice Time",
-        value: formatMinutes(
-          pick(promptTotals?.totalLabPractice, totals?.totalLabTimeMinutes),
-        ),
+        value: formatMinutes(totals?.totalLabTimeMinutes),
         icon: "/images/icon/beaker_01.svg",
       },
       {
         title: "Total Experiment Attempts",
-        value: formatCount(
-          pick(
-            promptTotals?.totalExperimentAttempts,
-            totals?.totalExperimentAttempts,
-          ),
-        ),
+        value: formatCount(totals?.totalExperimentAttempts),
         icon: "/images/icon/microscope.svg",
       },
       {
         title: "Total Quiz Attempts",
-        value: formatCount(
-          pick(promptTotals?.totalQuizAttempts, totals?.totalQuizAttempts),
-        ),
+        value: formatCount(totals?.totalQuizAttempts),
         icon: "/images/icon/clipboard.svg",
       },
       {
         title: "Total Quiz Scores",
-        // prompt-totals reports a percentage; the older endpoint a raw decimal.
-        value: isNumber(promptTotals?.totalQuizScorePercent)
-          ? formatPercent(promptTotals.totalQuizScorePercent)
-          : formatDecimal(totals?.totalQuizScores),
+        value: formatDecimal(totals?.totalQuizScores),
         icon: "/images/icon/studentgrad.svg",
       },
       {
         title: "Total ILS Created",
-        value: formatCount(
-          pick(promptTotals?.totalILScreated, totals?.totalIls),
-        ),
+        value: formatCount(totals?.totalIls),
         icon: "/images/icon/teacher/vr-headset-stemlabs.png",
       },
     ],
-    [promptTotals, totals],
+    [totals],
   );
 
   const userOverviewStats: StatCardData[] = useMemo(
     () => [
       {
         title: "Subscribed Users",
-        value: formatCount(
-          pick(promptTotals?.subscribedUsers, totals?.totalSubscribedUsers),
-        ),
+        value: formatCount(totals?.totalSubscribedUsers),
         icon: "/images/svg/subscribed.svg",
       },
       {
         title: "Active Users (30d)",
-        value: formatCount(
-          pick(promptTotals?.activeUsers, totals?.activeUsers30d),
-        ),
+        value: formatCount(totals?.activeUsers30d),
         icon: "/images/icon/user-bold.svg",
       },
-      // {
-      //   // Not in prompt-totals; still sourced from /dashboard/totals.
-      //   title: "Offline Users",
-      //   value: formatCount(totals?.offlineUsers),
-      //   icon: "/images/svg/offline.svg",
-      // },
       {
-        // Not in prompt-totals; still sourced from /dashboard/totals.
         title: "Offline Users",
-        value: formatCount(
-          pick(promptTotals?.offlineUsers, totals?.offlineUsers),
-        ),
+        value: formatCount(totals?.offlineUsers),
         icon: "/images/svg/offline.svg",
       },
       {
         title: "Male Users",
-        value: formatCount(pick(promptTotals?.maleUsers, totals?.maleUsers)),
+        value: formatCount(totals?.maleUsers),
         icon: "/images/svg/male.svg",
       },
       {
         title: "Female Users",
-        value: formatCount(
-          pick(promptTotals?.femaleUsers, totals?.femaleUsers),
-        ),
+        value: formatCount(totals?.femaleUsers),
         icon: "/images/svg/female.svg",
       },
     ],
-    [promptTotals, totals],
+    [totals],
   );
 
   const platformStats: StatCardData[] = useMemo(
@@ -333,20 +278,16 @@ const Page = () => {
       },
       {
         title: "Active Subscriptions",
-        value: formatCount(
-          pick(promptTotals?.activeSubscriptions, totals?.activeSubscriptions),
-        ),
+        value: formatCount(totals?.activeSubscriptions),
         icon: "/images/svg/subscribed.svg",
       },
       {
         title: "Payments Recorded",
-        value: formatCount(
-          pick(promptTotals?.paymentRecorded, totals?.totalPayments),
-        ),
+        value: formatCount(totals?.totalPayments),
         icon: "/images/icon/card_payment.svg",
       },
     ],
-    [promptTotals, totals],
+    [totals],
   );
 
   const supportStats: StatCardData[] = useMemo(
