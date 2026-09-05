@@ -45,40 +45,6 @@ export interface GlobalDashboardGrowth {
   points: GrowthPoint[];
 }
 
-/** Flat totals used to populate the overview cards. */
-export interface PromptTotals {
-  totalPlatformUsers: number;
-  totalSchoolsRegistered: number;
-  totalStemCourses: number;
-  /** Money amount, in NGN. */
-  totalPayments: number;
-  totalLabPractice: number;
-  totalExperimentAttempts: number;
-  totalQuizAttempts: number;
-  totalQuizScorePercent: number;
-  totalILScreated: number;
-  subscribedUsers: number;
-  activeUsers: number;
-  maleUsers: number;
-  offlineUsers: number;
-  activeSubscriptions: number;
-  /** Count of payments, not an amount. */
-  paymentRecorded: number;
-  femaleUsers: number;
-  generatedAtUtc: string;
-}
-
-export async function getGlobalDashboardPromptTotals(
-  token?: string | null,
-): Promise<PromptTotals> {
-  const res = await apiClient.get(
-    "/api/globaladmin/v1/dashboard/prompt-totals",
-    authConfig(token),
-  );
-  // Documented as text/plain but shaped like JSON — tolerate both.
-  return typeof res.data === "string" ? JSON.parse(res.data) : res.data;
-}
-
 export interface DashboardSeriesPoint {
   timestamp: string;
   value: number;
