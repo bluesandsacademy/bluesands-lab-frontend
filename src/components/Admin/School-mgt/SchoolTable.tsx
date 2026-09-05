@@ -11,7 +11,7 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "fullName", label: "School Admin" },
   { key: "email", label: "Email" },
   { key: "isActive", label: "Status" },
-  { key: "dateCreated", label: "Created" },
+  // { key: "dateCreated", label: "Created" },
 ];
 
 const PLACEHOLDER = "-";
@@ -154,7 +154,7 @@ const SchoolTable = ({
                     {user.isActive ? "Active" : "Inactive"}
                   </p>
                 </td>
-                <td className="p-2">{formatDate(user.dateCreated)}</td>
+                {/* <td className="p-2">{formatDate(user.dateCreated)}</td> */}
               </tr>
             ))
           )}
