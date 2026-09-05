@@ -1,26 +1,23 @@
 "use client";
-import type { BillingSubscription } from "@/services/globalAdminDashboardService";
+import type { GlobalUser } from "@/services/globalAdminDashboardService";
 import { useEffect, useMemo, useState } from "react";
 import { FaSort, FaSortDown, FaSortUp } from "react-icons/fa";
 import TablePagination from "../TablePagination";
 
-type SortKey =
-  | "schoolName"
-  | "studentsCovered"
-  | "pricePerStudent"
-  | "endsAt"
-  | "active";
+type SortKey = "schoolName" | "fullName" | "email" | "isActive" | "dateCreated";
 
 const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "schoolName", label: "School" },
-  { key: "studentsCovered", label: "Students Covered" },
-  { key: "pricePerStudent", label: "Price / Student" },
-  { key: "endsAt", label: "Subscription Ends" },
-  { key: "active", label: "Status" },
+  { key: "fullName", label: "School Admin" },
+  { key: "email", label: "Email" },
+  { key: "isActive", label: "Status" },
+  { key: "dateCreated", label: "Created" },
 ];
 
+const PLACEHOLDER = "-";
+
 const formatDate = (value?: string) => {
-  if (!value) return "—";
+  if (!value) return PLACEHOLDER;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString("en-NG", {
@@ -30,32 +27,27 @@ const formatDate = (value?: string) => {
   });
 };
 
-const formatNaira = (amount?: number) =>
-  typeof amount === "number" && Number.isFinite(amount)
-    ? `NGN ${amount.toLocaleString("en-NG", { maximumFractionDigits: 0 })}`
-    : "—";
+const isSchoolAdmin = (user: GlobalUser) =>
+  user.roleName?.replace(/\s+/g, "").toLowerCase() === "schooladmin";
 
-const sortValue = (row: BillingSubscription, key: SortKey): string | number => {
-  if (key === "active") return row.active ? 1 : 0;
-  if (key === "endsAt") {
-    const time = row.endsAt ? new Date(row.endsAt).getTime() : 0;
+const sortValue = (user: GlobalUser, key: SortKey): string | number => {
+  if (key === "isActive") return user.isActive ? 1 : 0;
+  if (key === "dateCreated") {
+    const time = user.dateCreated ? new Date(user.dateCreated).getTime() : 0;
     return Number.isNaN(time) ? 0 : time;
   }
-  if (key === "studentsCovered" || key === "pricePerStudent") {
-    return typeof row[key] === "number" ? row[key] : 0;
-  }
-  return (row[key] ?? "").toString().toLowerCase();
+  return (user[key] ?? "").toString().toLowerCase();
 };
 
 interface SchoolTableProps {
-  subscriptions: BillingSubscription[];
+  users: GlobalUser[];
   isLoading?: boolean;
   search: string;
   statusFilter: string;
 }
 
 const SchoolTable = ({
-  subscriptions,
+  users,
   isLoading,
   search,
   statusFilter,
@@ -69,16 +61,19 @@ const SchoolTable = ({
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return subscriptions.filter((row) => {
-      if (statusFilter === "Active" && !row.active) return false;
-      if (statusFilter === "Inactive" && row.active) return false;
+    return users.filter((user) => {
+      if (!isSchoolAdmin(user)) return false;
+      if (statusFilter === "Active" && !user.isActive) return false;
+      if (statusFilter === "Inactive" && user.isActive) return false;
       if (!term) return true;
+
       return (
-        (row.schoolName ?? "").toLowerCase().includes(term) ||
-        (row.lastPaymentReference ?? "").toLowerCase().includes(term)
+        (user.schoolName ?? "").toLowerCase().includes(term) ||
+        (user.fullName ?? "").toLowerCase().includes(term) ||
+        (user.email ?? "").toLowerCase().includes(term)
       );
     });
-  }, [subscriptions, search, statusFilter]);
+  }, [users, search, statusFilter]);
 
   const sorted = useMemo(() => {
     const factor = sort.direction === "asc" ? 1 : -1;
@@ -92,9 +87,7 @@ const SchoolTable = ({
   }, [filtered, sort]);
 
   const total = sorted.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  // A narrowed result set can leave the current page out of range.
   useEffect(() => {
     setPage(1);
   }, [search, statusFilter, pageSize]);
@@ -129,43 +122,39 @@ const SchoolTable = ({
                 </button>
               </td>
             ))}
-            <td className="p-2">Last Payment Ref</td>
           </tr>
         </thead>
         <tbody>
           {isLoading ? (
             <tr className="text-xs">
-              <td className="p-4 text-center text-gray-400" colSpan={6}>
-                Loading schools…
+              <td className="p-4 text-center text-gray-400" colSpan={5}>
+                Loading schools...
               </td>
             </tr>
           ) : !paginated.length ? (
             <tr className="text-xs">
-              <td className="p-4 text-center text-gray-400" colSpan={6}>
+              <td className="p-4 text-center text-gray-400" colSpan={5}>
                 No schools match this search
               </td>
             </tr>
           ) : (
-            paginated.map((row) => (
-              <tr className="text-xs border-b border-b-gray-200" key={row.id}>
-                <td className="p-2">{row.schoolName || "—"}</td>
-                <td className="p-2">{row.studentsCovered ?? "—"}</td>
-                <td className="p-2">{formatNaira(row.pricePerStudent)}</td>
-                <td className="p-2">{formatDate(row.endsAt)}</td>
+            paginated.map((user) => (
+              <tr className="text-xs border-b border-b-gray-200" key={user.id}>
+                <td className="p-2">{user.schoolName || PLACEHOLDER}</td>
+                <td className="p-2">{user.fullName || PLACEHOLDER}</td>
+                <td className="p-2 text-gray-500">{user.email || PLACEHOLDER}</td>
                 <td className="p-2">
                   <p
                     className={`p-1 px-1.5 rounded-3xl flex w-max ${
-                      row.active
+                      user.isActive
                         ? "bg-green-100 text-green-600"
-                        : "bg-gray-100 text-gray-600"
+                        : "bg-red-100 text-red-600"
                     }`}
                   >
-                    {row.active ? "Active" : "Inactive"}
+                    {user.isActive ? "Active" : "Inactive"}
                   </p>
                 </td>
-                <td className="p-2 text-gray-500">
-                  {row.lastPaymentReference || "—"}
-                </td>
+                <td className="p-2">{formatDate(user.dateCreated)}</td>
               </tr>
             ))
           )}

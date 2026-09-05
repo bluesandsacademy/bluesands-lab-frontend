@@ -9,7 +9,8 @@ import React, { useState } from "react";
 import { FaFilter } from "react-icons/fa";
 
 const AdminUserManagementPage = () => {
-  const filters = ["All Users", "Disputes"];
+  // const filters = ["All Users", "Disputes"];
+  const filters = ["All Users",];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const disputeTableFilters = ["All Statuses"];
 

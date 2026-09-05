@@ -687,6 +687,15 @@ export async function getGlobalUsers(
   return res.data;
 }
 
+export async function getAllGlobalUsers(
+  params: Omit<UserListParams, "page" | "pageSize"> = {},
+  token?: string | null,
+): Promise<GlobalUser[]> {
+  return fetchAllPages((page, pageSize) =>
+    getGlobalUsers({ ...params, page, pageSize }, token),
+  );
+}
+
 export async function getGlobalUser(
   id: string,
   token?: string | null,
