@@ -15,9 +15,9 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "reference", label: "ID" },
   { key: "schoolName", label: "Payer" },
   { key: "total", label: "Amount" },
-  { key: "provider", label: "Gateway" },
+  // { key: "provider", label: "Gateway" },
   { key: "status", label: "Status" },
-  { key: "dateCreated", label: "Date" },
+  // { key: "dateCreated", label: "Date" },
 ];
 
 const formatDate = (value?: string) => {
@@ -126,7 +126,7 @@ const PaymentsTable = ({
                 </button>
               </td>
             ))}
-            <td className="p-2">Next Payment</td>
+            {/* <td className="p-2">Next Payment</td> */}
           </tr>
         </thead>
         <tbody>
@@ -158,7 +158,7 @@ const PaymentsTable = ({
                     </p>
                   )}
                 </td>
-                <td className="p-2 capitalize">{row.provider || "—"}</td>
+                {/* <td className="p-2 capitalize">{row.provider || "—"}</td> */}
                 <td className="p-2">
                   <p
                     className={`p-1 px-1.5 rounded-3xl flex w-max ${statusStyle(row.status)}`}
@@ -166,10 +166,10 @@ const PaymentsTable = ({
                     {row.status || "—"}
                   </p>
                 </td>
-                <td className="p-2">{formatDate(row.dateCreated)}</td>
-                <td className="p-2">
+                {/* <td className="p-2">{formatDate(row.dateCreated)}</td> */}
+                {/* <td className="p-2">
                   {formatDate(nextPaymentBySchool[row.schoolId])}
-                </td>
+                </td> */}
               </tr>
             ))
           )}

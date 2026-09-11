@@ -20,10 +20,10 @@ type SortKey =
 const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "schoolName", label: "School" },
   { key: "reference", label: "Reference" },
-  { key: "provider", label: "Provider" },
+  // { key: "provider", label: "Provider" },
   { key: "total", label: "Amount" },
   { key: "status", label: "Status" },
-  { key: "dateCreated", label: "Date" },
+  // { key: "dateCreated", label: "Date" },
 ];
 
 const formatDate = (value?: string) => {
@@ -182,7 +182,7 @@ const PaymentTable = ({
                 <td className="p-2 text-gray-500 break-all">
                   {row.reference || "—"}
                 </td>
-                <td className="p-2 capitalize">{row.provider || "—"}</td>
+                {/* <td className="p-2 capitalize">{row.provider || "—"}</td> */}
                 <td className="p-2">
                   <p>{formatAmount(row.total, row.currency)}</p>
                   {!!row.vat && (
@@ -198,7 +198,7 @@ const PaymentTable = ({
                     {row.status || "—"}
                   </p>
                 </td>
-                <td className="p-2">{formatDate(row.dateCreated)}</td>
+                {/* <td className="p-2">{formatDate(row.dateCreated)}</td> */}
               </tr>
             ))
           )}
