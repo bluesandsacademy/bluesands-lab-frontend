@@ -9,7 +9,7 @@ type SortKey = "schoolName" | "fullName" | "email" | "isActive" | "dateCreated";
 const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "schoolName", label: "School" },
   { key: "fullName", label: "School Admin" },
-  { key: "email", label: "Email" },
+  { key: "email", label: "Username" },
   { key: "isActive", label: "Status" },
   // { key: "dateCreated", label: "Created" },
 ];

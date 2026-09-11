@@ -131,21 +131,21 @@ const AdminPaymentsAndFinancePage = () => {
         value: formatMoney(totals?.totalRevenueNGN ?? revenueByCurrency.NGN),
         icon: "/images/icon/admin/green_naira.svg",
       },
-      {
-        title: "Total Revenue (USD)",
-        value: formatMoney(revenueByCurrency.USD ?? 0, "USD"),
-        icon: "/images/icon/admin/blue_dollar.svg",
-      },
-      {
-        title: "Active Subscriptions",
-        value: formatCount(totals?.activeSubscriptions),
-        icon: "/images/icon/admin/red_alarm.svg",
-      },
-      {
-        title: "Monthly Recurring Revenue",
-        value: formatMoney(Math.round(mrr)),
-        icon: "/images/icon/clipboard.svg",
-      },
+      // {
+      //   title: "Total Revenue (USD)",
+      //   value: formatMoney(revenueByCurrency.USD ?? 0, "USD"),
+      //   icon: "/images/icon/admin/blue_dollar.svg",
+      // },
+      // {
+      //   title: "Active Subscriptions",
+      //   value: formatCount(totals?.activeSubscriptions),
+      //   icon: "/images/icon/admin/red_alarm.svg",
+      // },
+      // {
+      //   title: "Monthly Recurring Revenue",
+      //   value: formatMoney(Math.round(mrr)),
+      //   icon: "/images/icon/clipboard.svg",
+      // },
     ],
     [totals, revenueByCurrency, mrr],
   );
@@ -284,7 +284,9 @@ const AdminPaymentsAndFinancePage = () => {
       <StatCards stats={stats} isLoading={isLoading} />
 
       <div className="flex flex-col lg:flex-row gap-2 lg:gap-3">
-        <div className="flex flex-col gap-3 w-full lg:w-[65%]">
+        {/* INCASE YOU BRING BACK INTEGRATIONS SECTION, UNCOMMENT THE LINE BELOW, USE IT TO REPLACE THE LINE THAT FOLLOWS */}
+        {/* <div className="flex flex-col gap-3 w-full lg:w-[65%]"> */}
+        <div className="flex flex-col gap-3 w-full">
           <PaymentsTable
             payments={visiblePayments}
             isLoading={isLoading}
@@ -330,9 +332,9 @@ const AdminPaymentsAndFinancePage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col w-full lg:w-[35%] gap-2 lg:gap-4">
+        {/* <div className="flex flex-col w-full lg:w-[35%] gap-2 lg:gap-4"> */}
           {/* Payment Integrations */}
-          <div className="flex flex-col bg-white rounded-md p-3 gap-2 lg:gap-3">
+          {/* <div className="flex flex-col bg-white rounded-md p-3 gap-2 lg:gap-3">
             <p className="text-sm lg:text-base font-semibold">
               Payment Integrations
             </p>
@@ -366,10 +368,10 @@ const AdminPaymentsAndFinancePage = () => {
             >
               Add New Provider
             </button>
-          </div>
+          </div> */}
 
           {/* Billing Settings */}
-          <div className="flex flex-col bg-white rounded-md p-3 gap-1 lg:gap-3">
+          {/* <div className="flex flex-col bg-white rounded-md p-3 gap-1 lg:gap-3">
             <p className="text-sm lg:text-base font-semibold">
               Billing Settings
             </p>
@@ -403,7 +405,7 @@ const AdminPaymentsAndFinancePage = () => {
               Editing settings needs a backend update endpoint.
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
