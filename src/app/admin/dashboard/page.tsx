@@ -189,7 +189,7 @@ const Page = () => {
         icon: "/images/icon/total_schools.svg",
       },
       {
-        title: "Total STEM Courses",
+        title: "Total Number of Simulations",
         value: formatCount(totals?.totalStemCourses),
         icon: "/images/icon/calendar.svg",
       },
@@ -290,26 +290,26 @@ const Page = () => {
     [totals],
   );
 
-  const supportStats: StatCardData[] = useMemo(
-    () => [
-      {
-        title: "Messages (last 7 days)",
-        value: formatCount(support?.messagesLast7d),
-        icon: "/images/icon/clipboard.svg",
-      },
-      {
-        title: "Open Messages",
-        value: formatCount(support?.messagesOpen),
-        icon: "/images/svg/offline.svg",
-      },
-      {
-        title: "Schools Contacting (7d)",
-        value: formatCount(support?.distinctSchoolsLast7d),
-        icon: "/images/icon/total_schools.svg",
-      },
-    ],
-    [support],
-  );
+  // const supportStats: StatCardData[] = useMemo(
+  //   () => [
+  //     {
+  //       title: "Messages (last 7 days)",
+  //       value: formatCount(support?.messagesLast7d),
+  //       icon: "/images/icon/clipboard.svg",
+  //     },
+  //     {
+  //       title: "Open Messages",
+  //       value: formatCount(support?.messagesOpen),
+  //       icon: "/images/svg/offline.svg",
+  //     },
+  //     {
+  //       title: "Schools Contacting (7d)",
+  //       value: formatCount(support?.distinctSchoolsLast7d),
+  //       icon: "/images/icon/total_schools.svg",
+  //     },
+  //   ],
+  //   [support],
+  // );
 
   const growthData = useMemo(() => toChartData(userGrowth), [userGrowth]);
 
@@ -393,10 +393,10 @@ const Page = () => {
         <p className="text-xs">Users &amp; billing</p>
         <StatCards stats={platformStats} isLoading={isLoading} />
       </div>
-      <div className="flex flex-col gap-1">
+      {/* <div className="flex flex-col gap-1">
         <p className="text-xs">Support</p>
         <StatCards stats={supportStats} isLoading={isLoading} />
-      </div>
+      </div> */}
 
       {/* Growth and subject distribution */}
       <div className="flex flex-col lg:flex-row gap-4">
