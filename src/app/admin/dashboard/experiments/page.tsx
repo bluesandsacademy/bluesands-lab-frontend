@@ -25,9 +25,9 @@ const MAX_AUTHOR_LOOKUPS = 25;
 const AdminExperimentsPage = () => {
   const filters = [
     "Learning Spaces",
-    "Experiments",
-    "Subject & Quizzes",
-    "Engagement",
+    // "Experiments",
+    // "Subject & Quizzes",
+    // "Engagement",
   ];
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const engagementFilters = ["All Time", "Last 30 Days"];
