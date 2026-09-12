@@ -395,7 +395,7 @@ export const adminSideNavLinks: SidebarLinks[] = [
     icon: "/images/icon/user-bold.svg",
   },
   {
-    title: "Experiment & Content",
+    title: "Experiment",
     url: "/admin/dashboard/experiments",
     icon: "/images/icon/beaker.svg",
   },
@@ -404,11 +404,11 @@ export const adminSideNavLinks: SidebarLinks[] = [
     url: "/admin/dashboard/payments",
     icon: "/images/icon/card_payment.svg",
   },
-  // {
-  //   title: "Report & Analytics",
-  //   url: "/admin/dashboard/report",
-  //   icon: "/images/icon/report.svg",
-  // },
+  {
+    title: "Report & Analytics",
+    url: "/admin/dashboard/report",
+    icon: "/images/icon/report.svg",
+  },
   // {
   //   title: "Leaderboard",
   //   url: "/admin/dashboard/leaderboard",
