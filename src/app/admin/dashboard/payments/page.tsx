@@ -294,7 +294,7 @@ const AdminPaymentsAndFinancePage = () => {
           />
 
           {/* Donut Chart */}
-          <div className="flex-1 bg-white p-4 rounded-lg shadow">
+          {/* <div className="flex-1 bg-white p-4 rounded-lg shadow">
             <h3 className="text-sm font-semibold mb-4">
               Subscription Breakdown (Individual vs School)
             </h3>
@@ -329,7 +329,7 @@ const AdminPaymentsAndFinancePage = () => {
                 </PieChart>
               </ResponsiveContainer>
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* <div className="flex flex-col w-full lg:w-[35%] gap-2 lg:gap-4"> */}

@@ -210,24 +210,29 @@ const Page = () => {
         icon: "/images/icon/beaker_01.svg",
       },
       {
-        title: "Total Experiment Attempts",
+        title: "Total Experiments Conducted",
         value: formatCount(totals?.totalExperimentAttempts),
         icon: "/images/icon/microscope.svg",
       },
-      {
-        title: "Total Quiz Attempts",
-        value: formatCount(totals?.totalQuizAttempts),
-        icon: "/images/icon/clipboard.svg",
-      },
-      {
-        title: "Total Quiz Scores",
-        value: formatDecimal(totals?.totalQuizScores),
-        icon: "/images/icon/studentgrad.svg",
-      },
+      // {
+      //   title: "Total Quiz Attempts",
+      //   value: formatCount(totals?.totalQuizAttempts),
+      //   icon: "/images/icon/clipboard.svg",
+      // },
+      // {
+      //   title: "Total Quiz Scores",
+      //   value: formatDecimal(totals?.totalQuizScores),
+      //   icon: "/images/icon/studentgrad.svg",
+      // },
       {
         title: "Total ILS Created",
         value: formatCount(totals?.totalIls),
         icon: "/images/icon/teacher/vr-headset-stemlabs.png",
+      },
+      {
+        title: "Total ILS Drafts",
+        value: formatDecimal( 0),
+        icon: "/images/icon/studentgrad.svg",
       },
     ],
     [totals],
@@ -245,18 +250,18 @@ const Page = () => {
         value: formatCount(totals?.activeUsers30d),
         icon: "/images/icon/user-bold.svg",
       },
+      // {
+      //   title: "Offline Users",
+      //   value: formatCount(totals?.offlineUsers),
+      //   icon: "/images/svg/offline.svg",
+      // },
       {
-        title: "Offline Users",
-        value: formatCount(totals?.offlineUsers),
-        icon: "/images/svg/offline.svg",
-      },
-      {
-        title: "Male Users",
+        title: "Male Students",
         value: formatCount(totals?.maleUsers),
         icon: "/images/svg/male.svg",
       },
       {
-        title: "Female Users",
+        title: "Female Students",
         value: formatCount(totals?.femaleUsers),
         icon: "/images/svg/female.svg",
       },
@@ -276,11 +281,11 @@ const Page = () => {
         value: formatCount(totals?.totalStudent),
         icon: "/images/icon/student_blue.svg",
       },
-      {
-        title: "Active Subscriptions",
-        value: formatCount(totals?.activeSubscriptions),
-        icon: "/images/svg/subscribed.svg",
-      },
+      // {
+      //   title: "Active Subscriptions",
+      //   value: formatCount(totals?.activeSubscriptions),
+      //   icon: "/images/svg/subscribed.svg",
+      // },
       {
         title: "Payments Recorded",
         value: formatCount(totals?.totalPayments),
