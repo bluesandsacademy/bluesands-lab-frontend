@@ -2,6 +2,7 @@
 import ExportReportsPanel from "@/components/Admin/Report/ExportReportsPanel";
 import MostEngagedSubjectsTable from "@/components/Admin/Report/MostEngagedSubjectsTable";
 import PopularExperimentsTable from "@/components/Admin/Report/PopularExperimentsTable";
+import ReportsAnalyticsTable from "@/components/Admin/Report/ReportsAnalyticsTable";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import {
   getGlobalDashboardInsights,
@@ -64,15 +65,15 @@ const AdminReportPage = () => {
   const stats: StatCardData[] = useMemo(
     () => [
       {
-        title: "Total Experiment Attempts",
+        title: "Total Experiments Conducted",
         value: formatCount(totals?.totalExperimentAttempts),
         icon: "/images/icon/report.svg",
       },
-      {
-        title: "Total Quiz Attempts",
-        value: formatCount(totals?.totalQuizAttempts),
-        icon: "/images/icon/teacher/monthly-avg.svg",
-      },
+      // {
+      //   title: "Total Quiz Attempts",
+      //   value: formatCount(totals?.totalQuizAttempts),
+      //   icon: "/images/icon/teacher/monthly-avg.svg",
+      // },
     ],
     [totals],
   );
@@ -192,7 +193,7 @@ const AdminReportPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-5">
         <PopularExperimentsTable
           experiments={topExperiments}
           isLoading={isLoading}
@@ -201,6 +202,10 @@ const AdminReportPage = () => {
           subjects={topSubjects}
           isLoading={isLoading}
         />
+      </div> */}
+
+      <div>
+        <ReportsAnalyticsTable analytics={[]}/>
       </div>
     </div>
   );
