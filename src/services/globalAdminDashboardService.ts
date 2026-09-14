@@ -293,6 +293,26 @@ export interface ResetPasswordResult {
   resetAtUtc: string;
 }
 
+export interface GlobalAnalyticsData {
+  id: number;
+  reportDate: string;
+  newStudentsCount: number;
+  monthlyActiveStudents: number;
+  completedExperimentsCount: number;
+  newTeachersReached: number;
+  virtualExperimentsConducted: number;
+  monthlyRetentionRate: string;
+  newK12SchoolsReached: number;
+  teacherFeedbackEffectiveness: string;
+  teacherFeedbackLessonPlanning: string;
+  teachersCreatingIlsCount: number;
+  ilsCreatedCount: number;
+  ilsInDraftCount: number;
+  studentPerformancePrior: string;
+  studentPerformanceFollowing: string;
+  createdAt: string;
+}
+
 // ─── Country normalizer ───────────────────────────────────────────────────────
 
 const COUNTRY_MAP: Record<string, string> = {
@@ -568,6 +588,13 @@ export async function exportGlobalReportCsv(
     responseType: "blob",
   });
   triggerDownload(res.data, `${body.type}-${body.period}.csv`);
+}
+
+export async function getGlobalAnalyticsTableData(
+  token?: string | null,
+): Promise<GlobalAnalyticsData[]> {
+  const res = await apiClient.get("/api/ReportsUpload", authConfig(token));
+  return res.data;
 }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────

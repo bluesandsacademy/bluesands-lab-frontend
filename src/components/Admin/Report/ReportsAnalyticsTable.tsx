@@ -1,8 +1,8 @@
 "use client";
-import type { LabelValue } from "@/services/globalAdminDashboardService";
+import type { GlobalAnalyticsData, LabelValue } from "@/services/globalAdminDashboardService";
 
 interface ReportsAnalyticsTableProps {
-  analytics: LabelValue[];
+  analytics: GlobalAnalyticsData[];
   isLoading?: boolean;
 }
 
@@ -10,10 +10,6 @@ const ReportsAnalyticsTable = ({
   analytics,
   isLoading,
 }: ReportsAnalyticsTableProps) => {
-  const totalAttempts = analytics.reduce(
-    (sum, row) => sum + (row.value ?? 0),
-    0,
-  );
 
   return (
     <div className="flex flex-col overflow-x-auto gap-2">
@@ -57,19 +53,23 @@ const ReportsAnalyticsTable = ({
             analytics.map((row) => (
               <tr
                 className="text-xs border-b border-b-gray-200"
-                key={row.label}
+                key={row.id}
               >
-                <td className="p-2">{row.label || "—"}</td>
-                <td className="p-2">
-                  {(row.value ?? 0).toLocaleString("en-NG")}
-                </td>
-                {/* <td className="p-2">
-                  <p className="text-bgBlue">
-                    {totalAttempts
-                      ? `${Math.round(((row.value ?? 0) / totalAttempts) * 100)}%`
-                      : "—"}
-                  </p>
-                </td> */}
+                <td className="p-2">{row.reportDate || "-"}</td>
+                <td className="p-2">{row.newStudentsCount || "-"}</td>
+                <td className="p-2">{row.monthlyActiveStudents || "-"}</td>
+                <td className="p-2">{row.completedExperimentsCount || "-"}</td>
+                <td className="p-2">{row.newTeachersReached || "-"}</td>
+                <td className="p-2">{row.virtualExperimentsConducted || "-"}</td>
+                <td className="p-2">{row.monthlyRetentionRate || "-"}</td>
+                <td className="p-2">{row.newK12SchoolsReached || "-"}</td>
+                <td className="p-2">{row.teacherFeedbackEffectiveness || "-"}</td>
+                <td className="p-2">{row.teacherFeedbackLessonPlanning || "-"}</td>
+                <td className="p-2">{row.teachersCreatingIlsCount || "-"}</td>
+                <td className="p-2">{row.ilsCreatedCount || "-"}</td>
+                <td className="p-2">{row.ilsInDraftCount || "-"}</td>
+                <td className="p-2">{row.studentPerformancePrior || "-"}</td>
+                <td className="p-2">{row.studentPerformanceFollowing || "-"}</td>
               </tr>
             ))
           )}

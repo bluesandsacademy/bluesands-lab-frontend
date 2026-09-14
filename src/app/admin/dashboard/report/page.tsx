@@ -5,8 +5,10 @@ import PopularExperimentsTable from "@/components/Admin/Report/PopularExperiment
 import ReportsAnalyticsTable from "@/components/Admin/Report/ReportsAnalyticsTable";
 import StatCards, { StatCardData } from "@/components/Dashboard/StatCards";
 import {
+  getGlobalAnalyticsTableData,
   getGlobalDashboardInsights,
   getGlobalDashboardTotals,
+  GlobalAnalyticsData,
   type GlobalDashboardInsights,
   type GlobalDashboardTotals,
 } from "@/services/globalAdminDashboardService";
@@ -26,6 +28,7 @@ const AdminReportPage = () => {
 
   const [totals, setTotals] = useState<GlobalDashboardTotals | null>(null);
   const [insights, setInsights] = useState<GlobalDashboardInsights | null>(null);
+  const [analytics, setAnalytics] = useState<GlobalAnalyticsData[] | []>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,15 +39,17 @@ const AdminReportPage = () => {
       setIsLoading(true);
       setError(null);
 
-      const [totalsRes, insightsRes] = await Promise.allSettled([
+      const [totalsRes, insightsRes, analyticsRes] = await Promise.allSettled([
         getGlobalDashboardTotals(authToken),
         getGlobalDashboardInsights(authToken),
+        getGlobalAnalyticsTableData(authToken)
       ]);
 
       if (totalsRes.status === "fulfilled") setTotals(totalsRes.value);
       if (insightsRes.status === "fulfilled") setInsights(insightsRes.value);
+      if (analyticsRes.status === "fulfilled") setAnalytics(analyticsRes.value)
 
-      const failed = [totalsRes, insightsRes].filter(
+      const failed = [totalsRes, insightsRes, analyticsRes].filter(
         (r) => r.status === "rejected",
       );
       if (failed.length) {
@@ -205,7 +210,7 @@ const AdminReportPage = () => {
       </div> */}
 
       <div>
-        <ReportsAnalyticsTable analytics={[]}/>
+        <ReportsAnalyticsTable analytics={analytics} isLoading={isLoading}/>
       </div>
     </div>
   );
