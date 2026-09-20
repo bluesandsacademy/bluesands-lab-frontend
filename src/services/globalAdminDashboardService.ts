@@ -31,6 +31,7 @@ export interface GlobalDashboardTotals {
   femaleUsers: number;
   offlineUsers: number;
   totalIls: number;
+  totalIlsDraft: number;
   generatedAtUtc: string;
 }
 

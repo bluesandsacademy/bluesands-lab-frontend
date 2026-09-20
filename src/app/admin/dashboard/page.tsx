@@ -231,7 +231,7 @@ const Page = () => {
       },
       {
         title: "Total ILS Drafts",
-        value: formatDecimal( 0),
+        value: formatDecimal(totals?.totalIlsDraft),
         icon: "/images/icon/studentgrad.svg",
       },
     ],
