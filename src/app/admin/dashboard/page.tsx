@@ -240,11 +240,11 @@ const Page = () => {
 
   const userOverviewStats: StatCardData[] = useMemo(
     () => [
-      {
-        title: "Subscribed Users",
-        value: formatCount(totals?.totalSubscribedUsers),
-        icon: "/images/svg/subscribed.svg",
-      },
+      // {
+      //   title: "Subscribed Users",
+      //   value: formatCount(totals?.totalSubscribedUsers),
+      //   icon: "/images/svg/subscribed.svg",
+      // },
       {
         title: "Active Users (30d)",
         value: formatCount(totals?.activeUsers30d),
