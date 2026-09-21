@@ -204,11 +204,11 @@ const Page = () => {
 
   const learningStats: StatCardData[] = useMemo(
     () => [
-      {
-        title: "Total Lab Practice Time",
-        value: formatMinutes(totals?.totalLabTimeMinutes),
-        icon: "/images/icon/beaker_01.svg",
-      },
+      // {
+      //   title: "Total Lab Practice Time",
+      //   value: formatMinutes(totals?.totalLabTimeMinutes),
+      //   icon: "/images/icon/beaker_01.svg",
+      // },
       {
         title: "Total Experiments Conducted",
         value: formatCount(totals?.totalExperimentAttempts),
