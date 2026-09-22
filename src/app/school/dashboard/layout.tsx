@@ -16,9 +16,9 @@ export default function DashboardLayout({
       <div className="bg-[#F5F6FA] w-full flex flex-col min-h-screen overflow-x-hidden md:ml-64">
         <TopNav onMenuClick={() => setSidebarOpen(true)} />
         <div className="flex-1 overflow-y-auto">
-          <PaymentGuard paymentRoute="/school/dashboard/payments">
+          {/* <PaymentGuard paymentRoute="/school/dashboard/payments"> */}
             {children}
-          </PaymentGuard>
+          {/* </PaymentGuard> */}
         </div>
       </div>
     </main>
