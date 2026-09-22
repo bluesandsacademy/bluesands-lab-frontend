@@ -246,7 +246,7 @@ const Page = () => {
       //   icon: "/images/svg/subscribed.svg",
       // },
       {
-        title: "Active Users (30d)",
+        title: "Active Users",
         value: formatCount(totals?.activeUsers30d),
         icon: "/images/icon/user-bold.svg",
       },
